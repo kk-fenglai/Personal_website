@@ -1,0 +1,408 @@
+@import "tailwindcss";
+
+/* 第一版：简洁浅色 · 中文正楷 · 等风来主题 */
+:root {
+  --font-kai: "KaiTi", "KaiTi_GB2312", "STKaiti", "Kaiti SC", "楷体", "SimSun", serif;
+  --bg: #fdf8f5;
+  --bg-sky: #eef2f7;
+  --bg-horizon: #f5f0e9;
+  --bg-card: #fffbf8;
+  --fg: #2c2419;
+  --muted: #7c7268;
+  --border: #ebe4dd;
+  --warm: #c4a77d;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-sky: var(--bg-sky);
+  --color-bg-card: var(--bg-card);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1914;
+    --bg-sky: #1a1e24;
+    --bg-horizon: #1e1b16;
+    --bg-card: #252119;
+    --fg: #f5f0e8;
+    --muted: #a89f94;
+    --border: #3d362d;
+    --warm: #d4b896;
+  }
+}
+
+/* 春：浅绿粉天空，清新 */
+[data-season="spring"] {
+  --bg: #f5f9f2;
+  --bg-sky: #e8f4e6;
+  --bg-horizon: #f0f5eb;
+  --bg-card: #fafff8;
+  --warm: #7cb87a;
+}
+@media (prefers-color-scheme: dark) {
+  [data-season="spring"] {
+    --bg: #1a2118;
+    --bg-sky: #1e2a1c;
+    --bg-horizon: #1f251d;
+    --bg-card: #242d22;
+    --warm: #8bc488;
+  }
+}
+
+/* 夏：明亮天蓝与暖地 */
+[data-season="summer"] {
+  --bg: #faf8f2;
+  --bg-sky: #dceef8;
+  --bg-horizon: #f2efe4;
+  --bg-card: #fffef9;
+  --warm: #e8a83c;
+}
+@media (prefers-color-scheme: dark) {
+  [data-season="summer"] {
+    --bg: #1a1e18;
+    --bg-sky: #1a2430;
+    --bg-horizon: #1e221b;
+    --bg-card: #252a20;
+    --warm: #e8b85c;
+  }
+}
+
+/* 秋：暖橙褐 */
+[data-season="autumn"] {
+  --bg: #faf6f0;
+  --bg-sky: #f0e8dc;
+  --bg-horizon: #f5ebe0;
+  --bg-card: #fff9f2;
+  --warm: #c4783a;
+}
+@media (prefers-color-scheme: dark) {
+  [data-season="autumn"] {
+    --bg: #1e1914;
+    --bg-sky: #251f18;
+    --bg-horizon: #221c16;
+    --bg-card: #2a231b;
+    --warm: #d4945a;
+  }
+}
+
+/* 冬：当前默认，冷色天空 */
+[data-season="winter"] {
+  /* 使用 :root 已有变量 */
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes soft-float {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(2%, -2%); }
+}
+
+@keyframes warm-glow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.7; }
+}
+
+/* 春：花瓣飘落 */
+@keyframes petal-fall {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0.9; }
+  100% { transform: translate(var(--petal-drift, 10px), 100vh) rotate(360deg); opacity: 0.6; }
+}
+.petal-fall {
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(45deg);
+  background: radial-gradient(circle at 30% 30%, #fff5f5, #f0c8d0 40%, #e8a8b8);
+  animation: petal-fall 18s linear 0s infinite;
+  will-change: transform;
+}
+
+/* 夏：下雨 */
+@keyframes rain-fall {
+  0% { transform: translateX(-50%) rotate(-8deg) translateY(0); }
+  100% { transform: translateX(-50%) rotate(-8deg) translateY(100vh); }
+}
+.rain-drop {
+  background: linear-gradient(to bottom, transparent, rgba(174, 214, 241, 0.85) 20%, rgba(174, 214, 241, 0.95) 50%, rgba(174, 214, 241, 0.7) 80%, transparent);
+  border-radius: 1px;
+  transform-origin: center top;
+  animation: rain-fall 1s linear infinite;
+  will-change: transform;
+}
+@media (prefers-color-scheme: dark) {
+  .rain-drop {
+    background: linear-gradient(to bottom, transparent, rgba(200, 228, 248, 0.5) 20%, rgba(200, 228, 248, 0.65) 50%, rgba(200, 228, 248, 0.4) 80%, transparent);
+  }
+}
+
+/* 秋：落叶 */
+@keyframes leaf-fall {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0.9; }
+  100% { transform: translate(var(--leaf-drift, 12px), 100vh) rotate(720deg); opacity: 0.5; }
+}
+.leaf-fall {
+  border-radius: 50% 0 50% 50%;
+  transform: rotate(-30deg);
+  background: linear-gradient(135deg, #c4783a 0%, #a65c2e 50%, #8b4513 100%);
+  animation: leaf-fall 20s linear 0s infinite;
+  will-change: transform;
+}
+
+/* 下雪 */
+@keyframes snow-fall {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(var(--snow-drift, 8px), 100vh) rotate(180deg);
+    opacity: 0.7;
+  }
+}
+
+html {
+  font-size: 17px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.65;
+  min-height: 100vh;
+}
+
+/* 等风来：天空到地平线的渐变背景 */
+.bg-waiting-wind {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    var(--bg-sky) 0%,
+    var(--bg-horizon) 40%,
+    var(--bg) 100%
+  );
+  background-size: 100% 100%;
+}
+@media (prefers-color-scheme: dark) {
+  .bg-waiting-wind {
+    background: linear-gradient(
+      180deg,
+      var(--bg-sky) 0%,
+      var(--bg-horizon) 35%,
+      var(--bg) 100%
+    );
+  }
+}
+
+/* 等风来：轻柔的风的流动（缓慢动画） */
+@keyframes wind-drift {
+  0%, 100% { opacity: 0.03; transform: translateX(-2%) scale(1); }
+  50% { opacity: 0.06; transform: translateX(2%) scale(1.02); }
+}
+
+/* 等风来：呼吸感 - 缓慢的一呼一吸 */
+@keyframes breath {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.85; }
+}
+
+/* 等风来：风痕流动 */
+@keyframes wind-flow {
+  0% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -400; }
+}
+.waiting-wind-atmosphere .wind-lines {
+  color: var(--muted);
+  opacity: 0.12;
+}
+.wind-line {
+  stroke-dasharray: 120 280;
+  animation: wind-flow 35s linear infinite;
+}
+.wind-line-2 { animation-delay: -12s; }
+.wind-line-3 { animation-delay: -24s; }
+@media (prefers-color-scheme: dark) {
+  .waiting-wind-atmosphere .wind-lines { opacity: 0.08; }
+}
+
+.bg-wind-flow {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(105deg, transparent 45%, rgba(196, 167, 125, 0.08) 50%, transparent 55%),
+    linear-gradient(95deg, transparent 40%, rgba(212, 184, 150, 0.05) 50%, transparent 60%);
+  background-size: 80% 60%, 70% 50%;
+  background-position: 0% 20%, 100% 60%;
+  background-repeat: no-repeat;
+  animation: wind-drift 25s ease-in-out infinite;
+}
+[data-season="spring"] .bg-wind-flow {
+  background-image:
+    linear-gradient(105deg, transparent 45%, rgba(124, 184, 122, 0.06) 50%, transparent 55%),
+    linear-gradient(95deg, transparent 40%, rgba(240, 200, 200, 0.05) 50%, transparent 60%);
+}
+[data-season="summer"] .bg-wind-flow {
+  background-image:
+    linear-gradient(105deg, transparent 45%, rgba(232, 168, 60, 0.06) 50%, transparent 55%),
+    linear-gradient(95deg, transparent 40%, rgba(200, 230, 255, 0.06) 50%, transparent 60%);
+}
+[data-season="autumn"] .bg-wind-flow {
+  background-image:
+    linear-gradient(105deg, transparent 45%, rgba(196, 120, 58, 0.06) 50%, transparent 55%),
+    linear-gradient(95deg, transparent 40%, rgba(212, 148, 90, 0.05) 50%, transparent 60%);
+}
+@media (prefers-color-scheme: dark) {
+  .bg-wind-flow {
+    background-image:
+      linear-gradient(105deg, transparent 45%, rgba(212, 184, 150, 0.04) 50%, transparent 55%),
+      linear-gradient(95deg, transparent 40%, rgba(169, 139, 125, 0.03) 50%, transparent 60%);
+    animation-duration: 30s;
+  }
+}
+
+.font-sans {
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* 中文使用正楷（楷体） */
+[data-locale="zh"] body,
+[data-locale="zh"] .font-sans {
+  font-family: var(--font-kai);
+}
+
+p, .reading {
+  line-height: 1.7;
+}
+
+/* 温馨卡片 */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 1px 4px rgba(44, 36, 25, 0.04), 0 2px 8px rgba(196, 167, 125, 0.06);
+  transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
+}
+.card:hover {
+  box-shadow: 0 6px 20px rgba(44, 36, 25, 0.08), 0 4px 12px rgba(196, 167, 125, 0.1);
+  border-color: color-mix(in srgb, var(--warm) 35%, var(--border));
+  transform: translateY(-1px);
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.section-label {
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+/* 动态入场 */
+.animate-in {
+  animation: fade-in-up 0.55s ease-out forwards;
+}
+.animate-in-1 { animation-delay: 0.08s; opacity: 0; }
+.animate-in-2 { animation-delay: 0.16s; opacity: 0; }
+.animate-in-3 { animation-delay: 0.24s; opacity: 0; }
+.animate-in-4 { animation-delay: 0.32s; opacity: 0; }
+.animate-in-5 { animation-delay: 0.4s; opacity: 0; }
+.animate-in-6 { animation-delay: 0.48s; opacity: 0; }
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out forwards;
+}
+
+/* 背景光晕 + 呼吸感（随季节变色） */
+.bg-warm-glow {
+  position: fixed;
+  width: 60vmin;
+  height: 60vmin;
+  top: -10%;
+  right: -15%;
+  background: radial-gradient(circle, rgba(196, 167, 125, 0.12) 0%, transparent 65%);
+  pointer-events: none;
+  z-index: 0;
+  animation: soft-float 18s ease-in-out infinite, breath 12s ease-in-out infinite;
+}
+[data-season="spring"] .bg-warm-glow {
+  background: radial-gradient(circle, rgba(124, 184, 122, 0.1) 0%, transparent 65%);
+}
+[data-season="summer"] .bg-warm-glow {
+  background: radial-gradient(circle, rgba(232, 168, 60, 0.1) 0%, transparent 65%);
+}
+[data-season="autumn"] .bg-warm-glow {
+  background: radial-gradient(circle, rgba(196, 120, 58, 0.1) 0%, transparent 65%);
+}
+@media (prefers-color-scheme: dark) {
+  .bg-warm-glow {
+    background: radial-gradient(circle, rgba(212, 184, 150, 0.08) 0%, transparent 65%);
+    animation: soft-float 22s ease-in-out infinite, breath 14s ease-in-out infinite;
+  }
+  [data-season="spring"] .bg-warm-glow { background: radial-gradient(circle, rgba(139, 196, 136, 0.06) 0%, transparent 65%); }
+  [data-season="summer"] .bg-warm-glow { background: radial-gradient(circle, rgba(232, 184, 92, 0.06) 0%, transparent 65%); }
+  [data-season="autumn"] .bg-warm-glow { background: radial-gradient(circle, rgba(212, 148, 90, 0.06) 0%, transparent 65%); }
+}
+
+/* 雪花样式与动画：六角雪花，与背景区分明显 */
+.snowflake {
+  position: absolute;
+  left: var(--snow-left, 50%);
+  top: -30px;
+  width: var(--snow-size, 20px);
+  height: var(--snow-size, 20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 浅色背景：冰蓝白 + 淡灰描边感，与暖色背景区分 */
+  color: #a8d0e8;
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.95)) drop-shadow(0 1px 2px rgba(0, 50, 90, 0.35));
+  animation: snow-fall var(--snow-duration, 16s) linear var(--snow-delay, 0s) infinite;
+  will-change: transform;
+  opacity: 0.95;
+}
+.snowflake-svg {
+  width: 100%;
+  height: 100%;
+  color: inherit;
+}
+@media (prefers-color-scheme: dark) {
+  .snowflake {
+    color: #c8e0f5;
+    filter: drop-shadow(0 0 2px rgba(220, 238, 255, 0.6)) drop-shadow(0 1px 3px rgba(0, 60, 100, 0.3));
+  }
+}
+
+/* 右下角雪人：深色模式下帽子/眼睛/纽扣变浅 */
+.snowman-wrap {
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.08));
+}
+@media (prefers-color-scheme: dark) {
+  .snowman-wrap .snowman-hat,
+  .snowman-wrap .snowman-eye,
+  .snowman-wrap .snowman-btn {
+    fill: #e8e4dc;
+  }
+  .snowman-wrap .snowman-body {
+    fill: #f0eef8;
+  }
+}
