@@ -37,7 +37,7 @@ export function LanguageSwitcher() {
           role="listbox"
           className="absolute right-0 top-full mt-2 min-w-[7rem] py-1 rounded-lg border border-border bg-bg-card shadow-lg z-50"
         >
-          {(["zh", "en"] as const).map((loc) => (
+          {(["zh", "en", "fr"] as const).map((loc) => (
             <li key={loc} role="option" aria-selected={locale === loc}>
               <button
                 type="button"

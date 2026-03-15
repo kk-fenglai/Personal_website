@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useSeason } from "@/contexts/SeasonContext";
-import { type Season, seasonLabels } from "@/contexts/SeasonContext";
+import { type Season } from "@/contexts/SeasonContext";
 import { useLocale } from "@/contexts/LocaleContext";
 
 const SEASONS: Season[] = ["spring", "summer", "autumn", "winter"];
@@ -50,7 +50,7 @@ export function SeasonSwitcher() {
                   season === s ? "text-fg font-medium" : "text-muted hover:text-fg"
                 }`}
               >
-                {seasonLabels[s]}
+                {t(`season.${s}`)}
               </button>
             </li>
           ))}

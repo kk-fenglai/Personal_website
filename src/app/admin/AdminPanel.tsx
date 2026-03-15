@@ -3,10 +3,12 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useLocale } from "@/contexts/LocaleContext";
+import { BoldableContentField } from "@/components/BoldableContentField";
 
 type Thought = {
   id: string;
   title: string;
+  content: string;
   isPublic: boolean;
   createdAt: string;
 };
@@ -25,6 +27,7 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"thoughts" | "photos" | "new-thought" | "upload" | "access">("thoughts");
+  const [editingThought, setEditingThought] = useState<Thought | null>(null);
 
   const load = () => {
     Promise.all([
@@ -85,6 +88,9 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
           thoughts={thoughts}
           loading={loading}
           onToggle={load}
+          onEdit={setEditingThought}
+          editingThought={editingThought}
+          onCancelEdit={() => setEditingThought(null)}
         />
       )}
       {activeTab === "new-thought" && (
@@ -224,10 +230,16 @@ function ThoughtListAdmin({
   thoughts,
   loading,
   onToggle,
+  onEdit,
+  editingThought,
+  onCancelEdit,
 }: {
   thoughts: Thought[];
   loading: boolean;
   onToggle: () => void;
+  onEdit: (thought: Thought) => void;
+  editingThought: Thought | null;
+  onCancelEdit: () => void;
 }) {
   const { t, dateLocale } = useLocale();
 
@@ -241,9 +253,22 @@ function ThoughtListAdmin({
   };
 
   if (loading) return <div className="text-muted">{t("admin.loading")}</div>;
-  if (thoughts.length === 0) {
+  if (thoughts.length === 0 && !editingThought) {
     return (
       <p className="text-muted">{t("admin.thoughtsEmpty")}</p>
+    );
+  }
+
+  if (editingThought) {
+    return (
+      <EditThoughtForm
+        thought={editingThought}
+        onSuccess={() => {
+          onCancelEdit();
+          onToggle();
+        }}
+        onCancel={onCancelEdit}
+      />
     );
   }
 
@@ -252,9 +277,9 @@ function ThoughtListAdmin({
       {thoughts.map((item) => (
         <li
           key={item.id}
-          className="flex items-center justify-between p-4 border border-border"
+          className="flex flex-wrap items-center justify-between gap-2 p-4 border border-border rounded-xl bg-bg-card"
         >
-          <div>
+          <div className="min-w-0 flex-1">
             <Link href={`/thoughts/${item.id}`} className="font-medium text-fg hover:opacity-70">
               {item.title}
             </Link>
@@ -262,20 +287,132 @@ function ThoughtListAdmin({
               {new Date(item.createdAt).toLocaleDateString(dateLocale)}
             </span>
           </div>
-          <button
-            type="button"
-            onClick={() => toggle(item.id, item.isPublic)}
-            className={`text-sm px-3 py-1.5 rounded-full ${
-              item.isPublic
-                ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                : "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
-            }`}
-          >
-            {item.isPublic ? t("admin.visibilityPublic") : t("admin.visibilityPrivate")}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => onEdit(item)}
+              className="text-sm px-3 py-1.5 rounded-lg border border-border text-fg hover:bg-bg"
+            >
+              {t("admin.editThought")}
+            </button>
+            <button
+              type="button"
+              onClick={() => toggle(item.id, item.isPublic)}
+              className={`text-sm px-3 py-1.5 rounded-full ${
+                item.isPublic
+                  ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                  : "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
+              }`}
+            >
+              {item.isPublic ? t("admin.visibilityPublic") : t("admin.visibilityPrivate")}
+            </button>
+          </div>
         </li>
       ))}
     </ul>
+  );
+}
+
+function EditThoughtForm({
+  thought,
+  onSuccess,
+  onCancel,
+}: {
+  thought: Thought;
+  onSuccess: () => void;
+  onCancel: () => void;
+}) {
+  const { t } = useLocale();
+  const [title, setTitle] = useState(thought.title);
+  const [content, setContent] = useState(thought.content);
+  const [isPublic, setIsPublic] = useState(thought.isPublic);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/thoughts/${thought.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, content, isPublic }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || t("common.errorNetwork"));
+        return;
+      }
+      onSuccess();
+    } catch {
+      setError(t("common.errorNetwork"));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-4 max-w-xl">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold text-fg">{t("admin.editThought")}：{thought.title}</h2>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="text-sm text-muted hover:text-fg"
+        >
+          {t("admin.cancel")}
+        </button>
+      </div>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {error && <p className="text-base text-red-600 dark:text-red-400">{error}</p>}
+        <div>
+          <label className="block section-label mb-2">{t("admin.formTitle")}</label>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full border-b border-border bg-transparent px-0 py-2 text-base text-fg focus:outline-none focus:border-fg"
+            required
+          />
+        </div>
+        <div>
+          <label className="block section-label mb-2">{t("admin.formContent")}</label>
+          <BoldableContentField
+            value={content}
+            onChange={setContent}
+            placeholder={t("admin.contentPlaceholder")}
+            required
+            rows={14}
+            className="w-full min-h-[320px] border border-border rounded-xl bg-bg-card px-4 py-4 text-base text-fg leading-relaxed placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-warm/40 focus:border-warm resize-y"
+          />
+        </div>
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={isPublic}
+            onChange={(e) => setIsPublic(e.target.checked)}
+          />
+          <span className="text-base text-fg">{t("admin.formPublicLabel")}</span>
+        </label>
+        <div className="flex gap-3">
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-5 py-2.5 rounded-xl text-base font-medium bg-fg text-bg hover:opacity-90 disabled:opacity-50"
+          >
+            {loading ? t("admin.updating") : t("admin.saveChanges")}
+          </button>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-5 py-2.5 rounded-xl text-base border border-border text-muted hover:text-fg"
+          >
+            {t("admin.cancel")}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }
 
@@ -327,12 +464,13 @@ function NewThoughtForm({ onSuccess }: { onSuccess: () => void }) {
       </div>
       <div>
         <label className="block section-label mb-2">{t("admin.formContent")}</label>
-        <textarea
+        <BoldableContentField
           value={content}
-          onChange={(e) => setContent(e.target.value)}
-          rows={6}
-          className="w-full border border-border bg-transparent px-3 py-2 text-base text-fg resize-none focus:outline-none focus:border-fg"
+          onChange={setContent}
+          placeholder={t("admin.contentPlaceholder")}
           required
+          rows={14}
+          className="w-full min-h-[320px] border border-border rounded-xl bg-bg-card px-4 py-4 text-base text-fg leading-relaxed placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-warm/40 focus:border-warm resize-y"
         />
       </div>
       <label className="flex items-center gap-2 cursor-pointer">
@@ -342,7 +480,7 @@ function NewThoughtForm({ onSuccess }: { onSuccess: () => void }) {
           onChange={(e) => setIsPublic(e.target.checked)}
         />
         <span className="text-base text-fg">{t("admin.formPublicLabel")}</span>
-      </label>
+        </label>
       <button
         type="submit"
         disabled={loading}
@@ -364,8 +502,11 @@ function PhotoListAdmin({
   onToggle: () => void;
 }) {
   const { t } = useLocale();
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editCaption, setEditCaption] = useState("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const toggle = async (id: string, isPublic: boolean) => {
+  const toggleVisibility = async (id: string, isPublic: boolean) => {
     await fetch(`/api/photos/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -374,19 +515,52 @@ function PhotoListAdmin({
     onToggle();
   };
 
-  if (loading) return <div className="text-muted">{t("admin.loading")}</div>;
+  const startEdit = (p: Photo) => {
+    setEditingId(p.id);
+    setEditCaption(p.caption ?? "");
+  };
+
+  const saveCaption = async (id: string) => {
+    await fetch(`/api/photos/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ caption: editCaption || null }),
+    });
+    setEditingId(null);
+    onToggle();
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditCaption("");
+  };
+
+  const deletePhoto = async (id: string) => {
+    await fetch(`/api/photos/${id}`, { method: "DELETE" });
+    setDeletingId(null);
+    onToggle();
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center gap-3 text-muted">
+        <div className="w-6 h-6 border-2 border-current border-t-transparent rounded-full animate-spin" />
+        {t("admin.loading")}
+      </div>
+    );
+  }
   if (photos.length === 0) {
     return (
-      <p className="text-muted">{t("admin.photosEmpty")}</p>
+      <p className="text-muted py-6">{t("admin.photosEmpty")}</p>
     );
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
       {photos.map((p) => (
         <div
           key={p.id}
-          className="border border-border overflow-hidden"
+          className="rounded-xl border border-border bg-bg-card overflow-hidden shadow-sm hover:shadow-md transition-shadow"
         >
           <div className="aspect-square relative bg-border">
             <img
@@ -394,22 +568,102 @@ function PhotoListAdmin({
               alt={p.caption || ""}
               className="w-full h-full object-cover"
             />
+            <div className="absolute top-2 right-2 flex gap-2">
+              <span
+                className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                  p.isPublic
+                    ? "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300"
+                    : "bg-gray-200 text-gray-600 dark:bg-gray-600 dark:text-gray-300"
+                }`}
+              >
+                {p.isPublic ? t("admin.visibilityPublic") : t("admin.visibilityPrivate")}
+              </span>
+            </div>
           </div>
-          <div className="p-2 flex items-center justify-between gap-2">
-            <span className="text-sm text-muted truncate flex-1">
-              {p.caption || t("admin.noCaption")}
-            </span>
-            <button
-              type="button"
-              onClick={() => toggle(p.id, p.isPublic)}
-              className={`text-sm px-2 py-1 rounded shrink-0 ${
-                p.isPublic
-                  ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                  : "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
-              }`}
-            >
-              {p.isPublic ? t("admin.visibilityPublic") : t("admin.visibilityPrivate")}
-            </button>
+          <div className="p-4 space-y-3">
+            {editingId === p.id ? (
+              <div className="space-y-2">
+                <input
+                  type="text"
+                  value={editCaption}
+                  onChange={(e) => setEditCaption(e.target.value)}
+                  placeholder={t("admin.captionPlaceholder")}
+                  className="w-full border border-border rounded-lg px-3 py-2 text-base bg-bg text-fg focus:outline-none focus:ring-2 focus:ring-warm/50"
+                  autoFocus
+                />
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => saveCaption(p.id)}
+                    className="px-3 py-1.5 rounded-lg text-sm font-medium bg-warm text-white hover:opacity-90"
+                  >
+                    {t("admin.saveCaption")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={cancelEdit}
+                    className="px-3 py-1.5 rounded-lg text-sm border border-border text-muted hover:text-fg"
+                  >
+                    {t("admin.cancel")}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-fg min-h-[1.5rem]">
+                {p.caption || (
+                  <span className="text-muted">{t("admin.noCaption")}</span>
+                )}
+              </p>
+            )}
+            {editingId !== p.id && (
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => startEdit(p)}
+                  className="text-sm text-warm hover:underline"
+                >
+                  {t("admin.editCaption")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => toggleVisibility(p.id, p.isPublic)}
+                  className={`text-sm px-2.5 py-1 rounded-lg ${
+                    p.isPublic
+                      ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                      : "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
+                  }`}
+                >
+                  {p.isPublic ? t("admin.visibilityPublic") : t("admin.visibilityPrivate")}
+                </button>
+                {deletingId === p.id ? (
+                  <span className="flex items-center gap-2 text-sm">
+                    <span className="text-muted">{t("admin.deletePhotoConfirm")}</span>
+                    <button
+                      type="button"
+                      onClick={() => deletePhoto(p.id)}
+                      className="text-red-600 dark:text-red-400 font-medium"
+                    >
+                      {t("admin.deletePhoto")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDeletingId(null)}
+                      className="text-muted"
+                    >
+                      {t("admin.cancel")}
+                    </button>
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setDeletingId(p.id)}
+                    className="text-sm text-red-600 dark:text-red-400 hover:underline"
+                  >
+                    {t("admin.deletePhoto")}
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       ))}
@@ -420,10 +674,22 @@ function PhotoListAdmin({
 function UploadPhotoForm({ onSuccess }: { onSuccess: () => void }) {
   const { t } = useLocale();
   const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
   const [caption, setCaption] = useState("");
   const [isPublic, setIsPublic] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [dragActive, setDragActive] = useState(false);
+  const accept = "image/jpeg,image/png,image/gif,image/webp";
+
+  const onFile = (f: File | null) => {
+    if (preview) URL.revokeObjectURL(preview);
+    setPreview(null);
+    setFile(f);
+    if (f && f.type.startsWith("image/")) {
+      setPreview(URL.createObjectURL(f));
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -447,7 +713,7 @@ function UploadPhotoForm({ onSuccess }: { onSuccess: () => void }) {
         setError(data.error || t("common.errorNetwork"));
         return;
       }
-      setFile(null);
+      onFile(null);
       setCaption("");
       onSuccess();
     } catch {
@@ -457,26 +723,83 @@ function UploadPhotoForm({ onSuccess }: { onSuccess: () => void }) {
     }
   };
 
+  const onDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(true);
+  };
+  const onDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+  };
+  const onDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    const f = e.dataTransfer.files?.[0];
+    if (f && f.type.startsWith("image/")) onFile(f);
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
-      {error && <p className="text-base text-red-600 dark:text-red-400">{error}</p>}
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-lg">
+      {error && (
+        <p className="text-base text-red-600 dark:text-red-400">{error}</p>
+      )}
       <div>
-        <label className="block text-sm font-medium text-fg mb-1">{t("admin.selectImage")}</label>
         <input
           type="file"
-          accept="image/jpeg,image/png,image/gif,image/webp"
-          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-          className="w-full text-base text-fg file:mr-4 file:py-2 file:px-4 file:border file:border-border file:bg-transparent file:text-fg"
+          accept={accept}
+          onChange={(e) => onFile(e.target.files?.[0] ?? null)}
+          className="sr-only"
+          id="photo-upload"
         />
+        <label
+          htmlFor="photo-upload"
+          onDragOver={onDragOver}
+          onDragLeave={onDragLeave}
+          onDrop={onDrop}
+          className={`block rounded-xl border-2 border-dashed p-8 text-center cursor-pointer transition-colors ${
+            dragActive
+              ? "border-warm bg-warm/10"
+              : "border-border hover:border-warm/50 hover:bg-bg-card"
+          }`}
+        >
+          <p className="text-fg font-medium mb-1">{t("admin.dragDropHint")}</p>
+          <p className="text-sm text-muted">{t("admin.selectImage")}</p>
+        </label>
       </div>
+      {preview && (
+        <div className="rounded-xl overflow-hidden border border-border bg-bg-card">
+          <div className="aspect-video relative bg-border">
+            <img
+              src={preview}
+              alt=""
+              className="w-full h-full object-contain"
+            />
+          </div>
+          <div className="p-3 flex items-center justify-between gap-2">
+            <span className="text-sm text-muted truncate">{file?.name}</span>
+            <button
+              type="button"
+              onClick={() => onFile(null)}
+              className="text-sm text-muted hover:text-fg shrink-0"
+            >
+              {t("admin.cancel")}
+            </button>
+          </div>
+        </div>
+      )}
       <div>
-        <label className="block text-xs font-medium text-fg mb-1">{t("admin.captionOptional")}</label>
+        <label className="block text-sm font-medium text-fg mb-1">
+          {t("admin.captionOptional")}
+        </label>
         <input
           type="text"
           value={caption}
           onChange={(e) => setCaption(e.target.value)}
           placeholder={t("admin.captionPlaceholder")}
-          className="w-full border-b border-border bg-transparent px-0 py-2 text-base text-fg placeholder:text-muted focus:outline-none focus:border-fg"
+          className="w-full border border-border rounded-lg px-3 py-2 text-base bg-bg text-fg placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-warm/50"
         />
       </div>
       <label className="flex items-center gap-2 cursor-pointer">
@@ -489,8 +812,8 @@ function UploadPhotoForm({ onSuccess }: { onSuccess: () => void }) {
       </label>
       <button
         type="submit"
-        disabled={loading}
-        className="text-fg text-base font-medium border-b border-fg pb-0.5 hover:opacity-70 disabled:opacity-50"
+        disabled={loading || !file}
+        className="px-5 py-2.5 rounded-xl text-base font-medium bg-warm text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {loading ? t("admin.uploading") : t("admin.upload")}
       </button>

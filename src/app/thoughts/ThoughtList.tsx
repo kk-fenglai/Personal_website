@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useLocale } from "@/contexts/LocaleContext";
+import { FormattedContent } from "@/components/FormattedContent";
 
 type Thought = {
   id: string;
@@ -59,7 +60,7 @@ export function ThoughtList() {
               </span>
             </div>
             <p className="mt-2 text-muted text-base line-clamp-2 reading">
-              {item.content}
+              <FormattedContent content={item.content} />
             </p>
           </Link>
         </li>

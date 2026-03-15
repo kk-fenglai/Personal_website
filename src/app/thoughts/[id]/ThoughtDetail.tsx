@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useLocale } from "@/contexts/LocaleContext";
+import { FormattedContent } from "@/components/FormattedContent";
 
 type Comment = {
   id: string;
@@ -103,9 +104,11 @@ export function ThoughtDetail({ thoughtId }: { thoughtId: string }) {
       </header>
 
       <div>
-        <p className="text-fg reading whitespace-pre-wrap">
-          {thought.content}
-        </p>
+        <FormattedContent
+          content={thought.content}
+          as="p"
+          className="text-fg reading whitespace-pre-wrap"
+        />
       </div>
 
       <section className="card p-5 sm:p-6">
