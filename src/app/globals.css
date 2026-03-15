@@ -3,14 +3,14 @@
 /* 第一版：简洁浅色 · 中文正楷 · 等风来主题 */
 :root {
   --font-kai: "KaiTi", "KaiTi_GB2312", "STKaiti", "Kaiti SC", "楷体", "SimSun", serif;
-  --bg: #fdf8f5;
-  --bg-sky: #eef2f7;
-  --bg-horizon: #f5f0e9;
-  --bg-card: #fffbf8;
-  --fg: #2c2419;
-  --muted: #7c7268;
-  --border: #ebe4dd;
-  --warm: #c4a77d;
+  --bg: #f0f2f5;
+  --bg-sky: #e2e6ee;
+  --bg-horizon: #e8ecf2;
+  --bg-card: #f8f9fc;
+  --fg: #1e2433;
+  --muted: #5c6478;
+  --border: #d8dce6;
+  --warm: #6b7fb5;
 }
 
 @theme inline {
@@ -24,50 +24,50 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #1c1914;
-    --bg-sky: #1a1e24;
-    --bg-horizon: #1e1b16;
-    --bg-card: #252119;
-    --fg: #f5f0e8;
-    --muted: #a89f94;
-    --border: #3d362d;
-    --warm: #d4b896;
+    --bg: #161a22;
+    --bg-sky: #1a1f2e;
+    --bg-horizon: #1c212d;
+    --bg-card: #1e2433;
+    --fg: #e8ecf4;
+    --muted: #8c96a8;
+    --border: #2d3548;
+    --warm: #8b9dc8;
   }
 }
 
-/* 春：浅绿粉天空，清新 */
+/* 春：暖白与淡樱粉 */
 [data-season="spring"] {
-  --bg: #f5f9f2;
-  --bg-sky: #e8f4e6;
-  --bg-horizon: #f0f5eb;
-  --bg-card: #fafff8;
-  --warm: #7cb87a;
+  --bg: #fdf8f8;
+  --bg-sky: #f8f0f4;
+  --bg-horizon: #faf5f6;
+  --bg-card: #fffbfc;
+  --warm: #c49aa6;
 }
 @media (prefers-color-scheme: dark) {
   [data-season="spring"] {
-    --bg: #1a2118;
-    --bg-sky: #1e2a1c;
-    --bg-horizon: #1f251d;
-    --bg-card: #242d22;
-    --warm: #8bc488;
+    --bg: #1f1a1c;
+    --bg-sky: #252022;
+    --bg-horizon: #231e20;
+    --bg-card: #2a2426;
+    --warm: #d4a8b4;
   }
 }
 
-/* 夏：明亮天蓝与暖地 */
+/* 夏：清爽天蓝与米白 */
 [data-season="summer"] {
-  --bg: #faf8f2;
-  --bg-sky: #dceef8;
-  --bg-horizon: #f2efe4;
-  --bg-card: #fffef9;
-  --warm: #e8a83c;
+  --bg: #f6f9fc;
+  --bg-sky: #e4eef6;
+  --bg-horizon: #eef2f6;
+  --bg-card: #fafcfe;
+  --warm: #6b9bb8;
 }
 @media (prefers-color-scheme: dark) {
   [data-season="summer"] {
-    --bg: #1a1e18;
-    --bg-sky: #1a2430;
-    --bg-horizon: #1e221b;
-    --bg-card: #252a20;
-    --warm: #e8b85c;
+    --bg: #181d24;
+    --bg-sky: #1c2430;
+    --bg-horizon: #1a212c;
+    --bg-card: #1e2632;
+    --warm: #7aa8c4;
   }
 }
 
@@ -258,13 +258,13 @@ body {
 }
 [data-season="spring"] .bg-wind-flow {
   background-image:
-    linear-gradient(105deg, transparent 45%, rgba(124, 184, 122, 0.06) 50%, transparent 55%),
-    linear-gradient(95deg, transparent 40%, rgba(240, 200, 200, 0.05) 50%, transparent 60%);
+    linear-gradient(105deg, transparent 45%, rgba(196, 154, 166, 0.06) 50%, transparent 55%),
+    linear-gradient(95deg, transparent 40%, rgba(244, 220, 228, 0.05) 50%, transparent 60%);
 }
 [data-season="summer"] .bg-wind-flow {
   background-image:
-    linear-gradient(105deg, transparent 45%, rgba(232, 168, 60, 0.06) 50%, transparent 55%),
-    linear-gradient(95deg, transparent 40%, rgba(200, 230, 255, 0.06) 50%, transparent 60%);
+    linear-gradient(105deg, transparent 45%, rgba(107, 155, 184, 0.06) 50%, transparent 55%),
+    linear-gradient(95deg, transparent 40%, rgba(200, 220, 240, 0.05) 50%, transparent 60%);
 }
 [data-season="autumn"] .bg-wind-flow {
   background-image:
@@ -345,10 +345,10 @@ p, .reading {
   animation: soft-float 18s ease-in-out infinite, breath 12s ease-in-out infinite;
 }
 [data-season="spring"] .bg-warm-glow {
-  background: radial-gradient(circle, rgba(124, 184, 122, 0.1) 0%, transparent 65%);
+  background: radial-gradient(circle, rgba(196, 154, 166, 0.1) 0%, transparent 65%);
 }
 [data-season="summer"] .bg-warm-glow {
-  background: radial-gradient(circle, rgba(232, 168, 60, 0.1) 0%, transparent 65%);
+  background: radial-gradient(circle, rgba(107, 155, 184, 0.1) 0%, transparent 65%);
 }
 [data-season="autumn"] .bg-warm-glow {
   background: radial-gradient(circle, rgba(196, 120, 58, 0.1) 0%, transparent 65%);
@@ -358,8 +358,8 @@ p, .reading {
     background: radial-gradient(circle, rgba(212, 184, 150, 0.08) 0%, transparent 65%);
     animation: soft-float 22s ease-in-out infinite, breath 14s ease-in-out infinite;
   }
-  [data-season="spring"] .bg-warm-glow { background: radial-gradient(circle, rgba(139, 196, 136, 0.06) 0%, transparent 65%); }
-  [data-season="summer"] .bg-warm-glow { background: radial-gradient(circle, rgba(232, 184, 92, 0.06) 0%, transparent 65%); }
+  [data-season="spring"] .bg-warm-glow { background: radial-gradient(circle, rgba(212, 168, 180, 0.06) 0%, transparent 65%); }
+  [data-season="summer"] .bg-warm-glow { background: radial-gradient(circle, rgba(122, 168, 196, 0.06) 0%, transparent 65%); }
   [data-season="autumn"] .bg-warm-glow { background: radial-gradient(circle, rgba(212, 148, 90, 0.06) 0%, transparent 65%); }
 }
 
