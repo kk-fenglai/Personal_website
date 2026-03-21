@@ -992,6 +992,7 @@ export type PhotoCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * The data used to create many Photos.
    */
   data: Prisma.PhotoCreateManyInput | Prisma.PhotoCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1010,6 +1011,7 @@ export type PhotoCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extension
    * The data used to create many Photos.
    */
   data: Prisma.PhotoCreateManyInput | Prisma.PhotoCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**

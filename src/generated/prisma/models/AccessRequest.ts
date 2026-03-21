@@ -1044,6 +1044,7 @@ export type AccessRequestCreateManyArgs<ExtArgs extends runtime.Types.Extensions
    * The data used to create many AccessRequests.
    */
   data: Prisma.AccessRequestCreateManyInput | Prisma.AccessRequestCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1062,6 +1063,7 @@ export type AccessRequestCreateManyAndReturnArgs<ExtArgs extends runtime.Types.E
    * The data used to create many AccessRequests.
    */
   data: Prisma.AccessRequestCreateManyInput | Prisma.AccessRequestCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**

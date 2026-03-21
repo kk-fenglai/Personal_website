@@ -12,8 +12,21 @@ type Props = {
   rows?: number;
 };
 
+/** 从剪贴板取纯文本（粘贴自网页/Word 时去掉 HTML） */
+function getPlainTextFromClipboard(e: React.ClipboardEvent): string {
+  const data = e.clipboardData;
+  const html = data.getData("text/html");
+  if (html) {
+    const div = document.createElement("div");
+    div.innerHTML = html;
+    return div.textContent ?? div.innerText ?? "";
+  }
+  return data.getData("text/plain");
+}
+
 /**
- * 内容输入框 + 选中后点击「加粗」按钮，将选中文字用 ** 包裹。
+ * 内容输入框 + 选中后点击「加粗」按钮，将选中文字用 ** 包裹；
+ * 支持复制粘贴，粘贴时自动转为纯文本。
  */
 export function BoldableContentField({
   value,
@@ -25,6 +38,28 @@ export function BoldableContentField({
 }: Props) {
   const { t } = useLocale();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handlePaste = useCallback(
+    (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+      const ta = textareaRef.current;
+      if (!ta) return;
+      const pasted = getPlainTextFromClipboard(e);
+      if (!pasted) return;
+      e.preventDefault();
+      const start = ta.selectionStart;
+      const end = ta.selectionEnd;
+      const before = value.slice(0, start);
+      const after = value.slice(end);
+      const next = before + pasted + after;
+      onChange(next);
+      setTimeout(() => {
+        const newPos = start + pasted.length;
+        ta.setSelectionRange(newPos, newPos);
+        ta.focus();
+      }, 0);
+    },
+    [value, onChange]
+  );
 
   const handleBold = useCallback(() => {
     const ta = textareaRef.current;
@@ -64,6 +99,7 @@ export function BoldableContentField({
         ref={textareaRef}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        onPaste={handlePaste}
         rows={rows}
         placeholder={placeholder}
         className={className}

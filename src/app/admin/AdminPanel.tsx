@@ -673,53 +673,73 @@ function PhotoListAdmin({
 
 function UploadPhotoForm({ onSuccess }: { onSuccess: () => void }) {
   const { t } = useLocale();
-  const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
   const [caption, setCaption] = useState("");
   const [isPublic, setIsPublic] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<{ current: number; total: number } | null>(null);
   const [error, setError] = useState("");
   const [dragActive, setDragActive] = useState(false);
   const accept = "image/jpeg,image/png,image/gif,image/webp";
 
-  const onFile = (f: File | null) => {
-    if (preview) URL.revokeObjectURL(preview);
-    setPreview(null);
-    setFile(f);
-    if (f && f.type.startsWith("image/")) {
-      setPreview(URL.createObjectURL(f));
-    }
+  const addFiles = (newFiles: FileList | File[]) => {
+    const list = Array.from(newFiles).filter((f) => f.type.startsWith("image/"));
+    if (list.length === 0) return;
+    setFiles((prev) => [...prev, ...list]);
+    setPreviews((prev) => [...prev, ...list.map((f) => URL.createObjectURL(f))]);
+  };
+
+  const removeFile = (index: number) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+    setPreviews((prev) => {
+      URL.revokeObjectURL(prev[index]);
+      return prev.filter((_, i) => i !== index);
+    });
+  };
+
+  const clearAll = () => {
+    previews.forEach((url) => URL.revokeObjectURL(url));
+    setFiles([]);
+    setPreviews([]);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file) {
+    if (files.length === 0) {
       setError(t("admin.selectImage"));
       return;
     }
     setError("");
     setLoading(true);
+    setUploadProgress({ current: 0, total: files.length });
     try {
-      const form = new FormData();
-      form.append("file", file);
-      form.append("caption", caption);
-      form.append("isPublic", String(isPublic));
-      const res = await fetch("/api/photos/upload", {
-        method: "POST",
-        body: form,
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error || t("common.errorNetwork"));
-        return;
+      for (let i = 0; i < files.length; i++) {
+        setUploadProgress({ current: i + 1, total: files.length });
+        const form = new FormData();
+        form.append("file", files[i]);
+        form.append("caption", caption);
+        form.append("isPublic", String(isPublic));
+        const res = await fetch("/api/photos/upload", {
+          method: "POST",
+          body: form,
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          setError(data.error || t("common.errorNetwork"));
+          setUploadProgress(null);
+          setLoading(false);
+          return;
+        }
       }
-      onFile(null);
+      clearAll();
       setCaption("");
       onSuccess();
     } catch {
       setError(t("common.errorNetwork"));
     } finally {
       setLoading(false);
+      setUploadProgress(null);
     }
   };
 
@@ -737,8 +757,8 @@ function UploadPhotoForm({ onSuccess }: { onSuccess: () => void }) {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    const f = e.dataTransfer.files?.[0];
-    if (f && f.type.startsWith("image/")) onFile(f);
+    const list = e.dataTransfer.files;
+    if (list?.length) addFiles(list);
   };
 
   return (
@@ -750,7 +770,12 @@ function UploadPhotoForm({ onSuccess }: { onSuccess: () => void }) {
         <input
           type="file"
           accept={accept}
-          onChange={(e) => onFile(e.target.files?.[0] ?? null)}
+          multiple
+          onChange={(e) => {
+            const list = e.target.files;
+            if (list?.length) addFiles(list);
+            e.target.value = "";
+          }}
           className="sr-only"
           id="photo-upload"
         />
@@ -769,23 +794,46 @@ function UploadPhotoForm({ onSuccess }: { onSuccess: () => void }) {
           <p className="text-sm text-muted">{t("admin.selectImage")}</p>
         </label>
       </div>
-      {preview && (
-        <div className="rounded-xl overflow-hidden border border-border bg-bg-card">
-          <div className="aspect-video relative bg-border">
-            <img
-              src={preview}
-              alt=""
-              className="w-full h-full object-contain"
-            />
-          </div>
-          <div className="p-3 flex items-center justify-between gap-2">
-            <span className="text-sm text-muted truncate">{file?.name}</span>
+      {files.length > 0 && (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted">{t("admin.batchCount").replace("{count}", String(files.length))}</span>
             <button
               type="button"
-              onClick={() => onFile(null)}
-              className="text-sm text-muted hover:text-fg shrink-0"
+              onClick={clearAll}
+              className="text-sm text-muted hover:text-fg"
             >
               {t("admin.cancel")}
+            </button>
+          </div>
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-48 overflow-y-auto">
+            {previews.map((url, i) => (
+              <div key={i} className="relative aspect-square rounded-lg overflow-hidden border border-border bg-bg-card group">
+                <img src={url} alt="" className="w-full h-full object-cover" />
+                <button
+                  type="button"
+                  onClick={() => removeFile(i)}
+                  className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/50 text-white text-sm leading-none opacity-0 group-hover:opacity-100 transition-opacity"
+                  aria-label={t("admin.cancel")}
+                >
+                  ×
+                </button>
+                <span className="absolute bottom-0 left-0 right-0 py-0.5 px-1 text-[10px] text-white bg-black/60 truncate block">
+                  {files[i].name}
+                </span>
+              </div>
+            ))}
+          </div>
+          {/* 选图后立即显示的上传按钮，避免被遮挡或需要滚动 */}
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 rounded-xl text-base font-semibold bg-fg text-bg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading && uploadProgress
+                ? t("admin.uploadingCount").replace("{current}", String(uploadProgress.current)).replace("{total}", String(uploadProgress.total))
+                : t("admin.upload")}
             </button>
           </div>
         </div>
@@ -801,6 +849,7 @@ function UploadPhotoForm({ onSuccess }: { onSuccess: () => void }) {
           placeholder={t("admin.captionPlaceholder")}
           className="w-full border border-border rounded-lg px-3 py-2 text-base bg-bg text-fg placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-warm/50"
         />
+        <p className="text-xs text-muted mt-1">{t("admin.captionBatchHint")}</p>
       </div>
       <label className="flex items-center gap-2 cursor-pointer">
         <input
@@ -810,13 +859,6 @@ function UploadPhotoForm({ onSuccess }: { onSuccess: () => void }) {
         />
         <span className="text-base text-fg">{t("admin.formPublicLabel")}</span>
       </label>
-      <button
-        type="submit"
-        disabled={loading || !file}
-        className="px-5 py-2.5 rounded-xl text-base font-medium bg-warm text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {loading ? t("admin.uploading") : t("admin.upload")}
-      </button>
     </form>
   );
 }

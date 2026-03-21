@@ -380,6 +380,7 @@ export type CommentCreateOrConnectWithoutThoughtInput = {
 
 export type CommentCreateManyThoughtInputEnvelope = {
   data: Prisma.CommentCreateManyThoughtInput | Prisma.CommentCreateManyThoughtInput[]
+  skipDuplicates?: boolean
 }
 
 export type CommentUpsertWithWhereUniqueWithoutThoughtInput = {
@@ -1159,6 +1160,7 @@ export type CommentCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * The data used to create many Comments.
    */
   data: Prisma.CommentCreateManyInput | Prisma.CommentCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1177,6 +1179,7 @@ export type CommentCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
    * The data used to create many Comments.
    */
   data: Prisma.CommentCreateManyInput | Prisma.CommentCreateManyInput[]
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */

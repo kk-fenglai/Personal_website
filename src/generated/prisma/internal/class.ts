@@ -19,8 +19,8 @@ const config: runtime.GetPrismaClientConfig = {
   "previewFeatures": [],
   "clientVersion": "7.5.0",
   "engineVersion": "280c870be64f457428992c43c1f6d557fab6e29e",
-  "activeProvider": "sqlite",
-  "inlineSchema": "generator client {\n  provider = \"prisma-client\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"sqlite\"\n}\n\nmodel Thought {\n  id        String    @id @default(cuid())\n  title     String\n  content   String\n  isPublic  Boolean   @default(true)\n  createdAt DateTime  @default(now())\n  updatedAt DateTime  @updatedAt\n  comments  Comment[]\n}\n\nmodel Comment {\n  id        String   @id @default(cuid())\n  thoughtId String\n  thought   Thought  @relation(fields: [thoughtId], references: [id], onDelete: Cascade)\n  author    String\n  content   String\n  createdAt DateTime @default(now())\n}\n\nmodel Photo {\n  id        String   @id @default(cuid())\n  filename  String\n  caption   String?\n  isPublic  Boolean  @default(true)\n  createdAt DateTime @default(now())\n}\n\nmodel AccessRequest {\n  id          String   @id @default(cuid())\n  name        String\n  contact     String?\n  message     String?\n  status      String   @default(\"pending\") // pending | approved | rejected\n  accessToken String?\n  createdAt   DateTime @default(now())\n}\n",
+  "activeProvider": "postgresql",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel Thought {\n  id        String    @id @default(cuid())\n  title     String\n  content   String\n  isPublic  Boolean   @default(true)\n  createdAt DateTime  @default(now())\n  updatedAt DateTime  @updatedAt\n  comments  Comment[]\n}\n\nmodel Comment {\n  id        String   @id @default(cuid())\n  thoughtId String\n  thought   Thought  @relation(fields: [thoughtId], references: [id], onDelete: Cascade)\n  author    String\n  content   String\n  createdAt DateTime @default(now())\n}\n\nmodel Photo {\n  id        String   @id @default(cuid())\n  filename  String\n  caption   String?\n  isPublic  Boolean  @default(true)\n  createdAt DateTime @default(now())\n}\n\nmodel AccessRequest {\n  id          String   @id @default(cuid())\n  name        String\n  contact     String?\n  message     String?\n  status      String   @default(\"pending\") // pending | approved | rejected\n  accessToken String?\n  createdAt   DateTime @default(now())\n}\n",
   "runtimeDataModel": {
     "models": {},
     "enums": {},
@@ -45,10 +45,10 @@ async function decodeBase64AsWasm(wasmBase64: string): Promise<WebAssembly.Modul
 }
 
 config.compilerWasm = {
-  getRuntime: async () => await import("@prisma/client/runtime/query_compiler_fast_bg.sqlite.mjs"),
+  getRuntime: async () => await import("@prisma/client/runtime/query_compiler_fast_bg.postgresql.mjs"),
 
   getQueryCompilerWasmModule: async () => {
-    const { wasm } = await import("@prisma/client/runtime/query_compiler_fast_bg.sqlite.wasm-base64.mjs")
+    const { wasm } = await import("@prisma/client/runtime/query_compiler_fast_bg.postgresql.wasm-base64.mjs")
     return await decodeBase64AsWasm(wasm)
   },
 

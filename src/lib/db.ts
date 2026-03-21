@@ -1,17 +1,17 @@
 import { PrismaClient } from "@/generated/prisma/client";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
-import path from "path";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
 
-const dbPath = process.env.DATABASE_URL
-  ? process.env.DATABASE_URL.replace(/^file:/, "")
-  : "prisma/dev.db";
-const absolutePath = path.isAbsolute(dbPath)
-  ? dbPath
-  : path.resolve(process.cwd(), dbPath);
+const connectionString = process.env.DATABASE_URL;
 
-const adapter = new PrismaBetterSqlite3({
-  url: absolutePath,
-});
+if (!connectionString) {
+  throw new Error(
+    "DATABASE_URL 未设置。请在 .env 中配置 PostgreSQL 连接串（如 Neon / Supabase）。参见 .env.example"
+  );
+}
+
+const pool = new Pool({ connectionString });
+const adapter = new PrismaPg(pool);
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 

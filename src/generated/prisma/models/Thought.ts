@@ -1170,6 +1170,7 @@ export type ThoughtCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * The data used to create many Thoughts.
    */
   data: Prisma.ThoughtCreateManyInput | Prisma.ThoughtCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1188,6 +1189,7 @@ export type ThoughtCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
    * The data used to create many Thoughts.
    */
   data: Prisma.ThoughtCreateManyInput | Prisma.ThoughtCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**

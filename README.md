@@ -23,12 +23,12 @@ npm install
 复制 `.env.example` 为 `.env`，按需修改：
 
 ```env
-DATABASE_URL="file:./prisma/dev.db"
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/DATABASE?sslmode=require"
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=你的密码
 ```
 
-首次运行会自动在 `prisma/dev.db` 创建 SQLite 数据库。
+在 [Neon](https://neon.tech)、Supabase、Railway 等创建 **PostgreSQL**，把连接串填进 `DATABASE_URL`。首次建表请执行：`npx prisma db push`。
 
 ### 3. 启动开发服务器
 
@@ -37,6 +37,11 @@ npm run dev
 ```
 
 浏览器打开 [http://localhost:3000](http://localhost:3000)。
+
+## 部署到公网
+
+- **用 GitHub 托管并部署**：请按 **[GITHUB_DEPLOY.md](./GITHUB_DEPLOY.md)**（推送到 GitHub + Vercel/Railway 导入仓库）。
+- **各平台说明（PostgreSQL）**：**[DEPLOY.md](./DEPLOY.md)**。
 
 ### 4. 使用管理后台
 
@@ -56,7 +61,7 @@ npm run dev
 ## 技术栈
 
 - **Next.js 16**（App Router）
-- **Prisma 7** + SQLite
+- **Prisma 7** + **PostgreSQL**（`pg` 驱动）
 - **Tailwind CSS**
 - 管理登录：基于 Cookie 的简单会话，密码在 `.env` 中配置
 
