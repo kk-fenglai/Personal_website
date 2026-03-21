@@ -2,10 +2,10 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useLocale } from "@/contexts/LocaleContext";
-import { type Locale, localeLabels } from "@/lib/translations";
+import { languageSwitcherUiEn } from "@/lib/translations";
 
 export function LanguageSwitcher() {
-  const { locale, setLocale, t } = useLocale();
+  const { locale, setLocale } = useLocale();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -27,9 +27,9 @@ export function LanguageSwitcher() {
         className="flex items-center gap-1 text-base text-muted hover:text-fg transition-colors"
         aria-expanded={open}
         aria-haspopup="listbox"
-        aria-label={t("nav.language")}
+        aria-label={languageSwitcherUiEn.button}
       >
-        <span>{t("nav.language")}</span>
+        <span>{languageSwitcherUiEn.button}</span>
         <span className="text-xs">▾</span>
       </button>
       {open && (
@@ -49,7 +49,7 @@ export function LanguageSwitcher() {
                   locale === loc ? "text-fg font-medium" : "text-muted hover:text-fg"
                 }`}
               >
-                {localeLabels[loc]}
+                {languageSwitcherUiEn.option[loc]}
               </button>
             </li>
           ))}

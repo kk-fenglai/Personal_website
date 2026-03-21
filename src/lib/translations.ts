@@ -440,6 +440,16 @@ export const localeLabels: Record<Locale, string> = {
   fr: "Français",
 };
 
+/** 顶栏语言切换器固定用英文（与当前界面语言无关） */
+export const languageSwitcherUiEn = {
+  button: "Language",
+  option: {
+    zh: "Chinese",
+    en: "English",
+    fr: "French",
+  } as Record<Locale, string>,
+};
+
 export const dateLocales: Record<Locale, string> = {
   zh: "zh-CN",
   en: "en-US",
