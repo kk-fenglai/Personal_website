@@ -1,6 +1,5 @@
 import { PrismaClient } from "@/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -10,8 +9,9 @@ if (!connectionString) {
   );
 }
 
-const pool = new Pool({ connectionString });
-const adapter = new PrismaPg(pool);
+// 传入 PoolConfig（connectionString），由适配器内部创建 Pool，避免与 @prisma/adapter-pg
+// 嵌套的 @types/pg 和项目根目录 @types/pg 对 Pool 类型重复定义导致 TS 构建失败（如 Vercel）。
+const adapter = new PrismaPg({ connectionString });
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 

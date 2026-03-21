@@ -38,10 +38,11 @@ npm run dev
 
 浏览器打开 [http://localhost:3000](http://localhost:3000)。
 
-## 部署到公网
+## 部署到公网（推荐 Vercel）
 
-- **用 GitHub 托管并部署**：请按 **[GITHUB_DEPLOY.md](./GITHUB_DEPLOY.md)**（推送到 GitHub + Vercel/Railway 导入仓库）。
-- **各平台说明（PostgreSQL）**：**[DEPLOY.md](./DEPLOY.md)**。
+1. **Vercel + Neon**：按 **[VERCEL.md](./VERCEL.md)** 一步步做（导入 GitHub 仓库、环境变量、`prisma db push`）。
+2. **先把代码放到 GitHub**：**[GITHUB_DEPLOY.md](./GITHUB_DEPLOY.md)**。
+3. **其他平台与注意事项**：**[DEPLOY.md](./DEPLOY.md)**。
 
 ### 4. 使用管理后台
 

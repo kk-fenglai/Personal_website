@@ -155,6 +155,7 @@ website/
 
 ## 九、环境与运行
 
+- **部署（推荐）**：**[VERCEL.md](./VERCEL.md)**（Vercel + Neon）。
 - **.env**（参考 .env.example）：  
   - `DATABASE_URL`：PostgreSQL 连接串，如 `postgresql://user:pass@host:5432/db?sslmode=require`。  
   - `ADMIN_USERNAME`、`ADMIN_PASSWORD`：管理员账号密码（支持明文或 bcrypt）。
