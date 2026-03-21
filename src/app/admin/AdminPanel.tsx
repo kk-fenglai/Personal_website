@@ -26,7 +26,9 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
   const [thoughts, setThoughts] = useState<Thought[]>([]);
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"thoughts" | "photos" | "new-thought" | "upload" | "access">("thoughts");
+  const [activeTab, setActiveTab] = useState<
+    "thoughts" | "photos" | "new-thought" | "upload" | "access" | "visits"
+  >("thoughts");
   const [editingThought, setEditingThought] = useState<Thought | null>(null);
 
   const load = () => {
@@ -69,6 +71,7 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
           ["photos", t("admin.tabPhotos")],
           ["upload", t("admin.tabUpload")],
           ["access", t("admin.accessRequests")],
+          ["visits", t("admin.tabVisits")],
         ].map(([tab, label]) => (
           <button
             key={tab}
@@ -107,6 +110,7 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
         <UploadPhotoForm onSuccess={() => { setActiveTab("photos"); load(); }} />
       )}
       {activeTab === "access" && <AccessRequestsList />}
+      {activeTab === "visits" && <VisitLogsList />}
     </div>
   );
 }
@@ -223,6 +227,113 @@ function AccessRequestsList() {
         </li>
       ))}
     </ul>
+  );
+}
+
+type VisitLogRow = {
+  id: string;
+  path: string;
+  ip: string | null;
+  userAgent: string | null;
+  referer: string | null;
+  createdAt: string;
+};
+
+const VISIT_PAGE_SIZE = 80;
+
+function VisitLogsList() {
+  const { t, dateLocale } = useLocale();
+  const [items, setItems] = useState<VisitLogRow[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  const fetchPage = (skip: number, append: boolean) => {
+    const run = append ? setLoadingMore : setLoading;
+    run(true);
+    fetch(`/api/visit-logs?take=${VISIT_PAGE_SIZE}&skip=${skip}`)
+      .then((r) => r.json())
+      .then((data: { items?: VisitLogRow[]; total?: number }) => {
+        const next = Array.isArray(data.items) ? data.items : [];
+        setTotal(typeof data.total === "number" ? data.total : 0);
+        setItems((prev) => (append ? [...prev, ...next] : next));
+      })
+      .finally(() => {
+        setLoading(false);
+        setLoadingMore(false);
+      });
+  };
+
+  useEffect(() => {
+    fetchPage(0, false);
+  }, []);
+
+  if (loading) {
+    return <div className="text-muted text-base">{t("admin.loading")}</div>;
+  }
+
+  if (items.length === 0) {
+    return <p className="text-muted text-base max-w-xl">{t("admin.visitsEmpty")}</p>;
+  }
+
+  const hasMore = items.length < total;
+
+  return (
+    <div className="space-y-4">
+      <p className="text-muted text-sm">
+        {t("admin.visitsTotal", { count: total })}
+      </p>
+      <div className="overflow-x-auto border border-border rounded-lg">
+        <table className="w-full text-left text-sm min-w-[640px]">
+          <thead className="bg-bg-card border-b border-border">
+            <tr>
+              <th className="px-3 py-2 font-medium text-fg">{t("admin.visitsTime")}</th>
+              <th className="px-3 py-2 font-medium text-fg">{t("admin.visitsPath")}</th>
+              <th className="px-3 py-2 font-medium text-fg whitespace-nowrap">{t("admin.visitsIp")}</th>
+              <th className="px-3 py-2 font-medium text-fg">{t("admin.visitsReferer")}</th>
+              <th className="px-3 py-2 font-medium text-fg">{t("admin.visitsUa")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((row) => (
+              <tr key={row.id} className="border-b border-border last:border-0 align-top">
+                <td className="px-3 py-2 text-muted tabular-nums whitespace-nowrap">
+                  {new Date(row.createdAt).toLocaleString(dateLocale)}
+                </td>
+                <td className="px-3 py-2 font-mono text-fg break-all max-w-[240px]">
+                  {row.path}
+                </td>
+                <td className="px-3 py-2 text-muted whitespace-nowrap">{row.ip ?? "—"}</td>
+                <td className="px-3 py-2 text-muted break-all max-w-[180px]">
+                  {row.referer ? (
+                    <span title={row.referer}>{row.referer}</span>
+                  ) : (
+                    "—"
+                  )}
+                </td>
+                <td className="px-3 py-2 text-muted break-all max-w-[280px]">
+                  {row.userAgent ? (
+                    <span title={row.userAgent}>{row.userAgent}</span>
+                  ) : (
+                    "—"
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {hasMore && (
+        <button
+          type="button"
+          disabled={loadingMore}
+          onClick={() => fetchPage(items.length, true)}
+          className="text-fg text-base font-medium border-b border-fg pb-0.5 hover:opacity-70 disabled:opacity-50"
+        >
+          {loadingMore ? "…" : t("admin.visitsLoadMore")}
+        </button>
+      )}
+    </div>
   );
 }
 
