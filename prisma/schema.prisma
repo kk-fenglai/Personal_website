@@ -11,7 +11,7 @@ model Thought {
   id         String    @id @default(cuid())
   title      String
   content    String
-  /// 英文标题（DeepL 等自动翻译，随保存更新）
+  /// 英文标题（LibreTranslate 自动翻译，随保存更新）
   titleEn    String?
   /// 法文标题
   titleFr    String?

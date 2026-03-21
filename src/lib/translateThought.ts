@@ -1,46 +1,15 @@
 /**
- * 使用 DeepL API 将中文标题与正文翻译为英文、法文。
- * 在 https://www.deepl.com/pro-api 申请免费版密钥（每月约 50 万字符），
- * 设置环境变量 DEEPL_AUTH_KEY（免费版密钥以 :fx 结尾）。
+ * 使用 [LibreTranslate](https://github.com/LibreTranslate/LibreTranslate) HTTP API
+ * 将中文标题与正文翻译为英文、法文。
+ *
+ * 环境变量：
+ * - `LIBRETRANSLATE_URL`：实例地址，默认 `https://libretranslate.com`（公共实例有频率限制，生产建议自建）
+ * - `LIBRETRANSLATE_API_KEY`：若你的实例要求 API Key，则填写
+ * - `LIBRETRANSLATE_DISABLED=true`：关闭自动翻译（返回 null）
  */
-const DEEPL_FREE = "https://api-free.deepl.com/v2/translate";
-const DEEPL_PRO = "https://api.deepl.com/v2/translate";
-
-async function deepLTranslateTwo(
-  title: string,
-  content: string,
-  targetLang: "EN" | "FR",
-  authKey: string
-): Promise<[string, string]> {
-  const useFree = authKey.endsWith(":fx");
-  const url = useFree ? DEEPL_FREE : DEEPL_PRO;
-  const body = new URLSearchParams();
-  body.set("auth_key", authKey);
-  body.append("text", title);
-  body.append("text", content);
-  body.set("target_lang", targetLang);
-  body.set("source_lang", "ZH");
-
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: body.toString(),
-  });
-
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`DeepL HTTP ${res.status}: ${errText.slice(0, 500)}`);
-  }
-
-  const data = (await res.json()) as {
-    translations: { text: string }[];
-  };
-  const parts = data.translations.map((t) => t.text);
-  if (parts.length < 2) {
-    throw new Error("DeepL: unexpected response shape");
-  }
-  return [parts[0], parts[1]];
-}
+const DEFAULT_BASE = "https://libretranslate.com";
+/** 单次请求大致上限，过长则分段翻译再拼接 */
+const CHUNK_SOFT_MAX = 2800;
 
 export type ThoughtTranslations = {
   titleEn: string;
@@ -49,30 +18,105 @@ export type ThoughtTranslations = {
   contentFr: string;
 };
 
+function getBaseUrl(): string {
+  const raw = process.env.LIBRETRANSLATE_URL?.trim();
+  if (raw) return raw.replace(/\/$/, "");
+  return DEFAULT_BASE;
+}
+
+function splitForTranslate(text: string): string[] {
+  if (text.length <= CHUNK_SOFT_MAX) return [text];
+  const chunks: string[] = [];
+  let start = 0;
+  while (start < text.length) {
+    let end = Math.min(start + CHUNK_SOFT_MAX, text.length);
+    if (end < text.length) {
+      const slice = text.slice(start, end);
+      const nl = slice.lastIndexOf("\n");
+      if (nl > CHUNK_SOFT_MAX * 0.4) end = start + nl + 1;
+    }
+    chunks.push(text.slice(start, end));
+    start = end;
+  }
+  return chunks;
+}
+
+async function libreTranslateOne(
+  text: string,
+  target: "en" | "fr",
+  baseUrl: string,
+  apiKey?: string
+): Promise<string> {
+  const trimmed = text;
+  if (!trimmed) return "";
+
+  const url = `${baseUrl}/translate`;
+  const body: Record<string, string> = {
+    q: trimmed,
+    source: "zh",
+    target,
+    format: "text",
+  };
+  if (apiKey) body.api_key = apiKey;
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`LibreTranslate HTTP ${res.status}: ${errText.slice(0, 500)}`);
+  }
+
+  const data = (await res.json()) as { translatedText?: string; error?: string };
+  if (data.error) {
+    throw new Error(`LibreTranslate: ${data.error}`);
+  }
+  if (typeof data.translatedText !== "string") {
+    throw new Error("LibreTranslate: missing translatedText");
+  }
+  return data.translatedText;
+}
+
+async function translateTextChunks(
+  text: string,
+  target: "en" | "fr",
+  baseUrl: string,
+  apiKey?: string
+): Promise<string> {
+  const parts = splitForTranslate(text);
+  const out: string[] = [];
+  for (const chunk of parts) {
+    out.push(await libreTranslateOne(chunk, target, baseUrl, apiKey));
+  }
+  return out.join("");
+}
+
 /**
- * 将一条随想的标题与正文翻译为英、法。未配置 DEEPL_AUTH_KEY 时返回 null（不抛错）。
+ * 将一条随想的标题与正文翻译为英、法。
+ * 设置 `LIBRETRANSLATE_DISABLED=true` 时返回 null。
  */
 export async function translateThoughtZhToEnFr(
   title: string,
   content: string
 ): Promise<ThoughtTranslations | null> {
-  const authKey = process.env.DEEPL_AUTH_KEY?.trim();
-  if (!authKey) {
+  if (process.env.LIBRETRANSLATE_DISABLED?.toLowerCase() === "true") {
     return null;
   }
 
-  const [titleEn, contentEn] = await deepLTranslateTwo(
-    title,
-    content,
-    "EN",
-    authKey
-  );
-  const [titleFr, contentFr] = await deepLTranslateTwo(
-    title,
-    content,
-    "FR",
-    authKey
-  );
+  const baseUrl = getBaseUrl();
+  const apiKey = process.env.LIBRETRANSLATE_API_KEY?.trim();
+
+  // 串行请求，减轻公共实例限频（429）
+  const titleEn = await translateTextChunks(title, "en", baseUrl, apiKey);
+  const contentEn = await translateTextChunks(content, "en", baseUrl, apiKey);
+  const titleFr = await translateTextChunks(title, "fr", baseUrl, apiKey);
+  const contentFr = await translateTextChunks(content, "fr", baseUrl, apiKey);
 
   return { titleEn, contentEn, titleFr, contentFr };
 }

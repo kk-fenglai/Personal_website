@@ -39,7 +39,7 @@ export const translations: Record<
     "thoughts.loading": "加载中…",
     "thoughts.empty": "还没有随想，去管理后台写第一篇吧。",
     "thoughts.commentsCount": "{count} 条评论",
-    "thoughts.machineTranslationNote": "正文与标题由 DeepL 自动翻译，仅供参考。",
+    "thoughts.machineTranslationNote": "正文与标题由 LibreTranslate 自动翻译，仅供参考。",
 
     "thoughtDetail.back": "← 返回随想列表",
     "thoughtDetail.notFound": "这篇随想不存在或未公开。",
@@ -174,7 +174,7 @@ export const translations: Record<
     "thoughts.loading": "Loading…",
     "thoughts.empty": "No thoughts yet. Write your first one in the admin.",
     "thoughts.commentsCount": "{count} comment(s)",
-    "thoughts.machineTranslationNote": "Title and body are machine-translated (DeepL) for reference.",
+    "thoughts.machineTranslationNote": "Title and body are machine-translated (LibreTranslate) for reference.",
 
     "thoughtDetail.back": "← Back to thoughts",
     "thoughtDetail.notFound": "This thought doesn't exist or isn't public.",
@@ -309,7 +309,7 @@ export const translations: Record<
     "thoughts.loading": "Chargement…",
     "thoughts.empty": "Pas encore de réflexions. Écrivez la première dans l'admin.",
     "thoughts.commentsCount": "{count} commentaire(s)",
-    "thoughts.machineTranslationNote": "Le titre et le texte sont traduits automatiquement (DeepL), à titre indicatif.",
+    "thoughts.machineTranslationNote": "Le titre et le texte sont traduits automatiquement (LibreTranslate), à titre indicatif.",
 
     "thoughtDetail.back": "← Retour aux réflexions",
     "thoughtDetail.notFound": "Cette réflexion n'existe pas ou n'est pas publique.",

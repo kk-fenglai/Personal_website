@@ -628,7 +628,7 @@ export type $ThoughtPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     title: string
     content: string
     /**
-     * 英文标题（DeepL 等自动翻译，随保存更新）
+     * 英文标题（LibreTranslate 自动翻译，随保存更新）
      */
     titleEn: string | null
     /**

@@ -37,7 +37,9 @@
 | `DATABASE_URL` | Neon 复制的完整连接串 | 建议含 `?sslmode=require` |
 | `ADMIN_USERNAME` | 你的后台登录名 | 不要用过于简单的默认名 |
 | `ADMIN_PASSWORD` | 强密码 | 生产环境务必改成长随机密码 |
-| `DEEPL_AUTH_KEY` | （可选）[DeepL](https://www.deepl.com/pro-api) 密钥 | 填写后，保存随想时会**自动生成英文/法文**并存库；不填则界面仅显示中文原文 |
+| `LIBRETRANSLATE_URL` | （可选）LibreTranslate 实例根地址 | 默认 `https://libretranslate.com`；生产建议[自建](https://github.com/LibreTranslate/LibreTranslate)以免限流 |
+| `LIBRETRANSLATE_API_KEY` | （可选）实例若要求 API Key | 公共实例一般留空 |
+| `LIBRETRANSLATE_DISABLED` | （可选）设为 `true` 则关闭自动翻译 | 不填则启用（默认走公共 LibreTranslate） |
 
 6. 每个变量建议勾选 **Production**、**Preview**、**Development**（至少 Production + Preview），避免预览部署连不上库。
 7. 点击 **Deploy**，等待构建完成。
@@ -72,11 +74,11 @@
 
 ---
 
-## 随想英/法翻译（DeepL）
+## 随想英/法翻译（LibreTranslate）
 
-- 在环境变量中配置 **`DEEPL_AUTH_KEY`**（[DeepL API 免费版](https://www.deepl.com/pro-api)，密钥以 `:fx` 结尾）。
-- 执行 **`npx prisma db push`** 为数据库增加翻译字段后，**新建或编辑保存**随想时会自动写入英/法文；旧文章可在登录后台后请求 `POST /api/thoughts/文章id/translate` 补生成。
-- Vercel 需在 **Environment Variables** 里同样添加 `DEEPL_AUTH_KEY` 并重新部署。
+- 默认使用公共实例 **https://libretranslate.com**（有频率与稳定性限制）。生产环境建议在 **Vercel 同区域或自建 VPS** 部署 [LibreTranslate](https://github.com/LibreTranslate/LibreTranslate)，并把 **`LIBRETRANSLATE_URL`** 设为你的实例根地址（不含末尾 `/`）。
+- 若需 API Key，设置 **`LIBRETRANSLATE_API_KEY`**；若完全不想自动翻译，设 **`LIBRETRANSLATE_DISABLED=true`**。
+- 数据库需已有翻译字段（执行过 **`npx prisma db push`**）后，**新建或编辑保存**随想时会写入英/法文；旧文章可在登录后台后请求 `POST /api/thoughts/文章id/translate` 补生成。
 
 ---
 

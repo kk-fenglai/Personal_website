@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { isAdmin } from "@/lib/auth";
 import { translateAndSaveThought } from "@/lib/thoughtTranslateAndSave";
 
-/** 管理员：手动重新生成英/法翻译（例如补密钥后、或 DeepL 曾失败） */
+/** 管理员：手动重新生成英/法翻译（例如更换 LibreTranslate 实例后、或上次失败） */
 export async function POST(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
