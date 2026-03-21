@@ -51,3 +51,15 @@ model AccessRequest {
   accessToken String?
   createdAt   DateTime @default(now())
 }
+
+/// 访客页面访问记录（由 middleware 写入，供管理员查看）
+model VisitLog {
+  id        String   @id @default(cuid())
+  path      String
+  ip        String?
+  userAgent String?
+  referer   String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}

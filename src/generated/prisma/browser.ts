@@ -37,3 +37,8 @@ export type Photo = Prisma.PhotoModel
  * 
  */
 export type AccessRequest = Prisma.AccessRequestModel
+/**
+ * Model VisitLog
+ * 访客页面访问记录（由 middleware 写入，供管理员查看）
+ */
+export type VisitLog = Prisma.VisitLogModel

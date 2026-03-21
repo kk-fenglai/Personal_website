@@ -54,7 +54,8 @@ export const ModelName = {
   Thought: 'Thought',
   Comment: 'Comment',
   Photo: 'Photo',
-  AccessRequest: 'AccessRequest'
+  AccessRequest: 'AccessRequest',
+  VisitLog: 'VisitLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -122,6 +123,18 @@ export const AccessRequestScalarFieldEnum = {
 } as const
 
 export type AccessRequestScalarFieldEnum = (typeof AccessRequestScalarFieldEnum)[keyof typeof AccessRequestScalarFieldEnum]
+
+
+export const VisitLogScalarFieldEnum = {
+  id: 'id',
+  path: 'path',
+  ip: 'ip',
+  userAgent: 'userAgent',
+  referer: 'referer',
+  createdAt: 'createdAt'
+} as const
+
+export type VisitLogScalarFieldEnum = (typeof VisitLogScalarFieldEnum)[keyof typeof VisitLogScalarFieldEnum]
 
 
 export const SortOrder = {
