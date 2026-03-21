@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { isAdmin } from "@/lib/auth";
+import { translateAndSaveThought } from "@/lib/thoughtTranslateAndSave";
 
 export async function GET(request: NextRequest) {
   const admin = await isAdmin();
@@ -28,5 +29,10 @@ export async function POST(request: NextRequest) {
   const thought = await prisma.thought.create({
     data: { title, content, isPublic: !!isPublic },
   });
-  return NextResponse.json(thought);
+  await translateAndSaveThought(thought.id, thought.title, thought.content);
+  const fresh = await prisma.thought.findUnique({
+    where: { id: thought.id },
+    include: { comments: { orderBy: { createdAt: "asc" } } },
+  });
+  return NextResponse.json(fresh ?? thought);
 }

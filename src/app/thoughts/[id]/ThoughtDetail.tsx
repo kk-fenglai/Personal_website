@@ -4,6 +4,11 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useLocale } from "@/contexts/LocaleContext";
 import { FormattedContent } from "@/components/FormattedContent";
+import {
+  isShowingMachineTranslation,
+  pickThoughtContent,
+  pickThoughtTitle,
+} from "@/lib/pickThoughtLocale";
 
 type Comment = {
   id: string;
@@ -16,13 +21,17 @@ type Thought = {
   id: string;
   title: string;
   content: string;
+  titleEn?: string | null;
+  titleFr?: string | null;
+  contentEn?: string | null;
+  contentFr?: string | null;
   isPublic: boolean;
   createdAt: string;
   comments: Comment[];
 };
 
 export function ThoughtDetail({ thoughtId }: { thoughtId: string }) {
-  const { t, dateLocale } = useLocale();
+  const { t, dateLocale, locale } = useLocale();
   const [thought, setThought] = useState<Thought | null>(null);
   const [loading, setLoading] = useState(true);
   const [author, setAuthor] = useState("");
@@ -96,8 +105,11 @@ export function ThoughtDetail({ thoughtId }: { thoughtId: string }) {
 
       <header className="card p-5 sm:p-6">
         <h1 className="text-3xl sm:text-4xl font-bold text-fg">
-          {thought.title}
+          {pickThoughtTitle(thought, locale)}
         </h1>
+        {isShowingMachineTranslation(thought, locale) && (
+          <p className="mt-2 text-muted text-sm">{t("thoughts.machineTranslationNote")}</p>
+        )}
         <time dateTime={thought.createdAt} className="block mt-3 text-muted text-base tabular-nums">
           {new Date(thought.createdAt).toLocaleString(dateLocale)}
         </time>
@@ -105,7 +117,7 @@ export function ThoughtDetail({ thoughtId }: { thoughtId: string }) {
 
       <div>
         <FormattedContent
-          content={thought.content}
+          content={pickThoughtContent(thought, locale)}
           as="p"
           className="text-fg reading whitespace-pre-wrap"
         />

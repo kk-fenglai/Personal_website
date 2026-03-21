@@ -746,6 +746,10 @@ export const ThoughtScalarFieldEnum = {
   id: 'id',
   title: 'title',
   content: 'content',
+  titleEn: 'titleEn',
+  titleFr: 'titleFr',
+  contentEn: 'contentEn',
+  contentFr: 'contentFr',
   isPublic: 'isPublic',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

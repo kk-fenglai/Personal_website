@@ -4,18 +4,26 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useLocale } from "@/contexts/LocaleContext";
 import { FormattedContent } from "@/components/FormattedContent";
+import {
+  pickThoughtContent,
+  pickThoughtTitle,
+} from "@/lib/pickThoughtLocale";
 
 type Thought = {
   id: string;
   title: string;
   content: string;
+  titleEn?: string | null;
+  titleFr?: string | null;
+  contentEn?: string | null;
+  contentFr?: string | null;
   isPublic: boolean;
   createdAt: string;
   comments: { id: string }[];
 };
 
 export function ThoughtList() {
-  const { t, dateLocale } = useLocale();
+  const { t, dateLocale, locale } = useLocale();
   const [thoughts, setThoughts] = useState<Thought[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -52,7 +60,7 @@ export function ThoughtList() {
           <Link href={`/thoughts/${item.id}`} className="card p-6 block">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <h2 className="text-fg font-semibold">
-                {item.title}
+                {pickThoughtTitle(item, locale)}
               </h2>
               <span className="text-muted text-base tabular-nums">
                 {new Date(item.createdAt).toLocaleDateString(dateLocale)}
@@ -60,7 +68,7 @@ export function ThoughtList() {
               </span>
             </div>
             <p className="mt-2 text-muted text-base line-clamp-2 reading">
-              <FormattedContent content={item.content} />
+              <FormattedContent content={pickThoughtContent(item, locale)} />
             </p>
           </Link>
         </li>

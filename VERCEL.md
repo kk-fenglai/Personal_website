@@ -37,6 +37,7 @@
 | `DATABASE_URL` | Neon 复制的完整连接串 | 建议含 `?sslmode=require` |
 | `ADMIN_USERNAME` | 你的后台登录名 | 不要用过于简单的默认名 |
 | `ADMIN_PASSWORD` | 强密码 | 生产环境务必改成长随机密码 |
+| `DEEPL_AUTH_KEY` | （可选）[DeepL](https://www.deepl.com/pro-api) 密钥 | 填写后，保存随想时会**自动生成英文/法文**并存库；不填则界面仅显示中文原文 |
 
 6. 每个变量建议勾选 **Production**、**Preview**、**Development**（至少 Production + Preview），避免预览部署连不上库。
 7. 点击 **Deploy**，等待构建完成。
@@ -68,6 +69,14 @@
 
 - 代码改动后 `git push` 到 GitHub，Vercel 会自动触发新部署。
 - **只改了 `prisma/schema.prisma` 时**：部署前或部署后在能访问生产 `DATABASE_URL` 的环境再执行一次 `npx prisma db push`（或后续可改为 `prisma migrate` 流程）。
+
+---
+
+## 随想英/法翻译（DeepL）
+
+- 在环境变量中配置 **`DEEPL_AUTH_KEY`**（[DeepL API 免费版](https://www.deepl.com/pro-api)，密钥以 `:fx` 结尾）。
+- 执行 **`npx prisma db push`** 为数据库增加翻译字段后，**新建或编辑保存**随想时会自动写入英/法文；旧文章可在登录后台后请求 `POST /api/thoughts/文章id/translate` 补生成。
+- Vercel 需在 **Environment Variables** 里同样添加 `DEEPL_AUTH_KEY` 并重新部署。
 
 ---
 

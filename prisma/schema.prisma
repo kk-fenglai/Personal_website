@@ -11,6 +11,14 @@ model Thought {
   id         String    @id @default(cuid())
   title      String
   content    String
+  /// 英文标题（DeepL 等自动翻译，随保存更新）
+  titleEn    String?
+  /// 法文标题
+  titleFr    String?
+  /// 英文正文
+  contentEn  String?
+  /// 法文正文
+  contentFr  String?
   isPublic   Boolean   @default(true)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt

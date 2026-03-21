@@ -28,6 +28,10 @@ export type ThoughtMinAggregateOutputType = {
   id: string | null
   title: string | null
   content: string | null
+  titleEn: string | null
+  titleFr: string | null
+  contentEn: string | null
+  contentFr: string | null
   isPublic: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -37,6 +41,10 @@ export type ThoughtMaxAggregateOutputType = {
   id: string | null
   title: string | null
   content: string | null
+  titleEn: string | null
+  titleFr: string | null
+  contentEn: string | null
+  contentFr: string | null
   isPublic: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -46,6 +54,10 @@ export type ThoughtCountAggregateOutputType = {
   id: number
   title: number
   content: number
+  titleEn: number
+  titleFr: number
+  contentEn: number
+  contentFr: number
   isPublic: number
   createdAt: number
   updatedAt: number
@@ -57,6 +69,10 @@ export type ThoughtMinAggregateInputType = {
   id?: true
   title?: true
   content?: true
+  titleEn?: true
+  titleFr?: true
+  contentEn?: true
+  contentFr?: true
   isPublic?: true
   createdAt?: true
   updatedAt?: true
@@ -66,6 +82,10 @@ export type ThoughtMaxAggregateInputType = {
   id?: true
   title?: true
   content?: true
+  titleEn?: true
+  titleFr?: true
+  contentEn?: true
+  contentFr?: true
   isPublic?: true
   createdAt?: true
   updatedAt?: true
@@ -75,6 +95,10 @@ export type ThoughtCountAggregateInputType = {
   id?: true
   title?: true
   content?: true
+  titleEn?: true
+  titleFr?: true
+  contentEn?: true
+  contentFr?: true
   isPublic?: true
   createdAt?: true
   updatedAt?: true
@@ -157,6 +181,10 @@ export type ThoughtGroupByOutputType = {
   id: string
   title: string
   content: string
+  titleEn: string | null
+  titleFr: string | null
+  contentEn: string | null
+  contentFr: string | null
   isPublic: boolean
   createdAt: Date
   updatedAt: Date
@@ -187,6 +215,10 @@ export type ThoughtWhereInput = {
   id?: Prisma.StringFilter<"Thought"> | string
   title?: Prisma.StringFilter<"Thought"> | string
   content?: Prisma.StringFilter<"Thought"> | string
+  titleEn?: Prisma.StringNullableFilter<"Thought"> | string | null
+  titleFr?: Prisma.StringNullableFilter<"Thought"> | string | null
+  contentEn?: Prisma.StringNullableFilter<"Thought"> | string | null
+  contentFr?: Prisma.StringNullableFilter<"Thought"> | string | null
   isPublic?: Prisma.BoolFilter<"Thought"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Thought"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Thought"> | Date | string
@@ -197,6 +229,10 @@ export type ThoughtOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  titleEn?: Prisma.SortOrderInput | Prisma.SortOrder
+  titleFr?: Prisma.SortOrderInput | Prisma.SortOrder
+  contentEn?: Prisma.SortOrderInput | Prisma.SortOrder
+  contentFr?: Prisma.SortOrderInput | Prisma.SortOrder
   isPublic?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -210,6 +246,10 @@ export type ThoughtWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ThoughtWhereInput | Prisma.ThoughtWhereInput[]
   title?: Prisma.StringFilter<"Thought"> | string
   content?: Prisma.StringFilter<"Thought"> | string
+  titleEn?: Prisma.StringNullableFilter<"Thought"> | string | null
+  titleFr?: Prisma.StringNullableFilter<"Thought"> | string | null
+  contentEn?: Prisma.StringNullableFilter<"Thought"> | string | null
+  contentFr?: Prisma.StringNullableFilter<"Thought"> | string | null
   isPublic?: Prisma.BoolFilter<"Thought"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Thought"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Thought"> | Date | string
@@ -220,6 +260,10 @@ export type ThoughtOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  titleEn?: Prisma.SortOrderInput | Prisma.SortOrder
+  titleFr?: Prisma.SortOrderInput | Prisma.SortOrder
+  contentEn?: Prisma.SortOrderInput | Prisma.SortOrder
+  contentFr?: Prisma.SortOrderInput | Prisma.SortOrder
   isPublic?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -235,6 +279,10 @@ export type ThoughtScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Thought"> | string
   title?: Prisma.StringWithAggregatesFilter<"Thought"> | string
   content?: Prisma.StringWithAggregatesFilter<"Thought"> | string
+  titleEn?: Prisma.StringNullableWithAggregatesFilter<"Thought"> | string | null
+  titleFr?: Prisma.StringNullableWithAggregatesFilter<"Thought"> | string | null
+  contentEn?: Prisma.StringNullableWithAggregatesFilter<"Thought"> | string | null
+  contentFr?: Prisma.StringNullableWithAggregatesFilter<"Thought"> | string | null
   isPublic?: Prisma.BoolWithAggregatesFilter<"Thought"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Thought"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Thought"> | Date | string
@@ -244,6 +292,10 @@ export type ThoughtCreateInput = {
   id?: string
   title: string
   content: string
+  titleEn?: string | null
+  titleFr?: string | null
+  contentEn?: string | null
+  contentFr?: string | null
   isPublic?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -254,6 +306,10 @@ export type ThoughtUncheckedCreateInput = {
   id?: string
   title: string
   content: string
+  titleEn?: string | null
+  titleFr?: string | null
+  contentEn?: string | null
+  contentFr?: string | null
   isPublic?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -264,6 +320,10 @@ export type ThoughtUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleFr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentFr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -274,6 +334,10 @@ export type ThoughtUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleFr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentFr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -284,6 +348,10 @@ export type ThoughtCreateManyInput = {
   id?: string
   title: string
   content: string
+  titleEn?: string | null
+  titleFr?: string | null
+  contentEn?: string | null
+  contentFr?: string | null
   isPublic?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -293,6 +361,10 @@ export type ThoughtUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleFr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentFr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -302,6 +374,10 @@ export type ThoughtUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleFr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentFr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -311,6 +387,10 @@ export type ThoughtCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  titleEn?: Prisma.SortOrder
+  titleFr?: Prisma.SortOrder
+  contentEn?: Prisma.SortOrder
+  contentFr?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -320,6 +400,10 @@ export type ThoughtMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  titleEn?: Prisma.SortOrder
+  titleFr?: Prisma.SortOrder
+  contentEn?: Prisma.SortOrder
+  contentFr?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -329,6 +413,10 @@ export type ThoughtMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  titleEn?: Prisma.SortOrder
+  titleFr?: Prisma.SortOrder
+  contentEn?: Prisma.SortOrder
+  contentFr?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -341,6 +429,10 @@ export type ThoughtScalarRelationFilter = {
 
 export type StringFieldUpdateOperationsInput = {
   set?: string
+}
+
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
 }
 
 export type BoolFieldUpdateOperationsInput = {
@@ -369,6 +461,10 @@ export type ThoughtCreateWithoutCommentsInput = {
   id?: string
   title: string
   content: string
+  titleEn?: string | null
+  titleFr?: string | null
+  contentEn?: string | null
+  contentFr?: string | null
   isPublic?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -378,6 +474,10 @@ export type ThoughtUncheckedCreateWithoutCommentsInput = {
   id?: string
   title: string
   content: string
+  titleEn?: string | null
+  titleFr?: string | null
+  contentEn?: string | null
+  contentFr?: string | null
   isPublic?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -403,6 +503,10 @@ export type ThoughtUpdateWithoutCommentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleFr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentFr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -412,6 +516,10 @@ export type ThoughtUncheckedUpdateWithoutCommentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleFr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentFr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -452,6 +560,10 @@ export type ThoughtSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   id?: boolean
   title?: boolean
   content?: boolean
+  titleEn?: boolean
+  titleFr?: boolean
+  contentEn?: boolean
+  contentFr?: boolean
   isPublic?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -463,6 +575,10 @@ export type ThoughtSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   id?: boolean
   title?: boolean
   content?: boolean
+  titleEn?: boolean
+  titleFr?: boolean
+  contentEn?: boolean
+  contentFr?: boolean
   isPublic?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -472,6 +588,10 @@ export type ThoughtSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   id?: boolean
   title?: boolean
   content?: boolean
+  titleEn?: boolean
+  titleFr?: boolean
+  contentEn?: boolean
+  contentFr?: boolean
   isPublic?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -481,12 +601,16 @@ export type ThoughtSelectScalar = {
   id?: boolean
   title?: boolean
   content?: boolean
+  titleEn?: boolean
+  titleFr?: boolean
+  contentEn?: boolean
+  contentFr?: boolean
   isPublic?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ThoughtOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "content" | "isPublic" | "createdAt" | "updatedAt", ExtArgs["result"]["thought"]>
+export type ThoughtOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "content" | "titleEn" | "titleFr" | "contentEn" | "contentFr" | "isPublic" | "createdAt" | "updatedAt", ExtArgs["result"]["thought"]>
 export type ThoughtInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   comments?: boolean | Prisma.Thought$commentsArgs<ExtArgs>
   _count?: boolean | Prisma.ThoughtCountOutputTypeDefaultArgs<ExtArgs>
@@ -503,6 +627,22 @@ export type $ThoughtPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     id: string
     title: string
     content: string
+    /**
+     * 英文标题（DeepL 等自动翻译，随保存更新）
+     */
+    titleEn: string | null
+    /**
+     * 法文标题
+     */
+    titleFr: string | null
+    /**
+     * 英文正文
+     */
+    contentEn: string | null
+    /**
+     * 法文正文
+     */
+    contentFr: string | null
     isPublic: boolean
     createdAt: Date
     updatedAt: Date
@@ -933,6 +1073,10 @@ export interface ThoughtFieldRefs {
   readonly id: Prisma.FieldRef<"Thought", 'String'>
   readonly title: Prisma.FieldRef<"Thought", 'String'>
   readonly content: Prisma.FieldRef<"Thought", 'String'>
+  readonly titleEn: Prisma.FieldRef<"Thought", 'String'>
+  readonly titleFr: Prisma.FieldRef<"Thought", 'String'>
+  readonly contentEn: Prisma.FieldRef<"Thought", 'String'>
+  readonly contentFr: Prisma.FieldRef<"Thought", 'String'>
   readonly isPublic: Prisma.FieldRef<"Thought", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Thought", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Thought", 'DateTime'>

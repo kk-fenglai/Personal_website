@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { isAdmin } from "@/lib/auth";
+import { translateAndSaveThought } from "@/lib/thoughtTranslateAndSave";
 
 export async function GET(
   _request: NextRequest,
@@ -40,7 +41,14 @@ export async function PATCH(
       ...(typeof isPublic === "boolean" && { isPublic }),
     },
   });
-  return NextResponse.json(thought);
+  if (title != null || content != null) {
+    await translateAndSaveThought(id, thought.title, thought.content);
+  }
+  const fresh = await prisma.thought.findUnique({
+    where: { id },
+    include: { comments: { orderBy: { createdAt: "asc" } } },
+  });
+  return NextResponse.json(fresh ?? thought);
 }
 
 export async function DELETE(
