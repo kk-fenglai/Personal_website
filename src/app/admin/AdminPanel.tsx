@@ -465,7 +465,30 @@ function EditThoughtForm({
   const [content, setContent] = useState(thought.content);
   const [isPublic, setIsPublic] = useState(thought.isPublic);
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
+
+  const handleDelete = async () => {
+    if (!window.confirm(t("admin.deleteThoughtConfirm"))) return;
+    setError("");
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/thoughts/${thought.id}`, {
+        method: "DELETE",
+        credentials: "same-origin",
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError((data as { error?: string }).error || t("common.errorNetwork"));
+        return;
+      }
+      onSuccess();
+    } catch {
+      setError(t("common.errorNetwork"));
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -533,10 +556,10 @@ function EditThoughtForm({
           />
           <span className="text-base text-fg">{t("admin.formPublicLabel")}</span>
         </label>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || deleting}
             className="px-5 py-2.5 rounded-xl text-base font-medium bg-fg text-bg hover:opacity-90 disabled:opacity-50"
           >
             {loading ? t("admin.updating") : t("admin.saveChanges")}
@@ -544,12 +567,25 @@ function EditThoughtForm({
           <button
             type="button"
             onClick={onCancel}
-            className="px-5 py-2.5 rounded-xl text-base border border-border text-muted hover:text-fg"
+            disabled={deleting}
+            className="px-5 py-2.5 rounded-xl text-base border border-border text-muted hover:text-fg disabled:opacity-50"
           >
             {t("admin.cancel")}
           </button>
         </div>
       </form>
+
+      <div className="pt-6 border-t border-border">
+        <p className="section-label mb-2">{t("admin.deleteThought")}</p>
+        <button
+          type="button"
+          onClick={handleDelete}
+          disabled={loading || deleting}
+          className="px-5 py-2.5 rounded-xl text-base font-medium border border-red-500/60 text-red-600 dark:text-red-400 hover:bg-red-500/10 disabled:opacity-50"
+        >
+          {deleting ? t("admin.deletingThought") : t("admin.deleteThoughtButton")}
+        </button>
+      </div>
     </div>
   );
 }
@@ -861,6 +897,7 @@ function UploadPhotoForm({ onSuccess }: { onSuccess: () => void }) {
         const res = await fetch("/api/photos/upload", {
           method: "POST",
           body: form,
+          credentials: "same-origin",
         });
         const data = await res.json();
         if (!res.ok) {

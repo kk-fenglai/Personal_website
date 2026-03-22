@@ -125,8 +125,15 @@ export function BoldableContentField({
         const res = await fetch("/api/photos/upload", {
           method: "POST",
           body: formData,
+          credentials: "same-origin",
         });
-        const data = (await res.json()) as { filename?: string; error?: string };
+        let data: { filename?: string; error?: string };
+        try {
+          data = (await res.json()) as { filename?: string; error?: string };
+        } catch {
+          setImageError(t("admin.imageUploadError"));
+          return;
+        }
         if (!res.ok) {
           setImageError(data.error || t("admin.imageUploadError"));
           return;
