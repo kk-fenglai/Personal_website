@@ -237,7 +237,38 @@ type VisitLogRow = {
   userAgent: string | null;
   referer: string | null;
   createdAt: string;
+  browser: string | null;
+  os: string | null;
+  deviceType: string | null;
+  deviceModel: string | null;
+  country: string | null;
+  region: string | null;
+  city: string | null;
 };
+
+function formatVisitLocation(row: VisitLogRow): string {
+  const parts = [row.city, row.region, row.country].filter(Boolean);
+  return parts.length > 0 ? parts.join(" · ") : "—";
+}
+
+function prettifyDeviceType(t: string | null): string | null {
+  if (!t) return null;
+  if (t === "desktop") return "Desktop";
+  if (t === "mobile") return "Mobile";
+  if (t === "tablet") return "Tablet";
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
+
+function formatVisitDevice(row: VisitLogRow): string {
+  const dt = prettifyDeviceType(row.deviceType);
+  const parts = [dt, row.deviceModel].filter(Boolean);
+  return parts.length > 0 ? parts.join(" · ") : "—";
+}
+
+function formatVisitClient(row: VisitLogRow): string {
+  const parts = [row.browser, row.os].filter(Boolean);
+  return parts.length > 0 ? parts.join(" · ") : "—";
+}
 
 const VISIT_PAGE_SIZE = 80;
 
@@ -283,15 +314,20 @@ function VisitLogsList() {
       <p className="text-muted text-sm">
         {t("admin.visitsTotal", { count: total })}
       </p>
+      <p className="text-muted text-xs max-w-3xl leading-relaxed">
+        {t("admin.visitsFootnote")}
+      </p>
       <div className="overflow-x-auto border border-border rounded-lg">
-        <table className="w-full text-left text-sm min-w-[640px]">
+        <table className="w-full text-left text-sm min-w-[72rem]">
           <thead className="bg-bg-card border-b border-border">
             <tr>
-              <th className="px-3 py-2 font-medium text-fg">{t("admin.visitsTime")}</th>
+              <th className="px-3 py-2 font-medium text-fg whitespace-nowrap">{t("admin.visitsTime")}</th>
+              <th className="px-3 py-2 font-medium text-fg min-w-[8rem]">{t("admin.visitsLocation")}</th>
+              <th className="px-3 py-2 font-medium text-fg min-w-[7rem]">{t("admin.visitsDevice")}</th>
+              <th className="px-3 py-2 font-medium text-fg min-w-[10rem]">{t("admin.visitsClient")}</th>
               <th className="px-3 py-2 font-medium text-fg">{t("admin.visitsPath")}</th>
               <th className="px-3 py-2 font-medium text-fg whitespace-nowrap">{t("admin.visitsIp")}</th>
-              <th className="px-3 py-2 font-medium text-fg">{t("admin.visitsReferer")}</th>
-              <th className="px-3 py-2 font-medium text-fg">{t("admin.visitsUa")}</th>
+              <th className="px-3 py-2 font-medium text-fg max-w-[10rem]">{t("admin.visitsReferer")}</th>
             </tr>
           </thead>
           <tbody>
@@ -300,20 +336,28 @@ function VisitLogsList() {
                 <td className="px-3 py-2 text-muted tabular-nums whitespace-nowrap">
                   {new Date(row.createdAt).toLocaleString(dateLocale)}
                 </td>
-                <td className="px-3 py-2 font-mono text-fg break-all max-w-[240px]">
+                <td className="px-3 py-2 text-fg text-sm">
+                  {formatVisitLocation(row)}
+                </td>
+                <td
+                  className="px-3 py-2 text-fg text-sm"
+                  title={row.userAgent ? `${t("admin.visitsUaHint")}: ${row.userAgent}` : undefined}
+                >
+                  {formatVisitDevice(row)}
+                </td>
+                <td
+                  className="px-3 py-2 text-muted text-sm break-words max-w-[14rem]"
+                  title={row.userAgent ? `${t("admin.visitsUaHint")}: ${row.userAgent}` : undefined}
+                >
+                  {formatVisitClient(row)}
+                </td>
+                <td className="px-3 py-2 font-mono text-fg break-all max-w-[200px]">
                   {row.path}
                 </td>
                 <td className="px-3 py-2 text-muted whitespace-nowrap">{row.ip ?? "—"}</td>
                 <td className="px-3 py-2 text-muted break-all max-w-[180px]">
                   {row.referer ? (
                     <span title={row.referer}>{row.referer}</span>
-                  ) : (
-                    "—"
-                  )}
-                </td>
-                <td className="px-3 py-2 text-muted break-all max-w-[280px]">
-                  {row.userAgent ? (
-                    <span title={row.userAgent}>{row.userAgent}</span>
                   ) : (
                     "—"
                   )}

@@ -51,6 +51,9 @@ export function middleware(request: NextRequest) {
     ip,
     userAgent: request.headers.get("user-agent") ?? "",
     referer: request.headers.get("referer") ?? "",
+    // Vercel 边缘提供的国家/地区（部署在 Vercel 时有助于补全 Geo）
+    vercelCountry: request.headers.get("x-vercel-ip-country") ?? "",
+    vercelRegion: request.headers.get("x-vercel-ip-country-region") ?? "",
   };
 
   const logUrl = new URL("/api/visit-logs", request.url);

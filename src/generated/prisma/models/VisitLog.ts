@@ -31,6 +31,13 @@ export type VisitLogMinAggregateOutputType = {
   userAgent: string | null
   referer: string | null
   createdAt: Date | null
+  browser: string | null
+  os: string | null
+  deviceType: string | null
+  deviceModel: string | null
+  country: string | null
+  region: string | null
+  city: string | null
 }
 
 export type VisitLogMaxAggregateOutputType = {
@@ -40,6 +47,13 @@ export type VisitLogMaxAggregateOutputType = {
   userAgent: string | null
   referer: string | null
   createdAt: Date | null
+  browser: string | null
+  os: string | null
+  deviceType: string | null
+  deviceModel: string | null
+  country: string | null
+  region: string | null
+  city: string | null
 }
 
 export type VisitLogCountAggregateOutputType = {
@@ -49,6 +63,13 @@ export type VisitLogCountAggregateOutputType = {
   userAgent: number
   referer: number
   createdAt: number
+  browser: number
+  os: number
+  deviceType: number
+  deviceModel: number
+  country: number
+  region: number
+  city: number
   _all: number
 }
 
@@ -60,6 +81,13 @@ export type VisitLogMinAggregateInputType = {
   userAgent?: true
   referer?: true
   createdAt?: true
+  browser?: true
+  os?: true
+  deviceType?: true
+  deviceModel?: true
+  country?: true
+  region?: true
+  city?: true
 }
 
 export type VisitLogMaxAggregateInputType = {
@@ -69,6 +97,13 @@ export type VisitLogMaxAggregateInputType = {
   userAgent?: true
   referer?: true
   createdAt?: true
+  browser?: true
+  os?: true
+  deviceType?: true
+  deviceModel?: true
+  country?: true
+  region?: true
+  city?: true
 }
 
 export type VisitLogCountAggregateInputType = {
@@ -78,6 +113,13 @@ export type VisitLogCountAggregateInputType = {
   userAgent?: true
   referer?: true
   createdAt?: true
+  browser?: true
+  os?: true
+  deviceType?: true
+  deviceModel?: true
+  country?: true
+  region?: true
+  city?: true
   _all?: true
 }
 
@@ -160,6 +202,13 @@ export type VisitLogGroupByOutputType = {
   userAgent: string | null
   referer: string | null
   createdAt: Date
+  browser: string | null
+  os: string | null
+  deviceType: string | null
+  deviceModel: string | null
+  country: string | null
+  region: string | null
+  city: string | null
   _count: VisitLogCountAggregateOutputType | null
   _min: VisitLogMinAggregateOutputType | null
   _max: VisitLogMaxAggregateOutputType | null
@@ -190,6 +239,13 @@ export type VisitLogWhereInput = {
   userAgent?: Prisma.StringNullableFilter<"VisitLog"> | string | null
   referer?: Prisma.StringNullableFilter<"VisitLog"> | string | null
   createdAt?: Prisma.DateTimeFilter<"VisitLog"> | Date | string
+  browser?: Prisma.StringNullableFilter<"VisitLog"> | string | null
+  os?: Prisma.StringNullableFilter<"VisitLog"> | string | null
+  deviceType?: Prisma.StringNullableFilter<"VisitLog"> | string | null
+  deviceModel?: Prisma.StringNullableFilter<"VisitLog"> | string | null
+  country?: Prisma.StringNullableFilter<"VisitLog"> | string | null
+  region?: Prisma.StringNullableFilter<"VisitLog"> | string | null
+  city?: Prisma.StringNullableFilter<"VisitLog"> | string | null
 }
 
 export type VisitLogOrderByWithRelationInput = {
@@ -199,6 +255,13 @@ export type VisitLogOrderByWithRelationInput = {
   userAgent?: Prisma.SortOrderInput | Prisma.SortOrder
   referer?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  browser?: Prisma.SortOrderInput | Prisma.SortOrder
+  os?: Prisma.SortOrderInput | Prisma.SortOrder
+  deviceType?: Prisma.SortOrderInput | Prisma.SortOrder
+  deviceModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  country?: Prisma.SortOrderInput | Prisma.SortOrder
+  region?: Prisma.SortOrderInput | Prisma.SortOrder
+  city?: Prisma.SortOrderInput | Prisma.SortOrder
 }
 
 export type VisitLogWhereUniqueInput = Prisma.AtLeast<{
@@ -211,6 +274,13 @@ export type VisitLogWhereUniqueInput = Prisma.AtLeast<{
   userAgent?: Prisma.StringNullableFilter<"VisitLog"> | string | null
   referer?: Prisma.StringNullableFilter<"VisitLog"> | string | null
   createdAt?: Prisma.DateTimeFilter<"VisitLog"> | Date | string
+  browser?: Prisma.StringNullableFilter<"VisitLog"> | string | null
+  os?: Prisma.StringNullableFilter<"VisitLog"> | string | null
+  deviceType?: Prisma.StringNullableFilter<"VisitLog"> | string | null
+  deviceModel?: Prisma.StringNullableFilter<"VisitLog"> | string | null
+  country?: Prisma.StringNullableFilter<"VisitLog"> | string | null
+  region?: Prisma.StringNullableFilter<"VisitLog"> | string | null
+  city?: Prisma.StringNullableFilter<"VisitLog"> | string | null
 }, "id">
 
 export type VisitLogOrderByWithAggregationInput = {
@@ -220,6 +290,13 @@ export type VisitLogOrderByWithAggregationInput = {
   userAgent?: Prisma.SortOrderInput | Prisma.SortOrder
   referer?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  browser?: Prisma.SortOrderInput | Prisma.SortOrder
+  os?: Prisma.SortOrderInput | Prisma.SortOrder
+  deviceType?: Prisma.SortOrderInput | Prisma.SortOrder
+  deviceModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  country?: Prisma.SortOrderInput | Prisma.SortOrder
+  region?: Prisma.SortOrderInput | Prisma.SortOrder
+  city?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.VisitLogCountOrderByAggregateInput
   _max?: Prisma.VisitLogMaxOrderByAggregateInput
   _min?: Prisma.VisitLogMinOrderByAggregateInput
@@ -235,6 +312,13 @@ export type VisitLogScalarWhereWithAggregatesInput = {
   userAgent?: Prisma.StringNullableWithAggregatesFilter<"VisitLog"> | string | null
   referer?: Prisma.StringNullableWithAggregatesFilter<"VisitLog"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"VisitLog"> | Date | string
+  browser?: Prisma.StringNullableWithAggregatesFilter<"VisitLog"> | string | null
+  os?: Prisma.StringNullableWithAggregatesFilter<"VisitLog"> | string | null
+  deviceType?: Prisma.StringNullableWithAggregatesFilter<"VisitLog"> | string | null
+  deviceModel?: Prisma.StringNullableWithAggregatesFilter<"VisitLog"> | string | null
+  country?: Prisma.StringNullableWithAggregatesFilter<"VisitLog"> | string | null
+  region?: Prisma.StringNullableWithAggregatesFilter<"VisitLog"> | string | null
+  city?: Prisma.StringNullableWithAggregatesFilter<"VisitLog"> | string | null
 }
 
 export type VisitLogCreateInput = {
@@ -244,6 +328,13 @@ export type VisitLogCreateInput = {
   userAgent?: string | null
   referer?: string | null
   createdAt?: Date | string
+  browser?: string | null
+  os?: string | null
+  deviceType?: string | null
+  deviceModel?: string | null
+  country?: string | null
+  region?: string | null
+  city?: string | null
 }
 
 export type VisitLogUncheckedCreateInput = {
@@ -253,6 +344,13 @@ export type VisitLogUncheckedCreateInput = {
   userAgent?: string | null
   referer?: string | null
   createdAt?: Date | string
+  browser?: string | null
+  os?: string | null
+  deviceType?: string | null
+  deviceModel?: string | null
+  country?: string | null
+  region?: string | null
+  city?: string | null
 }
 
 export type VisitLogUpdateInput = {
@@ -262,6 +360,13 @@ export type VisitLogUpdateInput = {
   userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referer?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  browser?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  os?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deviceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deviceModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type VisitLogUncheckedUpdateInput = {
@@ -271,6 +376,13 @@ export type VisitLogUncheckedUpdateInput = {
   userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referer?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  browser?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  os?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deviceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deviceModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type VisitLogCreateManyInput = {
@@ -280,6 +392,13 @@ export type VisitLogCreateManyInput = {
   userAgent?: string | null
   referer?: string | null
   createdAt?: Date | string
+  browser?: string | null
+  os?: string | null
+  deviceType?: string | null
+  deviceModel?: string | null
+  country?: string | null
+  region?: string | null
+  city?: string | null
 }
 
 export type VisitLogUpdateManyMutationInput = {
@@ -289,6 +408,13 @@ export type VisitLogUpdateManyMutationInput = {
   userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referer?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  browser?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  os?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deviceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deviceModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type VisitLogUncheckedUpdateManyInput = {
@@ -298,6 +424,13 @@ export type VisitLogUncheckedUpdateManyInput = {
   userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referer?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  browser?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  os?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deviceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deviceModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  region?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type VisitLogCountOrderByAggregateInput = {
@@ -307,6 +440,13 @@ export type VisitLogCountOrderByAggregateInput = {
   userAgent?: Prisma.SortOrder
   referer?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  browser?: Prisma.SortOrder
+  os?: Prisma.SortOrder
+  deviceType?: Prisma.SortOrder
+  deviceModel?: Prisma.SortOrder
+  country?: Prisma.SortOrder
+  region?: Prisma.SortOrder
+  city?: Prisma.SortOrder
 }
 
 export type VisitLogMaxOrderByAggregateInput = {
@@ -316,6 +456,13 @@ export type VisitLogMaxOrderByAggregateInput = {
   userAgent?: Prisma.SortOrder
   referer?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  browser?: Prisma.SortOrder
+  os?: Prisma.SortOrder
+  deviceType?: Prisma.SortOrder
+  deviceModel?: Prisma.SortOrder
+  country?: Prisma.SortOrder
+  region?: Prisma.SortOrder
+  city?: Prisma.SortOrder
 }
 
 export type VisitLogMinOrderByAggregateInput = {
@@ -325,6 +472,13 @@ export type VisitLogMinOrderByAggregateInput = {
   userAgent?: Prisma.SortOrder
   referer?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  browser?: Prisma.SortOrder
+  os?: Prisma.SortOrder
+  deviceType?: Prisma.SortOrder
+  deviceModel?: Prisma.SortOrder
+  country?: Prisma.SortOrder
+  region?: Prisma.SortOrder
+  city?: Prisma.SortOrder
 }
 
 
@@ -336,6 +490,13 @@ export type VisitLogSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   userAgent?: boolean
   referer?: boolean
   createdAt?: boolean
+  browser?: boolean
+  os?: boolean
+  deviceType?: boolean
+  deviceModel?: boolean
+  country?: boolean
+  region?: boolean
+  city?: boolean
 }, ExtArgs["result"]["visitLog"]>
 
 export type VisitLogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -345,6 +506,13 @@ export type VisitLogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   userAgent?: boolean
   referer?: boolean
   createdAt?: boolean
+  browser?: boolean
+  os?: boolean
+  deviceType?: boolean
+  deviceModel?: boolean
+  country?: boolean
+  region?: boolean
+  city?: boolean
 }, ExtArgs["result"]["visitLog"]>
 
 export type VisitLogSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -354,6 +522,13 @@ export type VisitLogSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   userAgent?: boolean
   referer?: boolean
   createdAt?: boolean
+  browser?: boolean
+  os?: boolean
+  deviceType?: boolean
+  deviceModel?: boolean
+  country?: boolean
+  region?: boolean
+  city?: boolean
 }, ExtArgs["result"]["visitLog"]>
 
 export type VisitLogSelectScalar = {
@@ -363,9 +538,16 @@ export type VisitLogSelectScalar = {
   userAgent?: boolean
   referer?: boolean
   createdAt?: boolean
+  browser?: boolean
+  os?: boolean
+  deviceType?: boolean
+  deviceModel?: boolean
+  country?: boolean
+  region?: boolean
+  city?: boolean
 }
 
-export type VisitLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "path" | "ip" | "userAgent" | "referer" | "createdAt", ExtArgs["result"]["visitLog"]>
+export type VisitLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "path" | "ip" | "userAgent" | "referer" | "createdAt" | "browser" | "os" | "deviceType" | "deviceModel" | "country" | "region" | "city", ExtArgs["result"]["visitLog"]>
 
 export type $VisitLogPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "VisitLog"
@@ -377,6 +559,34 @@ export type $VisitLogPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     userAgent: string | null
     referer: string | null
     createdAt: Date
+    /**
+     * 解析自 UA，如 Chrome 120
+     */
+    browser: string | null
+    /**
+     * 如 Windows 11、iOS 17
+     */
+    os: string | null
+    /**
+     * mobile | tablet | desktop | smarttv 等
+     */
+    deviceType: string | null
+    /**
+     * 机型，如 iPhone、Samsung SM-G991B
+     */
+    deviceModel: string | null
+    /**
+     * 国家（可含 Geo 或 Vercel 国家码）
+     */
+    country: string | null
+    /**
+     * 省/州
+     */
+    region: string | null
+    /**
+     * 城市
+     */
+    city: string | null
   }, ExtArgs["result"]["visitLog"]>
   composites: {}
 }
@@ -806,6 +1016,13 @@ export interface VisitLogFieldRefs {
   readonly userAgent: Prisma.FieldRef<"VisitLog", 'String'>
   readonly referer: Prisma.FieldRef<"VisitLog", 'String'>
   readonly createdAt: Prisma.FieldRef<"VisitLog", 'DateTime'>
+  readonly browser: Prisma.FieldRef<"VisitLog", 'String'>
+  readonly os: Prisma.FieldRef<"VisitLog", 'String'>
+  readonly deviceType: Prisma.FieldRef<"VisitLog", 'String'>
+  readonly deviceModel: Prisma.FieldRef<"VisitLog", 'String'>
+  readonly country: Prisma.FieldRef<"VisitLog", 'String'>
+  readonly region: Prisma.FieldRef<"VisitLog", 'String'>
+  readonly city: Prisma.FieldRef<"VisitLog", 'String'>
 }
     
 
