@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { isAdmin } from "@/lib/auth";
+import {
+  lookupIpGeo,
+  mergeGeo,
+  parseVisitUserAgent,
+} from "@/lib/visitLogEnrich";
 
 function getVisitLogSecret(): string {
   if (process.env.VISIT_LOG_SECRET?.trim()) {
@@ -12,7 +17,16 @@ function getVisitLogSecret(): string {
   return "";
 }
 
-/** 中间件调用：写入一条访问记录 */
+type LogBody = {
+  path?: string;
+  ip?: string;
+  userAgent?: string;
+  referer?: string;
+  vercelCountry?: string;
+  vercelRegion?: string;
+};
+
+/** 中间件调用：写入一条访问记录（含 UA 解析与 Geo） */
 export async function POST(request: NextRequest) {
   const secret = getVisitLogSecret();
   if (!secret) {
@@ -23,7 +37,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "未授权" }, { status: 401 });
   }
 
-  let body: { path?: string; ip?: string; userAgent?: string; referer?: string };
+  let body: LogBody;
   try {
     body = await request.json();
   } catch {
@@ -35,14 +49,60 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "path 无效" }, { status: 400 });
   }
 
-  await prisma.visitLog.create({
-    data: {
-      path,
-      ip: body.ip?.slice(0, 128) || null,
-      userAgent: body.userAgent?.slice(0, 512) || null,
-      referer: body.referer?.slice(0, 2048) || null,
-    },
-  });
+  const ip = body.ip?.slice(0, 128) || null;
+  const uaStr = body.userAgent?.slice(0, 512) || null;
+
+  let parsed: ReturnType<typeof parseVisitUserAgent>;
+  try {
+    parsed = parseVisitUserAgent(uaStr);
+  } catch (e) {
+    console.error("[visit-log] parseVisitUserAgent", e);
+    parsed = {
+      browser: null,
+      os: null,
+      deviceType: null,
+      deviceModel: null,
+    };
+  }
+
+  let geo = { country: null as string | null, region: null as string | null, city: null as string | null };
+  try {
+    const geoRaw = ip ? await lookupIpGeo(ip) : { country: null, region: null, city: null };
+    geo = mergeGeo(
+      geoRaw,
+      body.vercelCountry?.trim() || null,
+      body.vercelRegion?.trim() || null
+    );
+  } catch (e) {
+    console.error("[visit-log] geo", e);
+  }
+
+  try {
+    await prisma.visitLog.create({
+      data: {
+        path,
+        ip,
+        userAgent: uaStr,
+        referer: body.referer?.slice(0, 2048) || null,
+        browser: parsed.browser?.slice(0, 128) || null,
+        os: parsed.os?.slice(0, 128) || null,
+        deviceType: parsed.deviceType?.slice(0, 64) || null,
+        deviceModel: parsed.deviceModel?.slice(0, 128) || null,
+        country: geo.country?.slice(0, 128) || null,
+        region: geo.region?.slice(0, 128) || null,
+        city: geo.city?.slice(0, 128) || null,
+      },
+    });
+  } catch (e) {
+    console.error("[visit-log] prisma.create", e);
+    return NextResponse.json(
+      {
+        error: "写入失败，请确认数据库已迁移（npx prisma db push）",
+        detail: String(e),
+      },
+      { status: 500 }
+    );
+  }
 
   return NextResponse.json({ ok: true });
 }

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, type NextFetchEvent } from "next/server";
 
 function visitLogSecret(): string {
   if (process.env.VISIT_LOG_SECRET?.trim()) {
@@ -10,7 +10,10 @@ function visitLogSecret(): string {
   return "";
 }
 
-export function middleware(request: NextRequest) {
+/**
+ * 使用 waitUntil，避免 Vercel Edge 在 return next() 后终止未完成的 fetch，导致访问记录写不进库。
+ */
+export function middleware(request: NextRequest, event: NextFetchEvent) {
   if (request.method !== "GET") {
     return NextResponse.next();
   }
@@ -21,11 +24,16 @@ export function middleware(request: NextRequest) {
   }
 
   const accept = request.headers.get("accept") ?? "";
-  if (!accept.includes("text/html")) {
+  const secFetchMode = request.headers.get("sec-fetch-mode");
+  const secFetchDest = request.headers.get("sec-fetch-dest");
+  const looksLikePageNavigation =
+    accept.includes("text/html") ||
+    secFetchMode === "navigate" ||
+    secFetchDest === "document";
+  if (!looksLikePageNavigation) {
     return NextResponse.next();
   }
 
-  // 减少 RSC / 预取产生的重复记录
   if (request.headers.get("next-router-prefetch") === "1") {
     return NextResponse.next();
   }
@@ -51,17 +59,23 @@ export function middleware(request: NextRequest) {
     ip,
     userAgent: request.headers.get("user-agent") ?? "",
     referer: request.headers.get("referer") ?? "",
+    vercelCountry: request.headers.get("x-vercel-ip-country") ?? "",
+    vercelRegion: request.headers.get("x-vercel-ip-country-region") ?? "",
   };
 
   const logUrl = new URL("/api/visit-logs", request.url);
-  fetch(logUrl, {
+  const logPromise = fetch(logUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${secret}`,
     },
     body: JSON.stringify(payload),
-  }).catch(() => {});
+  }).catch((err) => {
+    console.error("[visit-log middleware fetch]", err);
+  });
+
+  event.waitUntil(logPromise);
 
   return NextResponse.next();
 }

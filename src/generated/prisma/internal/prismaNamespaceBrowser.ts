@@ -131,6 +131,13 @@ export const VisitLogScalarFieldEnum = {
   ip: 'ip',
   userAgent: 'userAgent',
   referer: 'referer',
+  browser: 'browser',
+  os: 'os',
+  deviceType: 'deviceType',
+  deviceModel: 'deviceModel',
+  country: 'country',
+  region: 'region',
+  city: 'city',
   createdAt: 'createdAt'
 } as const
 

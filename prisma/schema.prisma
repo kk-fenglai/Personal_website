@@ -59,6 +59,20 @@ model VisitLog {
   ip        String?
   userAgent String?
   referer   String?
+  /// 浏览器摘要，如 Chrome 120
+  browser      String?
+  /// 操作系统，如 Windows 11、iOS 17
+  os           String?
+  /// mobile | tablet | desktop 等
+  deviceType   String?
+  /// 设备型号 / 厂商，如 iPhone、SM-G991B
+  deviceModel  String?
+  /// 国家/地区（Geo 或 Vercel 头）
+  country   String?
+  /// 省/州
+  region    String?
+  /// 城市
+  city      String?
   createdAt DateTime @default(now())
 
   @@index([createdAt])
