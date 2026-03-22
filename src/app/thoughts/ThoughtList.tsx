@@ -68,7 +68,11 @@ export function ThoughtList() {
               </span>
             </div>
             <p className="mt-2 text-muted text-base line-clamp-2 reading">
-              <FormattedContent content={pickThoughtContent(item, locale)} />
+              <FormattedContent
+                content={pickThoughtContent(item, locale)}
+                stripImages
+                as="span"
+              />
             </p>
           </Link>
         </li>
