@@ -20,9 +20,23 @@ model Thought {
   /// 法文正文
   contentFr  String?
   isPublic   Boolean   @default(true)
+  categoryId String?
+  category   ThoughtCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  isPinned   Boolean   @default(false)
+  pinnedOrder Int?
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   comments   Comment[]
+
+  @@index([isPinned, pinnedOrder])
+  @@index([categoryId, createdAt])
+}
+
+model ThoughtCategory {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  thoughts  Thought[]
 }
 
 model Comment {

@@ -10,6 +10,10 @@ type Thought = {
   title: string;
   content: string;
   isPublic: boolean;
+  isPinned: boolean;
+  pinnedOrder: number | null;
+  categoryId: string | null;
+  category?: { id: string; name: string } | null;
   createdAt: string;
 };
 
@@ -22,12 +26,13 @@ type Photo = {
 };
 
 export function AdminPanel({ onLogout }: { onLogout: () => void }) {
-  const { t, dateLocale } = useLocale();
+  const { t } = useLocale();
   const [thoughts, setThoughts] = useState<Thought[]>([]);
   const [photos, setPhotos] = useState<Photo[]>([]);
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<
-    "thoughts" | "photos" | "new-thought" | "upload" | "access" | "visits"
+    "thoughts" | "photos" | "new-thought" | "upload" | "access" | "visits" | "categories"
   >("thoughts");
   const [editingThought, setEditingThought] = useState<Thought | null>(null);
 
@@ -35,9 +40,11 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
     Promise.all([
       fetch("/api/thoughts").then((r) => r.json()),
       fetch("/api/photos").then((r) => r.json()),
-    ]).then(([tData, pData]) => {
+      fetch("/api/thought-categories").then((r) => r.json()),
+    ]).then(([tData, pData, cData]) => {
       setThoughts(Array.isArray(tData) ? tData : []);
       setPhotos(Array.isArray(pData) ? pData : []);
+      setCategories(Array.isArray(cData) ? cData : []);
       setLoading(false);
     });
   };
@@ -53,18 +60,21 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-fg">{t("admin.title")}</h1>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="section-label mb-2">{t("nav.siteName")}</p>
+          <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight text-fg">{t("admin.title")}</h1>
+        </div>
         <button
           type="button"
           onClick={handleLogout}
-          className="text-base text-muted hover:text-fg"
+          className="button-secondary self-start px-4 py-2 text-base"
         >
           {t("admin.logout")}
         </button>
       </div>
 
-      <div className="flex flex-wrap gap-6 border-b border-border pb-3 text-base">
+      <div className="card p-2 flex flex-wrap gap-2 text-base">
         {[
           ["thoughts", t("admin.tabThoughts")],
           ["new-thought", t("admin.tabNewThought")],
@@ -72,14 +82,15 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
           ["upload", t("admin.tabUpload")],
           ["access", t("admin.accessRequests")],
           ["visits", t("admin.tabVisits")],
+          ["categories", t("admin.tabCategories")],
         ].map(([tab, label]) => (
           <button
             key={tab}
             type="button"
             onClick={() => setActiveTab(tab as typeof activeTab)}
-            className={`relative py-1 transition-colors ${
-              activeTab === tab ? "text-fg font-medium" : "text-muted hover:text-fg"
-            } ${activeTab === tab ? "after:content-[''] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-fg" : ""}`}
+            className={`button-ghost px-3 py-2 text-sm sm:text-base ${
+              activeTab === tab ? "bg-warm text-bg font-medium" : "hover:bg-bg"
+            }`}
           >
             {label}
           </button>
@@ -89,6 +100,7 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
       {activeTab === "thoughts" && (
         <ThoughtListAdmin
           thoughts={thoughts}
+          categories={categories}
           loading={loading}
           onToggle={load}
           onEdit={setEditingThought}
@@ -97,7 +109,13 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
         />
       )}
       {activeTab === "new-thought" && (
-        <NewThoughtForm onSuccess={() => { setActiveTab("thoughts"); load(); }} />
+        <NewThoughtForm
+          categories={categories}
+          onSuccess={() => {
+            setActiveTab("thoughts");
+            load();
+          }}
+        />
       )}
       {activeTab === "photos" && (
         <PhotoListAdmin
@@ -111,6 +129,14 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
       )}
       {activeTab === "access" && <AccessRequestsList />}
       {activeTab === "visits" && <VisitLogsList />}
+      {activeTab === "categories" && (
+        <CategoryManager
+          categories={categories}
+          onChange={() => {
+            load();
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -168,7 +194,7 @@ function AccessRequestsList() {
       {list.map((r) => (
         <li
           key={r.id}
-          className="p-4 border border-border flex flex-col gap-2"
+          className="card p-4 flex flex-col gap-2"
         >
           <div className="flex items-start justify-between gap-2">
             <div>
@@ -178,12 +204,12 @@ function AccessRequestsList() {
               )}
             </div>
             <span
-              className={`text-sm px-2 py-0.5 rounded ${
+              className={`status-badge text-sm px-2 py-0.5 ${
                 r.status === "approved"
-                  ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                  ? "status-badge-approved"
                   : r.status === "rejected"
-                    ? "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
-                    : "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400"
+                    ? "status-badge-rejected"
+                    : "status-badge-pending"
               }`}
             >
               {r.status === "approved"
@@ -205,7 +231,7 @@ function AccessRequestsList() {
             <button
               type="button"
               onClick={() => approve(r.id)}
-              className="self-start text-fg text-base font-medium border-b border-fg pb-0.5 hover:opacity-70"
+              className="button-secondary self-start px-4 py-2 text-base font-medium hover:opacity-80"
             >
               {t("admin.approve")}
             </button>
@@ -215,7 +241,7 @@ function AccessRequestsList() {
               <button
                 type="button"
                 onClick={() => copyAccessLink(r.accessToken!, r.id)}
-                className="text-base text-fg font-medium border-b border-fg pb-0.5 hover:opacity-70"
+                className="button-secondary px-4 py-2 text-base font-medium hover:opacity-80"
               >
                 {copiedId === r.id ? t("admin.copied") : t("admin.copyLink")}
               </button>
@@ -284,7 +310,7 @@ function VisitLogsList() {
   };
 
   useEffect(() => {
-    fetchPage(0, false);
+    void Promise.resolve().then(() => fetchPage(0, false));
   }, []);
 
   if (loading) {
@@ -302,9 +328,9 @@ function VisitLogsList() {
       <p className="text-muted text-sm">
         {t("admin.visitsTotal", { count: total })}
       </p>
-      <div className="overflow-x-auto border border-border rounded-lg">
+      <div className="overflow-x-auto border border-border rounded-[var(--radius-card)] bg-bg-card">
         <table className="w-full text-left text-sm min-w-[960px]">
-          <thead className="bg-bg-card border-b border-border">
+          <thead className="bg-bg border-b border-border">
             <tr>
               <th className="px-3 py-2 font-medium text-fg">{t("admin.visitsTime")}</th>
               <th className="px-3 py-2 font-medium text-fg">{t("admin.visitsPath")}</th>
@@ -366,6 +392,7 @@ function VisitLogsList() {
 
 function ThoughtListAdmin({
   thoughts,
+  categories,
   loading,
   onToggle,
   onEdit,
@@ -373,6 +400,7 @@ function ThoughtListAdmin({
   onCancelEdit,
 }: {
   thoughts: Thought[];
+  categories: { id: string; name: string }[];
   loading: boolean;
   onToggle: () => void;
   onEdit: (thought: Thought) => void;
@@ -380,12 +408,72 @@ function ThoughtListAdmin({
   onCancelEdit: () => void;
 }) {
   const { t, dateLocale } = useLocale();
+  const [selected, setSelected] = useState<Record<string, boolean>>({});
+  const [bulkCategoryId, setBulkCategoryId] = useState<string>("");
 
   const toggle = async (id: string, isPublic: boolean) => {
     await fetch(`/api/thoughts/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ isPublic: !isPublic }),
+    });
+    onToggle();
+  };
+
+  const moveToCategory = async (id: string, nextCategoryId: string) => {
+    await fetch(`/api/thoughts/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ categoryId: nextCategoryId || null }),
+    });
+    onToggle();
+  };
+
+  const selectedIds = Object.entries(selected)
+    .filter(([, v]) => v)
+    .map(([k]) => k);
+
+  const setSelectedFor = (ids: string[], v: boolean) => {
+    setSelected((prev) => {
+      const next = { ...prev };
+      ids.forEach((id) => {
+        next[id] = v;
+      });
+      return next;
+    });
+  };
+
+  const clearSelected = () => setSelected({});
+
+  const bulk = async (action: "moveCategory" | "delete" | "pin" | "unpin", extra?: Record<string, unknown>) => {
+    if (selectedIds.length === 0) return;
+    const res = await fetch("/api/thoughts/batch", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids: selectedIds, action, ...(extra || {}) }),
+    });
+    if (!res.ok) return;
+    clearSelected();
+    onToggle();
+  };
+
+  const setPinned = async (id: string, nextPinned: boolean, nextOrder?: number) => {
+    await fetch(`/api/thoughts/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        isPinned: nextPinned,
+        ...(typeof nextOrder === "number" ? { pinnedOrder: nextOrder } : {}),
+      }),
+    });
+    onToggle();
+  };
+
+  const reorderPinned = async (orderedIds: string[]) => {
+    await fetch("/api/thoughts/pin-order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids: orderedIds }),
     });
     onToggle();
   };
@@ -401,6 +489,7 @@ function ThoughtListAdmin({
     return (
       <EditThoughtForm
         thought={editingThought}
+        categories={categories}
         onSuccess={() => {
           onCancelEdit();
           onToggle();
@@ -410,53 +499,248 @@ function ThoughtListAdmin({
     );
   }
 
+  const pinned = thoughts.filter((x) => x.isPinned).slice().sort((a, b) => {
+    const ao = a.pinnedOrder ?? 999999;
+    const bo = b.pinnedOrder ?? 999999;
+    if (ao !== bo) return ao - bo;
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+  const normal = thoughts.filter((x) => !x.isPinned);
+
   return (
-    <ul className="space-y-3">
-      {thoughts.map((item) => (
-        <li
-          key={item.id}
-          className="flex flex-wrap items-center justify-between gap-2 p-4 border border-border rounded-xl bg-bg-card"
-        >
-          <div className="min-w-0 flex-1">
-            <Link href={`/thoughts/${item.id}`} className="font-medium text-fg hover:opacity-70">
-              {item.title}
-            </Link>
-            <span className="ml-2 text-sm text-muted">
-              {new Date(item.createdAt).toLocaleDateString(dateLocale)}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => onEdit(item)}
-              className="text-sm px-3 py-1.5 rounded-lg border border-border text-fg hover:bg-bg"
-            >
-              {t("admin.editThought")}
-            </button>
-            <button
-              type="button"
-              onClick={() => toggle(item.id, item.isPublic)}
-              className={`text-sm px-3 py-1.5 rounded-full ${
-                item.isPublic
-                  ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                  : "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
-              }`}
-            >
-              {item.isPublic ? t("admin.visibilityPublic") : t("admin.visibilityPrivate")}
-            </button>
-          </div>
+    <div className="space-y-6">
+      {selectedIds.length > 0 && (
+        <div className="card p-4 flex flex-wrap items-center gap-3">
+          <span className="text-sm text-fg font-medium">
+            {t("admin.bulkSelected").replace("{count}", String(selectedIds.length))}
+          </span>
+          <button
+            type="button"
+            onClick={clearSelected}
+            className="button-secondary px-3 py-1.5 text-sm"
+          >
+            {t("admin.clearSelection")}
+          </button>
+          <div className="flex-1" />
+          <select
+            value={bulkCategoryId}
+            onChange={(e) => setBulkCategoryId(e.target.value)}
+            className="form-control text-sm py-1 px-2 w-[12rem]"
+            aria-label={t("admin.formCategory")}
+          >
+            <option value="">{t("admin.noCategory")}</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={() => void bulk("moveCategory", { categoryId: bulkCategoryId || null })}
+            className="button-primary px-4 py-2 text-sm font-medium"
+          >
+            {t("admin.bulkMove")}
+          </button>
+          <button
+            type="button"
+            onClick={() => void bulk("pin")}
+            className="button-secondary px-4 py-2 text-sm font-medium"
+          >
+            {t("admin.bulkPin")}
+          </button>
+          <button
+            type="button"
+            onClick={() => void bulk("unpin")}
+            className="button-secondary px-4 py-2 text-sm font-medium"
+          >
+            {t("admin.bulkUnpin")}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (!window.confirm(t("admin.bulkDeleteConfirm"))) return;
+              void bulk("delete");
+            }}
+            className="button-secondary px-4 py-2 text-sm font-medium danger-text"
+          >
+            {t("admin.bulkDelete")}
+          </button>
+        </div>
+      )}
+
+      {pinned.length > 0 && (
+        <div className="card p-4 space-y-3">
+          <p className="section-label">{t("admin.pinned")}</p>
+          <ul className="space-y-2">
+            {pinned.map((item, idx) => {
+              const orderedIds = pinned.map((x) => x.id);
+              return (
+                <li key={item.id} className="flex flex-wrap items-center justify-between gap-3">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={!!selected[item.id]}
+                      onChange={(e) => setSelected((p) => ({ ...p, [item.id]: e.target.checked }))}
+                    />
+                  </label>
+                  <div className="min-w-0 flex-1">
+                    <Link href={`/thoughts/${item.id}`} className="font-medium text-fg hover:opacity-70">
+                      {item.title}
+                    </Link>
+                    {item.category?.name && (
+                      <span className="ml-2 text-xs text-muted">#{item.category.name}</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={item.category?.id ?? ""}
+                      onChange={(e) => void moveToCategory(item.id, e.target.value)}
+                      className="form-control text-sm py-1 px-2 w-[10.5rem]"
+                      aria-label={t("admin.formCategory")}
+                    >
+                      <option value="">{t("admin.noCategory")}</option>
+                      {categories.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      disabled={idx === 0}
+                      onClick={() => {
+                        const next = orderedIds.slice();
+                        const tmp = next[idx - 1];
+                        next[idx - 1] = next[idx];
+                        next[idx] = tmp;
+                        void reorderPinned(next);
+                      }}
+                      className="button-secondary text-sm px-3 py-1.5 disabled:opacity-50"
+                    >
+                      ↑
+                    </button>
+                    <button
+                      type="button"
+                      disabled={idx === pinned.length - 1}
+                      onClick={() => {
+                        const next = orderedIds.slice();
+                        const tmp = next[idx + 1];
+                        next[idx + 1] = next[idx];
+                        next[idx] = tmp;
+                        void reorderPinned(next);
+                      }}
+                      className="button-secondary text-sm px-3 py-1.5 disabled:opacity-50"
+                    >
+                      ↓
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPinned(item.id, false)}
+                      className="button-secondary text-sm px-3 py-1.5"
+                    >
+                      {t("admin.unpin")}
+                    </button>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
+      <ul className="space-y-3">
+        <li className="flex items-center gap-3">
+          <label className="flex items-center gap-2 text-sm text-muted">
+            <input
+              type="checkbox"
+              checked={normal.length > 0 && normal.every((x) => selected[x.id])}
+              onChange={(e) => setSelectedFor(normal.map((x) => x.id), e.target.checked)}
+            />
+            {t("admin.selectAll")}
+          </label>
         </li>
-      ))}
-    </ul>
+        {normal.map((item) => (
+          <li
+            key={item.id}
+            className="card flex flex-wrap items-center justify-between gap-3 p-4"
+          >
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={!!selected[item.id]}
+                onChange={(e) => setSelected((p) => ({ ...p, [item.id]: e.target.checked }))}
+              />
+            </label>
+            <div className="min-w-0 flex-1">
+              <Link href={`/thoughts/${item.id}`} className="font-medium text-fg hover:opacity-70">
+                {item.title}
+              </Link>
+              {item.category?.name && (
+                <span className="ml-2 text-xs text-muted">#{item.category.name}</span>
+              )}
+              <span className="ml-2 text-sm text-muted">
+                {new Date(item.createdAt).toLocaleDateString(dateLocale)}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => onEdit(item)}
+                className="button-secondary text-sm px-3 py-1.5"
+              >
+                {t("admin.editThought")}
+              </button>
+              <select
+                value={item.category?.id ?? ""}
+                onChange={(e) => void moveToCategory(item.id, e.target.value)}
+                className="form-control text-sm py-1 px-2 w-[10.5rem]"
+                aria-label={t("admin.formCategory")}
+              >
+                <option value="">{t("admin.noCategory")}</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={() => {
+                  const nextOrder = pinned.length + 1;
+                  void setPinned(item.id, true, nextOrder);
+                }}
+                className="button-secondary text-sm px-3 py-1.5"
+              >
+                {t("admin.pin")}
+              </button>
+              <button
+                type="button"
+                onClick={() => toggle(item.id, item.isPublic)}
+                className={`status-badge text-sm px-3 py-1.5 ${
+                  item.isPublic
+                    ? "status-badge-public"
+                    : "status-badge-private"
+                }`}
+              >
+                {item.isPublic ? t("admin.visibilityPublic") : t("admin.visibilityPrivate")}
+              </button>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
 function EditThoughtForm({
   thought,
+  categories,
   onSuccess,
   onCancel,
 }: {
   thought: Thought;
+  categories: { id: string; name: string }[];
   onSuccess: () => void;
   onCancel: () => void;
 }) {
@@ -464,6 +748,7 @@ function EditThoughtForm({
   const [title, setTitle] = useState(thought.title);
   const [content, setContent] = useState(thought.content);
   const [isPublic, setIsPublic] = useState(thought.isPublic);
+  const [categoryId, setCategoryId] = useState<string>(thought.categoryId ?? "");
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
@@ -498,7 +783,7 @@ function EditThoughtForm({
       const res = await fetch(`/api/thoughts/${thought.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, content, isPublic }),
+        body: JSON.stringify({ title, content, isPublic, categoryId: categoryId || null }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -514,7 +799,7 @@ function EditThoughtForm({
   };
 
   return (
-    <div className="space-y-4 max-w-xl">
+    <div className="card p-5 sm:p-6 space-y-4 max-w-2xl">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold text-fg">{t("admin.editThought")}：{thought.title}</h2>
         <button
@@ -526,14 +811,14 @@ function EditThoughtForm({
         </button>
       </div>
       <form onSubmit={handleSubmit} className="space-y-4">
-        {error && <p className="text-base text-red-600 dark:text-red-400">{error}</p>}
+        {error && <p className="text-base danger-text">{error}</p>}
         <div>
           <label className="block section-label mb-2">{t("admin.formTitle")}</label>
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full border-b border-border bg-transparent px-0 py-2 text-base text-fg focus:outline-none focus:border-fg"
+            className="form-control"
             required
           />
         </div>
@@ -545,7 +830,7 @@ function EditThoughtForm({
             placeholder={t("admin.contentPlaceholder")}
             required
             rows={14}
-            className="w-full min-h-[320px] border border-border rounded-xl bg-bg-card px-4 py-4 text-base text-fg leading-relaxed placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-warm/40 focus:border-warm resize-y"
+            className="form-control min-h-[320px] rounded-[var(--radius-card)] py-4 leading-relaxed resize-y"
           />
         </div>
         <label className="flex items-center gap-2 cursor-pointer">
@@ -556,11 +841,26 @@ function EditThoughtForm({
           />
           <span className="text-base text-fg">{t("admin.formPublicLabel")}</span>
         </label>
+        <div>
+          <label className="block section-label mb-2">{t("admin.formCategory")}</label>
+          <select
+            value={categoryId}
+            onChange={(e) => setCategoryId(e.target.value)}
+            className="form-control max-w-md"
+          >
+            <option value="">{t("admin.noCategory")}</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </div>
         <div className="flex flex-wrap gap-3">
           <button
             type="submit"
             disabled={loading || deleting}
-            className="px-5 py-2.5 rounded-xl text-base font-medium bg-fg text-bg hover:opacity-90 disabled:opacity-50"
+            className="button-primary px-5 py-2.5 text-base font-medium hover:opacity-90 disabled:opacity-50"
           >
             {loading ? t("admin.updating") : t("admin.saveChanges")}
           </button>
@@ -568,7 +868,7 @@ function EditThoughtForm({
             type="button"
             onClick={onCancel}
             disabled={deleting}
-            className="px-5 py-2.5 rounded-xl text-base border border-border text-muted hover:text-fg disabled:opacity-50"
+            className="button-secondary px-5 py-2.5 text-base disabled:opacity-50"
           >
             {t("admin.cancel")}
           </button>
@@ -581,7 +881,7 @@ function EditThoughtForm({
           type="button"
           onClick={handleDelete}
           disabled={loading || deleting}
-          className="px-5 py-2.5 rounded-xl text-base font-medium border border-red-500/60 text-red-600 dark:text-red-400 hover:bg-red-500/10 disabled:opacity-50"
+          className="button-secondary px-5 py-2.5 text-base font-medium danger-text hover:opacity-80 disabled:opacity-50"
         >
           {deleting ? t("admin.deletingThought") : t("admin.deleteThoughtButton")}
         </button>
@@ -590,11 +890,18 @@ function EditThoughtForm({
   );
 }
 
-function NewThoughtForm({ onSuccess }: { onSuccess: () => void }) {
+function NewThoughtForm({
+  categories,
+  onSuccess,
+}: {
+  categories: { id: string; name: string }[];
+  onSuccess: () => void;
+}) {
   const { t } = useLocale();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isPublic, setIsPublic] = useState(true);
+  const [categoryId, setCategoryId] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -606,7 +913,7 @@ function NewThoughtForm({ onSuccess }: { onSuccess: () => void }) {
       const res = await fetch("/api/thoughts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, content, isPublic }),
+        body: JSON.stringify({ title, content, isPublic, categoryId: categoryId || null }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -624,15 +931,15 @@ function NewThoughtForm({ onSuccess }: { onSuccess: () => void }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-xl">
-      {error && <p className="text-base text-red-600 dark:text-red-400">{error}</p>}
+    <form onSubmit={handleSubmit} className="card p-5 sm:p-6 space-y-4 max-w-2xl">
+      {error && <p className="text-base danger-text">{error}</p>}
       <div>
         <label className="block section-label mb-2">{t("admin.formTitle")}</label>
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full border-b border-border bg-transparent px-0 py-2 text-base text-fg focus:outline-none focus:border-fg"
+          className="form-control"
           required
         />
       </div>
@@ -644,7 +951,7 @@ function NewThoughtForm({ onSuccess }: { onSuccess: () => void }) {
           placeholder={t("admin.contentPlaceholder")}
           required
           rows={14}
-          className="w-full min-h-[320px] border border-border rounded-xl bg-bg-card px-4 py-4 text-base text-fg leading-relaxed placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-warm/40 focus:border-warm resize-y"
+          className="form-control min-h-[320px] rounded-[var(--radius-card)] py-4 leading-relaxed resize-y"
         />
       </div>
       <label className="flex items-center gap-2 cursor-pointer">
@@ -655,14 +962,206 @@ function NewThoughtForm({ onSuccess }: { onSuccess: () => void }) {
         />
         <span className="text-base text-fg">{t("admin.formPublicLabel")}</span>
         </label>
+      <div>
+        <label className="block section-label mb-2">{t("admin.formCategory")}</label>
+        <select
+          value={categoryId}
+          onChange={(e) => setCategoryId(e.target.value)}
+          className="form-control max-w-md"
+        >
+          <option value="">{t("admin.noCategory")}</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+      </div>
       <button
         type="submit"
         disabled={loading}
-        className="text-fg text-base font-medium border-b border-fg pb-0.5 hover:opacity-70 disabled:opacity-50"
+        className="button-primary self-start px-5 py-2.5 text-base font-medium hover:opacity-90 disabled:opacity-50"
       >
         {loading ? t("admin.publishing") : t("admin.publish")}
       </button>
     </form>
+  );
+}
+
+function CategoryManager({
+  categories,
+  onChange,
+}: {
+  categories: { id: string; name: string }[];
+  onChange: () => void;
+}) {
+  const { t } = useLocale();
+  const [name, setName] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState("");
+
+  const create = async () => {
+    setError("");
+    const v = name.trim();
+    if (!v) return;
+    setSaving(true);
+    try {
+      const res = await fetch("/api/thought-categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: v }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || t("common.errorNetwork"));
+        return;
+      }
+      setName("");
+      onChange();
+    } catch {
+      setError(t("common.errorNetwork"));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const saveRename = async (id: string) => {
+    setError("");
+    const v = editingName.trim();
+    if (!v) return;
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/thought-categories/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: v }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || t("common.errorNetwork"));
+        return;
+      }
+      setEditingId(null);
+      setEditingName("");
+      onChange();
+    } catch {
+      setError(t("common.errorNetwork"));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const remove = async (id: string) => {
+    if (!window.confirm(t("admin.deleteCategoryConfirm"))) return;
+    setError("");
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/thought-categories/${id}`, { method: "DELETE" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || t("common.errorNetwork"));
+        return;
+      }
+      onChange();
+    } catch {
+      setError(t("common.errorNetwork"));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="card p-5 sm:p-6 space-y-4 max-w-2xl">
+      <h2 className="text-xl font-semibold text-fg">{t("admin.tabCategories")}</h2>
+      {error && <p className="text-base danger-text">{error}</p>}
+
+      <div className="flex flex-wrap gap-3 items-end">
+        <div className="flex-1 min-w-[220px]">
+          <label className="block section-label mb-2">{t("admin.newCategory")}</label>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="form-control"
+            placeholder={t("admin.newCategoryPlaceholder")}
+            maxLength={40}
+          />
+        </div>
+        <button
+          type="button"
+          onClick={() => void create()}
+          disabled={saving || !name.trim()}
+          className="button-primary px-5 py-2.5 text-base font-medium disabled:opacity-50"
+        >
+          {t("admin.create")}
+        </button>
+      </div>
+
+      {categories.length === 0 ? (
+        <p className="text-muted text-base">{t("admin.categoriesEmpty")}</p>
+      ) : (
+        <ul className="space-y-2">
+          {categories.map((c) => (
+            <li key={c.id} className="flex items-center justify-between gap-3">
+              {editingId === c.id ? (
+                <div className="flex-1 flex flex-wrap items-center gap-2">
+                  <input
+                    value={editingName}
+                    onChange={(e) => setEditingName(e.target.value)}
+                    className="form-control"
+                    maxLength={40}
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    onClick={() => void saveRename(c.id)}
+                    disabled={saving || !editingName.trim()}
+                    className="button-primary px-4 py-2 text-sm font-medium disabled:opacity-50"
+                  >
+                    {t("admin.save")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingId(null);
+                      setEditingName("");
+                    }}
+                    className="button-secondary px-4 py-2 text-sm"
+                  >
+                    {t("admin.cancel")}
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <span className="text-fg font-medium">{c.name}</span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingId(c.id);
+                        setEditingName(c.name);
+                      }}
+                      className="button-secondary px-3 py-1.5 text-sm"
+                    >
+                      {t("admin.rename")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void remove(c.id)}
+                      disabled={saving}
+                      className="button-secondary px-3 py-1.5 text-sm danger-text disabled:opacity-50"
+                    >
+                      {t("admin.delete")}
+                    </button>
+                  </div>
+                </>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
 
@@ -734,7 +1233,7 @@ function PhotoListAdmin({
       {photos.map((p) => (
         <div
           key={p.id}
-          className="rounded-xl border border-border bg-bg-card overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+          className="card overflow-hidden"
         >
           <div className="aspect-square relative bg-border">
             <img
@@ -744,10 +1243,10 @@ function PhotoListAdmin({
             />
             <div className="absolute top-2 right-2 flex gap-2">
               <span
-                className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                className={`status-badge px-2.5 py-1 text-xs font-medium ${
                   p.isPublic
-                    ? "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300"
-                    : "bg-gray-200 text-gray-600 dark:bg-gray-600 dark:text-gray-300"
+                    ? "status-badge-public"
+                    : "status-badge-private"
                 }`}
               >
                 {p.isPublic ? t("admin.visibilityPublic") : t("admin.visibilityPrivate")}
@@ -762,21 +1261,21 @@ function PhotoListAdmin({
                   value={editCaption}
                   onChange={(e) => setEditCaption(e.target.value)}
                   placeholder={t("admin.captionPlaceholder")}
-                  className="w-full border border-border rounded-lg px-3 py-2 text-base bg-bg text-fg focus:outline-none focus:ring-2 focus:ring-warm/50"
+                  className="form-control"
                   autoFocus
                 />
                 <div className="flex gap-2">
                   <button
                     type="button"
                     onClick={() => saveCaption(p.id)}
-                    className="px-3 py-1.5 rounded-lg text-sm font-medium bg-warm text-white hover:opacity-90"
+                    className="button-primary px-3 py-1.5 text-sm font-medium hover:opacity-90"
                   >
                     {t("admin.saveCaption")}
                   </button>
                   <button
                     type="button"
                     onClick={cancelEdit}
-                    className="px-3 py-1.5 rounded-lg text-sm border border-border text-muted hover:text-fg"
+                    className="button-secondary px-3 py-1.5 text-sm"
                   >
                     {t("admin.cancel")}
                   </button>
@@ -801,10 +1300,10 @@ function PhotoListAdmin({
                 <button
                   type="button"
                   onClick={() => toggleVisibility(p.id, p.isPublic)}
-                  className={`text-sm px-2.5 py-1 rounded-lg ${
+                  className={`status-badge text-sm px-2.5 py-1 ${
                     p.isPublic
-                      ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                      : "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
+                      ? "status-badge-public"
+                      : "status-badge-private"
                   }`}
                 >
                   {p.isPublic ? t("admin.visibilityPublic") : t("admin.visibilityPrivate")}
@@ -815,7 +1314,7 @@ function PhotoListAdmin({
                     <button
                       type="button"
                       onClick={() => deletePhoto(p.id)}
-                      className="text-red-600 dark:text-red-400 font-medium"
+                      className="danger-text font-medium"
                     >
                       {t("admin.deletePhoto")}
                     </button>
@@ -831,7 +1330,7 @@ function PhotoListAdmin({
                   <button
                     type="button"
                     onClick={() => setDeletingId(p.id)}
-                    className="text-sm text-red-600 dark:text-red-400 hover:underline"
+                    className="text-sm danger-text hover:underline"
                   >
                     {t("admin.deletePhoto")}
                   </button>
@@ -937,9 +1436,9 @@ function UploadPhotoForm({ onSuccess }: { onSuccess: () => void }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-lg">
+    <form onSubmit={handleSubmit} className="card p-5 sm:p-6 space-y-6 max-w-2xl">
       {error && (
-        <p className="text-base text-red-600 dark:text-red-400">{error}</p>
+        <p className="text-base danger-text">{error}</p>
       )}
       <div>
         <input
@@ -959,7 +1458,7 @@ function UploadPhotoForm({ onSuccess }: { onSuccess: () => void }) {
           onDragOver={onDragOver}
           onDragLeave={onDragLeave}
           onDrop={onDrop}
-          className={`block rounded-xl border-2 border-dashed p-8 text-center cursor-pointer transition-colors ${
+          className={`block rounded-[var(--radius-card)] border-2 border-dashed p-8 text-center cursor-pointer transition-colors ${
             dragActive
               ? "border-warm bg-warm/10"
               : "border-border hover:border-warm/50 hover:bg-bg-card"
@@ -1004,7 +1503,7 @@ function UploadPhotoForm({ onSuccess }: { onSuccess: () => void }) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-xl text-base font-semibold bg-fg text-bg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="button-primary w-full py-3 text-base font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading && uploadProgress
                 ? t("admin.uploadingCount").replace("{current}", String(uploadProgress.current)).replace("{total}", String(uploadProgress.total))
@@ -1022,7 +1521,7 @@ function UploadPhotoForm({ onSuccess }: { onSuccess: () => void }) {
           value={caption}
           onChange={(e) => setCaption(e.target.value)}
           placeholder={t("admin.captionPlaceholder")}
-          className="w-full border border-border rounded-lg px-3 py-2 text-base bg-bg text-fg placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-warm/50"
+          className="form-control"
         />
         <p className="text-xs text-muted mt-1">{t("admin.captionBatchHint")}</p>
       </div>

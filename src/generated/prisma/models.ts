@@ -9,6 +9,7 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/Thought'
+export type * from './models/ThoughtCategory'
 export type * from './models/Comment'
 export type * from './models/Photo'
 export type * from './models/AccessRequest'

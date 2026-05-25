@@ -385,6 +385,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   Thought: 'Thought',
+  ThoughtCategory: 'ThoughtCategory',
   Comment: 'Comment',
   Photo: 'Photo',
   AccessRequest: 'AccessRequest',
@@ -404,7 +405,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "thought" | "comment" | "photo" | "accessRequest" | "visitLog"
+    modelProps: "thought" | "thoughtCategory" | "comment" | "photo" | "accessRequest" | "visitLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -479,6 +480,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ThoughtCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ThoughtCountAggregateOutputType> | number
+        }
+      }
+    }
+    ThoughtCategory: {
+      payload: Prisma.$ThoughtCategoryPayload<ExtArgs>
+      fields: Prisma.ThoughtCategoryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ThoughtCategoryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThoughtCategoryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ThoughtCategoryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThoughtCategoryPayload>
+        }
+        findFirst: {
+          args: Prisma.ThoughtCategoryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThoughtCategoryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ThoughtCategoryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThoughtCategoryPayload>
+        }
+        findMany: {
+          args: Prisma.ThoughtCategoryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThoughtCategoryPayload>[]
+        }
+        create: {
+          args: Prisma.ThoughtCategoryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThoughtCategoryPayload>
+        }
+        createMany: {
+          args: Prisma.ThoughtCategoryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ThoughtCategoryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThoughtCategoryPayload>[]
+        }
+        delete: {
+          args: Prisma.ThoughtCategoryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThoughtCategoryPayload>
+        }
+        update: {
+          args: Prisma.ThoughtCategoryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThoughtCategoryPayload>
+        }
+        deleteMany: {
+          args: Prisma.ThoughtCategoryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ThoughtCategoryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ThoughtCategoryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThoughtCategoryPayload>[]
+        }
+        upsert: {
+          args: Prisma.ThoughtCategoryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThoughtCategoryPayload>
+        }
+        aggregate: {
+          args: Prisma.ThoughtCategoryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateThoughtCategory>
+        }
+        groupBy: {
+          args: Prisma.ThoughtCategoryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ThoughtCategoryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ThoughtCategoryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ThoughtCategoryCountAggregateOutputType> | number
         }
       }
     }
@@ -826,11 +901,23 @@ export const ThoughtScalarFieldEnum = {
   contentEn: 'contentEn',
   contentFr: 'contentFr',
   isPublic: 'isPublic',
+  categoryId: 'categoryId',
+  isPinned: 'isPinned',
+  pinnedOrder: 'pinnedOrder',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type ThoughtScalarFieldEnum = (typeof ThoughtScalarFieldEnum)[keyof typeof ThoughtScalarFieldEnum]
+
+
+export const ThoughtCategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  createdAt: 'createdAt'
+} as const
+
+export type ThoughtCategoryScalarFieldEnum = (typeof ThoughtCategoryScalarFieldEnum)[keyof typeof ThoughtCategoryScalarFieldEnum]
 
 
 export const CommentScalarFieldEnum = {
@@ -939,6 +1026,20 @@ export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
+ * Reference to a field of type 'Int'
+ */
+export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+/**
+ * Reference to a field of type 'Int[]'
+ */
+export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
  * Reference to a field of type 'DateTime'
  */
 export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -953,16 +1054,16 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 
 
 /**
- * Reference to a field of type 'Int'
+ * Reference to a field of type 'Float'
  */
-export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
     
 
 
 /**
- * Reference to a field of type 'Int[]'
+ * Reference to a field of type 'Float[]'
  */
-export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
 
 /**
@@ -1061,6 +1162,7 @@ export type PrismaClientOptions = ({
 }
 export type GlobalOmitConfig = {
   thought?: Prisma.ThoughtOmit
+  thoughtCategory?: Prisma.ThoughtCategoryOmit
   comment?: Prisma.CommentOmit
   photo?: Prisma.PhotoOmit
   accessRequest?: Prisma.AccessRequestOmit

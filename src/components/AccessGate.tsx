@@ -9,12 +9,10 @@ export function AccessGate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [allowed, setAllowed] = useState<boolean | null>(null);
+  const isAllowedPath = ALLOWED_PATHS.some((p) => pathname?.startsWith(p));
 
   useEffect(() => {
-    if (ALLOWED_PATHS.some((p) => pathname?.startsWith(p))) {
-      setAllowed(true);
-      return;
-    }
+    if (isAllowedPath) return;
     fetch("/api/access/check")
       .then((res) => res.json())
       .then((data) => {
@@ -29,7 +27,11 @@ export function AccessGate({ children }: { children: React.ReactNode }) {
         setAllowed(false);
         router.replace("/verify");
       });
-  }, [pathname, router]);
+  }, [isAllowedPath, router]);
+
+  if (isAllowedPath) {
+    return <>{children}</>;
+  }
 
   if (allowed === null || !allowed) {
     return (

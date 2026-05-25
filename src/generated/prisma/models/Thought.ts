@@ -20,8 +20,18 @@ export type ThoughtModel = runtime.Types.Result.DefaultSelection<Prisma.$Thought
 
 export type AggregateThought = {
   _count: ThoughtCountAggregateOutputType | null
+  _avg: ThoughtAvgAggregateOutputType | null
+  _sum: ThoughtSumAggregateOutputType | null
   _min: ThoughtMinAggregateOutputType | null
   _max: ThoughtMaxAggregateOutputType | null
+}
+
+export type ThoughtAvgAggregateOutputType = {
+  pinnedOrder: number | null
+}
+
+export type ThoughtSumAggregateOutputType = {
+  pinnedOrder: number | null
 }
 
 export type ThoughtMinAggregateOutputType = {
@@ -33,6 +43,9 @@ export type ThoughtMinAggregateOutputType = {
   contentEn: string | null
   contentFr: string | null
   isPublic: boolean | null
+  categoryId: string | null
+  isPinned: boolean | null
+  pinnedOrder: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -46,6 +59,9 @@ export type ThoughtMaxAggregateOutputType = {
   contentEn: string | null
   contentFr: string | null
   isPublic: boolean | null
+  categoryId: string | null
+  isPinned: boolean | null
+  pinnedOrder: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -59,11 +75,22 @@ export type ThoughtCountAggregateOutputType = {
   contentEn: number
   contentFr: number
   isPublic: number
+  categoryId: number
+  isPinned: number
+  pinnedOrder: number
   createdAt: number
   updatedAt: number
   _all: number
 }
 
+
+export type ThoughtAvgAggregateInputType = {
+  pinnedOrder?: true
+}
+
+export type ThoughtSumAggregateInputType = {
+  pinnedOrder?: true
+}
 
 export type ThoughtMinAggregateInputType = {
   id?: true
@@ -74,6 +101,9 @@ export type ThoughtMinAggregateInputType = {
   contentEn?: true
   contentFr?: true
   isPublic?: true
+  categoryId?: true
+  isPinned?: true
+  pinnedOrder?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -87,6 +117,9 @@ export type ThoughtMaxAggregateInputType = {
   contentEn?: true
   contentFr?: true
   isPublic?: true
+  categoryId?: true
+  isPinned?: true
+  pinnedOrder?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -100,6 +133,9 @@ export type ThoughtCountAggregateInputType = {
   contentEn?: true
   contentFr?: true
   isPublic?: true
+  categoryId?: true
+  isPinned?: true
+  pinnedOrder?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -143,6 +179,18 @@ export type ThoughtAggregateArgs<ExtArgs extends runtime.Types.Extensions.Intern
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: ThoughtAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: ThoughtSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: ThoughtMinAggregateInputType
@@ -173,6 +221,8 @@ export type ThoughtGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   _count?: ThoughtCountAggregateInputType | true
+  _avg?: ThoughtAvgAggregateInputType
+  _sum?: ThoughtSumAggregateInputType
   _min?: ThoughtMinAggregateInputType
   _max?: ThoughtMaxAggregateInputType
 }
@@ -186,9 +236,14 @@ export type ThoughtGroupByOutputType = {
   contentEn: string | null
   contentFr: string | null
   isPublic: boolean
+  categoryId: string | null
+  isPinned: boolean
+  pinnedOrder: number | null
   createdAt: Date
   updatedAt: Date
   _count: ThoughtCountAggregateOutputType | null
+  _avg: ThoughtAvgAggregateOutputType | null
+  _sum: ThoughtSumAggregateOutputType | null
   _min: ThoughtMinAggregateOutputType | null
   _max: ThoughtMaxAggregateOutputType | null
 }
@@ -220,8 +275,12 @@ export type ThoughtWhereInput = {
   contentEn?: Prisma.StringNullableFilter<"Thought"> | string | null
   contentFr?: Prisma.StringNullableFilter<"Thought"> | string | null
   isPublic?: Prisma.BoolFilter<"Thought"> | boolean
+  categoryId?: Prisma.StringNullableFilter<"Thought"> | string | null
+  isPinned?: Prisma.BoolFilter<"Thought"> | boolean
+  pinnedOrder?: Prisma.IntNullableFilter<"Thought"> | number | null
   createdAt?: Prisma.DateTimeFilter<"Thought"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Thought"> | Date | string
+  category?: Prisma.XOR<Prisma.ThoughtCategoryNullableScalarRelationFilter, Prisma.ThoughtCategoryWhereInput> | null
   comments?: Prisma.CommentListRelationFilter
 }
 
@@ -234,8 +293,12 @@ export type ThoughtOrderByWithRelationInput = {
   contentEn?: Prisma.SortOrderInput | Prisma.SortOrder
   contentFr?: Prisma.SortOrderInput | Prisma.SortOrder
   isPublic?: Prisma.SortOrder
+  categoryId?: Prisma.SortOrderInput | Prisma.SortOrder
+  isPinned?: Prisma.SortOrder
+  pinnedOrder?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  category?: Prisma.ThoughtCategoryOrderByWithRelationInput
   comments?: Prisma.CommentOrderByRelationAggregateInput
 }
 
@@ -251,8 +314,12 @@ export type ThoughtWhereUniqueInput = Prisma.AtLeast<{
   contentEn?: Prisma.StringNullableFilter<"Thought"> | string | null
   contentFr?: Prisma.StringNullableFilter<"Thought"> | string | null
   isPublic?: Prisma.BoolFilter<"Thought"> | boolean
+  categoryId?: Prisma.StringNullableFilter<"Thought"> | string | null
+  isPinned?: Prisma.BoolFilter<"Thought"> | boolean
+  pinnedOrder?: Prisma.IntNullableFilter<"Thought"> | number | null
   createdAt?: Prisma.DateTimeFilter<"Thought"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Thought"> | Date | string
+  category?: Prisma.XOR<Prisma.ThoughtCategoryNullableScalarRelationFilter, Prisma.ThoughtCategoryWhereInput> | null
   comments?: Prisma.CommentListRelationFilter
 }, "id">
 
@@ -265,11 +332,16 @@ export type ThoughtOrderByWithAggregationInput = {
   contentEn?: Prisma.SortOrderInput | Prisma.SortOrder
   contentFr?: Prisma.SortOrderInput | Prisma.SortOrder
   isPublic?: Prisma.SortOrder
+  categoryId?: Prisma.SortOrderInput | Prisma.SortOrder
+  isPinned?: Prisma.SortOrder
+  pinnedOrder?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ThoughtCountOrderByAggregateInput
+  _avg?: Prisma.ThoughtAvgOrderByAggregateInput
   _max?: Prisma.ThoughtMaxOrderByAggregateInput
   _min?: Prisma.ThoughtMinOrderByAggregateInput
+  _sum?: Prisma.ThoughtSumOrderByAggregateInput
 }
 
 export type ThoughtScalarWhereWithAggregatesInput = {
@@ -284,6 +356,9 @@ export type ThoughtScalarWhereWithAggregatesInput = {
   contentEn?: Prisma.StringNullableWithAggregatesFilter<"Thought"> | string | null
   contentFr?: Prisma.StringNullableWithAggregatesFilter<"Thought"> | string | null
   isPublic?: Prisma.BoolWithAggregatesFilter<"Thought"> | boolean
+  categoryId?: Prisma.StringNullableWithAggregatesFilter<"Thought"> | string | null
+  isPinned?: Prisma.BoolWithAggregatesFilter<"Thought"> | boolean
+  pinnedOrder?: Prisma.IntNullableWithAggregatesFilter<"Thought"> | number | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Thought"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Thought"> | Date | string
 }
@@ -297,8 +372,11 @@ export type ThoughtCreateInput = {
   contentEn?: string | null
   contentFr?: string | null
   isPublic?: boolean
+  isPinned?: boolean
+  pinnedOrder?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  category?: Prisma.ThoughtCategoryCreateNestedOneWithoutThoughtsInput
   comments?: Prisma.CommentCreateNestedManyWithoutThoughtInput
 }
 
@@ -311,6 +389,9 @@ export type ThoughtUncheckedCreateInput = {
   contentEn?: string | null
   contentFr?: string | null
   isPublic?: boolean
+  categoryId?: string | null
+  isPinned?: boolean
+  pinnedOrder?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutThoughtInput
@@ -325,8 +406,11 @@ export type ThoughtUpdateInput = {
   contentEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contentFr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pinnedOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  category?: Prisma.ThoughtCategoryUpdateOneWithoutThoughtsNestedInput
   comments?: Prisma.CommentUpdateManyWithoutThoughtNestedInput
 }
 
@@ -339,6 +423,9 @@ export type ThoughtUncheckedUpdateInput = {
   contentEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contentFr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isPinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pinnedOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   comments?: Prisma.CommentUncheckedUpdateManyWithoutThoughtNestedInput
@@ -353,6 +440,9 @@ export type ThoughtCreateManyInput = {
   contentEn?: string | null
   contentFr?: string | null
   isPublic?: boolean
+  categoryId?: string | null
+  isPinned?: boolean
+  pinnedOrder?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -366,6 +456,8 @@ export type ThoughtUpdateManyMutationInput = {
   contentEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contentFr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pinnedOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -379,6 +471,9 @@ export type ThoughtUncheckedUpdateManyInput = {
   contentEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contentFr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isPinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pinnedOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -392,8 +487,15 @@ export type ThoughtCountOrderByAggregateInput = {
   contentEn?: Prisma.SortOrder
   contentFr?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
+  categoryId?: Prisma.SortOrder
+  isPinned?: Prisma.SortOrder
+  pinnedOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type ThoughtAvgOrderByAggregateInput = {
+  pinnedOrder?: Prisma.SortOrder
 }
 
 export type ThoughtMaxOrderByAggregateInput = {
@@ -405,6 +507,9 @@ export type ThoughtMaxOrderByAggregateInput = {
   contentEn?: Prisma.SortOrder
   contentFr?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
+  categoryId?: Prisma.SortOrder
+  isPinned?: Prisma.SortOrder
+  pinnedOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -418,8 +523,25 @@ export type ThoughtMinOrderByAggregateInput = {
   contentEn?: Prisma.SortOrder
   contentFr?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
+  categoryId?: Prisma.SortOrder
+  isPinned?: Prisma.SortOrder
+  pinnedOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type ThoughtSumOrderByAggregateInput = {
+  pinnedOrder?: Prisma.SortOrder
+}
+
+export type ThoughtListRelationFilter = {
+  every?: Prisma.ThoughtWhereInput
+  some?: Prisma.ThoughtWhereInput
+  none?: Prisma.ThoughtWhereInput
+}
+
+export type ThoughtOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type ThoughtScalarRelationFilter = {
@@ -439,8 +561,58 @@ export type BoolFieldUpdateOperationsInput = {
   set?: boolean
 }
 
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type ThoughtCreateNestedManyWithoutCategoryInput = {
+  create?: Prisma.XOR<Prisma.ThoughtCreateWithoutCategoryInput, Prisma.ThoughtUncheckedCreateWithoutCategoryInput> | Prisma.ThoughtCreateWithoutCategoryInput[] | Prisma.ThoughtUncheckedCreateWithoutCategoryInput[]
+  connectOrCreate?: Prisma.ThoughtCreateOrConnectWithoutCategoryInput | Prisma.ThoughtCreateOrConnectWithoutCategoryInput[]
+  createMany?: Prisma.ThoughtCreateManyCategoryInputEnvelope
+  connect?: Prisma.ThoughtWhereUniqueInput | Prisma.ThoughtWhereUniqueInput[]
+}
+
+export type ThoughtUncheckedCreateNestedManyWithoutCategoryInput = {
+  create?: Prisma.XOR<Prisma.ThoughtCreateWithoutCategoryInput, Prisma.ThoughtUncheckedCreateWithoutCategoryInput> | Prisma.ThoughtCreateWithoutCategoryInput[] | Prisma.ThoughtUncheckedCreateWithoutCategoryInput[]
+  connectOrCreate?: Prisma.ThoughtCreateOrConnectWithoutCategoryInput | Prisma.ThoughtCreateOrConnectWithoutCategoryInput[]
+  createMany?: Prisma.ThoughtCreateManyCategoryInputEnvelope
+  connect?: Prisma.ThoughtWhereUniqueInput | Prisma.ThoughtWhereUniqueInput[]
+}
+
+export type ThoughtUpdateManyWithoutCategoryNestedInput = {
+  create?: Prisma.XOR<Prisma.ThoughtCreateWithoutCategoryInput, Prisma.ThoughtUncheckedCreateWithoutCategoryInput> | Prisma.ThoughtCreateWithoutCategoryInput[] | Prisma.ThoughtUncheckedCreateWithoutCategoryInput[]
+  connectOrCreate?: Prisma.ThoughtCreateOrConnectWithoutCategoryInput | Prisma.ThoughtCreateOrConnectWithoutCategoryInput[]
+  upsert?: Prisma.ThoughtUpsertWithWhereUniqueWithoutCategoryInput | Prisma.ThoughtUpsertWithWhereUniqueWithoutCategoryInput[]
+  createMany?: Prisma.ThoughtCreateManyCategoryInputEnvelope
+  set?: Prisma.ThoughtWhereUniqueInput | Prisma.ThoughtWhereUniqueInput[]
+  disconnect?: Prisma.ThoughtWhereUniqueInput | Prisma.ThoughtWhereUniqueInput[]
+  delete?: Prisma.ThoughtWhereUniqueInput | Prisma.ThoughtWhereUniqueInput[]
+  connect?: Prisma.ThoughtWhereUniqueInput | Prisma.ThoughtWhereUniqueInput[]
+  update?: Prisma.ThoughtUpdateWithWhereUniqueWithoutCategoryInput | Prisma.ThoughtUpdateWithWhereUniqueWithoutCategoryInput[]
+  updateMany?: Prisma.ThoughtUpdateManyWithWhereWithoutCategoryInput | Prisma.ThoughtUpdateManyWithWhereWithoutCategoryInput[]
+  deleteMany?: Prisma.ThoughtScalarWhereInput | Prisma.ThoughtScalarWhereInput[]
+}
+
+export type ThoughtUncheckedUpdateManyWithoutCategoryNestedInput = {
+  create?: Prisma.XOR<Prisma.ThoughtCreateWithoutCategoryInput, Prisma.ThoughtUncheckedCreateWithoutCategoryInput> | Prisma.ThoughtCreateWithoutCategoryInput[] | Prisma.ThoughtUncheckedCreateWithoutCategoryInput[]
+  connectOrCreate?: Prisma.ThoughtCreateOrConnectWithoutCategoryInput | Prisma.ThoughtCreateOrConnectWithoutCategoryInput[]
+  upsert?: Prisma.ThoughtUpsertWithWhereUniqueWithoutCategoryInput | Prisma.ThoughtUpsertWithWhereUniqueWithoutCategoryInput[]
+  createMany?: Prisma.ThoughtCreateManyCategoryInputEnvelope
+  set?: Prisma.ThoughtWhereUniqueInput | Prisma.ThoughtWhereUniqueInput[]
+  disconnect?: Prisma.ThoughtWhereUniqueInput | Prisma.ThoughtWhereUniqueInput[]
+  delete?: Prisma.ThoughtWhereUniqueInput | Prisma.ThoughtWhereUniqueInput[]
+  connect?: Prisma.ThoughtWhereUniqueInput | Prisma.ThoughtWhereUniqueInput[]
+  update?: Prisma.ThoughtUpdateWithWhereUniqueWithoutCategoryInput | Prisma.ThoughtUpdateWithWhereUniqueWithoutCategoryInput[]
+  updateMany?: Prisma.ThoughtUpdateManyWithWhereWithoutCategoryInput | Prisma.ThoughtUpdateManyWithWhereWithoutCategoryInput[]
+  deleteMany?: Prisma.ThoughtScalarWhereInput | Prisma.ThoughtScalarWhereInput[]
 }
 
 export type ThoughtCreateNestedOneWithoutCommentsInput = {
@@ -457,6 +629,83 @@ export type ThoughtUpdateOneRequiredWithoutCommentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ThoughtUpdateToOneWithWhereWithoutCommentsInput, Prisma.ThoughtUpdateWithoutCommentsInput>, Prisma.ThoughtUncheckedUpdateWithoutCommentsInput>
 }
 
+export type ThoughtCreateWithoutCategoryInput = {
+  id?: string
+  title: string
+  content: string
+  titleEn?: string | null
+  titleFr?: string | null
+  contentEn?: string | null
+  contentFr?: string | null
+  isPublic?: boolean
+  isPinned?: boolean
+  pinnedOrder?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  comments?: Prisma.CommentCreateNestedManyWithoutThoughtInput
+}
+
+export type ThoughtUncheckedCreateWithoutCategoryInput = {
+  id?: string
+  title: string
+  content: string
+  titleEn?: string | null
+  titleFr?: string | null
+  contentEn?: string | null
+  contentFr?: string | null
+  isPublic?: boolean
+  isPinned?: boolean
+  pinnedOrder?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutThoughtInput
+}
+
+export type ThoughtCreateOrConnectWithoutCategoryInput = {
+  where: Prisma.ThoughtWhereUniqueInput
+  create: Prisma.XOR<Prisma.ThoughtCreateWithoutCategoryInput, Prisma.ThoughtUncheckedCreateWithoutCategoryInput>
+}
+
+export type ThoughtCreateManyCategoryInputEnvelope = {
+  data: Prisma.ThoughtCreateManyCategoryInput | Prisma.ThoughtCreateManyCategoryInput[]
+  skipDuplicates?: boolean
+}
+
+export type ThoughtUpsertWithWhereUniqueWithoutCategoryInput = {
+  where: Prisma.ThoughtWhereUniqueInput
+  update: Prisma.XOR<Prisma.ThoughtUpdateWithoutCategoryInput, Prisma.ThoughtUncheckedUpdateWithoutCategoryInput>
+  create: Prisma.XOR<Prisma.ThoughtCreateWithoutCategoryInput, Prisma.ThoughtUncheckedCreateWithoutCategoryInput>
+}
+
+export type ThoughtUpdateWithWhereUniqueWithoutCategoryInput = {
+  where: Prisma.ThoughtWhereUniqueInput
+  data: Prisma.XOR<Prisma.ThoughtUpdateWithoutCategoryInput, Prisma.ThoughtUncheckedUpdateWithoutCategoryInput>
+}
+
+export type ThoughtUpdateManyWithWhereWithoutCategoryInput = {
+  where: Prisma.ThoughtScalarWhereInput
+  data: Prisma.XOR<Prisma.ThoughtUpdateManyMutationInput, Prisma.ThoughtUncheckedUpdateManyWithoutCategoryInput>
+}
+
+export type ThoughtScalarWhereInput = {
+  AND?: Prisma.ThoughtScalarWhereInput | Prisma.ThoughtScalarWhereInput[]
+  OR?: Prisma.ThoughtScalarWhereInput[]
+  NOT?: Prisma.ThoughtScalarWhereInput | Prisma.ThoughtScalarWhereInput[]
+  id?: Prisma.StringFilter<"Thought"> | string
+  title?: Prisma.StringFilter<"Thought"> | string
+  content?: Prisma.StringFilter<"Thought"> | string
+  titleEn?: Prisma.StringNullableFilter<"Thought"> | string | null
+  titleFr?: Prisma.StringNullableFilter<"Thought"> | string | null
+  contentEn?: Prisma.StringNullableFilter<"Thought"> | string | null
+  contentFr?: Prisma.StringNullableFilter<"Thought"> | string | null
+  isPublic?: Prisma.BoolFilter<"Thought"> | boolean
+  categoryId?: Prisma.StringNullableFilter<"Thought"> | string | null
+  isPinned?: Prisma.BoolFilter<"Thought"> | boolean
+  pinnedOrder?: Prisma.IntNullableFilter<"Thought"> | number | null
+  createdAt?: Prisma.DateTimeFilter<"Thought"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Thought"> | Date | string
+}
+
 export type ThoughtCreateWithoutCommentsInput = {
   id?: string
   title: string
@@ -466,8 +715,11 @@ export type ThoughtCreateWithoutCommentsInput = {
   contentEn?: string | null
   contentFr?: string | null
   isPublic?: boolean
+  isPinned?: boolean
+  pinnedOrder?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  category?: Prisma.ThoughtCategoryCreateNestedOneWithoutThoughtsInput
 }
 
 export type ThoughtUncheckedCreateWithoutCommentsInput = {
@@ -479,6 +731,9 @@ export type ThoughtUncheckedCreateWithoutCommentsInput = {
   contentEn?: string | null
   contentFr?: string | null
   isPublic?: boolean
+  categoryId?: string | null
+  isPinned?: boolean
+  pinnedOrder?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -508,8 +763,11 @@ export type ThoughtUpdateWithoutCommentsInput = {
   contentEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contentFr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pinnedOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  category?: Prisma.ThoughtCategoryUpdateOneWithoutThoughtsNestedInput
 }
 
 export type ThoughtUncheckedUpdateWithoutCommentsInput = {
@@ -521,6 +779,71 @@ export type ThoughtUncheckedUpdateWithoutCommentsInput = {
   contentEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contentFr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isPinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pinnedOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ThoughtCreateManyCategoryInput = {
+  id?: string
+  title: string
+  content: string
+  titleEn?: string | null
+  titleFr?: string | null
+  contentEn?: string | null
+  contentFr?: string | null
+  isPublic?: boolean
+  isPinned?: boolean
+  pinnedOrder?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ThoughtUpdateWithoutCategoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleFr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentFr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pinnedOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  comments?: Prisma.CommentUpdateManyWithoutThoughtNestedInput
+}
+
+export type ThoughtUncheckedUpdateWithoutCategoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleFr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentFr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pinnedOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutThoughtNestedInput
+}
+
+export type ThoughtUncheckedUpdateManyWithoutCategoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleFr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentFr?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPinned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pinnedOrder?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -565,8 +888,12 @@ export type ThoughtSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   contentEn?: boolean
   contentFr?: boolean
   isPublic?: boolean
+  categoryId?: boolean
+  isPinned?: boolean
+  pinnedOrder?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  category?: boolean | Prisma.Thought$categoryArgs<ExtArgs>
   comments?: boolean | Prisma.Thought$commentsArgs<ExtArgs>
   _count?: boolean | Prisma.ThoughtCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["thought"]>
@@ -580,8 +907,12 @@ export type ThoughtSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   contentEn?: boolean
   contentFr?: boolean
   isPublic?: boolean
+  categoryId?: boolean
+  isPinned?: boolean
+  pinnedOrder?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  category?: boolean | Prisma.Thought$categoryArgs<ExtArgs>
 }, ExtArgs["result"]["thought"]>
 
 export type ThoughtSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -593,8 +924,12 @@ export type ThoughtSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   contentEn?: boolean
   contentFr?: boolean
   isPublic?: boolean
+  categoryId?: boolean
+  isPinned?: boolean
+  pinnedOrder?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  category?: boolean | Prisma.Thought$categoryArgs<ExtArgs>
 }, ExtArgs["result"]["thought"]>
 
 export type ThoughtSelectScalar = {
@@ -606,21 +941,30 @@ export type ThoughtSelectScalar = {
   contentEn?: boolean
   contentFr?: boolean
   isPublic?: boolean
+  categoryId?: boolean
+  isPinned?: boolean
+  pinnedOrder?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ThoughtOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "content" | "titleEn" | "titleFr" | "contentEn" | "contentFr" | "isPublic" | "createdAt" | "updatedAt", ExtArgs["result"]["thought"]>
+export type ThoughtOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "content" | "titleEn" | "titleFr" | "contentEn" | "contentFr" | "isPublic" | "categoryId" | "isPinned" | "pinnedOrder" | "createdAt" | "updatedAt", ExtArgs["result"]["thought"]>
 export type ThoughtInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  category?: boolean | Prisma.Thought$categoryArgs<ExtArgs>
   comments?: boolean | Prisma.Thought$commentsArgs<ExtArgs>
   _count?: boolean | Prisma.ThoughtCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type ThoughtIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type ThoughtIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type ThoughtIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  category?: boolean | Prisma.Thought$categoryArgs<ExtArgs>
+}
+export type ThoughtIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  category?: boolean | Prisma.Thought$categoryArgs<ExtArgs>
+}
 
 export type $ThoughtPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Thought"
   objects: {
+    category: Prisma.$ThoughtCategoryPayload<ExtArgs> | null
     comments: Prisma.$CommentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -644,6 +988,9 @@ export type $ThoughtPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
      */
     contentFr: string | null
     isPublic: boolean
+    categoryId: string | null
+    isPinned: boolean
+    pinnedOrder: number | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["thought"]>
@@ -1040,6 +1387,7 @@ readonly fields: ThoughtFieldRefs;
  */
 export interface Prisma__ThoughtClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  category<T extends Prisma.Thought$categoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Thought$categoryArgs<ExtArgs>>): Prisma.Prisma__ThoughtCategoryClient<runtime.Types.Result.GetResult<Prisma.$ThoughtCategoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   comments<T extends Prisma.Thought$commentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Thought$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1078,6 +1426,9 @@ export interface ThoughtFieldRefs {
   readonly contentEn: Prisma.FieldRef<"Thought", 'String'>
   readonly contentFr: Prisma.FieldRef<"Thought", 'String'>
   readonly isPublic: Prisma.FieldRef<"Thought", 'Boolean'>
+  readonly categoryId: Prisma.FieldRef<"Thought", 'String'>
+  readonly isPinned: Prisma.FieldRef<"Thought", 'Boolean'>
+  readonly pinnedOrder: Prisma.FieldRef<"Thought", 'Int'>
   readonly createdAt: Prisma.FieldRef<"Thought", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Thought", 'DateTime'>
 }
@@ -1334,6 +1685,10 @@ export type ThoughtCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
    */
   data: Prisma.ThoughtCreateManyInput | Prisma.ThoughtCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ThoughtIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1404,6 +1759,10 @@ export type ThoughtUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
    * Limit how many Thoughts to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ThoughtIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1470,6 +1829,25 @@ export type ThoughtDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Limit how many Thoughts to delete.
    */
   limit?: number
+}
+
+/**
+ * Thought.category
+ */
+export type Thought$categoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ThoughtCategory
+   */
+  select?: Prisma.ThoughtCategorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ThoughtCategory
+   */
+  omit?: Prisma.ThoughtCategoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ThoughtCategoryInclude<ExtArgs> | null
+  where?: Prisma.ThoughtCategoryWhereInput
 }
 
 /**

@@ -11,7 +11,7 @@ export async function GET(
   const admin = await isAdmin();
   const thought = await prisma.thought.findUnique({
     where: { id },
-    include: { comments: { orderBy: { createdAt: "asc" } } },
+    include: { category: true, comments: { orderBy: { createdAt: "asc" } } },
   });
   if (!thought) {
     return NextResponse.json({ error: "未找到" }, { status: 404 });
@@ -32,13 +32,19 @@ export async function PATCH(
   }
   const { id } = await params;
   const body = await request.json();
-  const { title, content, isPublic } = body;
+  const { title, content, isPublic, categoryId, isPinned, pinnedOrder } = body;
   const thought = await prisma.thought.update({
     where: { id },
     data: {
       ...(title != null && { title }),
       ...(content != null && { content }),
       ...(typeof isPublic === "boolean" && { isPublic }),
+      ...(categoryId !== undefined && { categoryId: categoryId || null }),
+      ...(typeof isPinned === "boolean" && {
+        isPinned,
+        pinnedOrder: isPinned ? (typeof pinnedOrder === "number" ? pinnedOrder : 0) : null,
+      }),
+      ...(typeof pinnedOrder === "number" && { pinnedOrder }),
     },
   });
   if (title != null || content != null) {
@@ -46,7 +52,7 @@ export async function PATCH(
   }
   const fresh = await prisma.thought.findUnique({
     where: { id },
-    include: { comments: { orderBy: { createdAt: "asc" } } },
+    include: { category: true, comments: { orderBy: { createdAt: "asc" } } },
   });
   return NextResponse.json(fresh ?? thought);
 }

@@ -25,13 +25,7 @@ type LocaleContextValue = {
 const LocaleContext = createContext<LocaleContextValue | null>(null);
 
 export function LocaleProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>("zh");
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setLocaleState(getStoredLocale());
-    setMounted(true);
-  }, []);
+  const [locale, setLocaleState] = useState<Locale>(getStoredLocale);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-locale", locale);

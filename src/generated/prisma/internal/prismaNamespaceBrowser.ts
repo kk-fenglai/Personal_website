@@ -52,6 +52,7 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   Thought: 'Thought',
+  ThoughtCategory: 'ThoughtCategory',
   Comment: 'Comment',
   Photo: 'Photo',
   AccessRequest: 'AccessRequest',
@@ -83,11 +84,23 @@ export const ThoughtScalarFieldEnum = {
   contentEn: 'contentEn',
   contentFr: 'contentFr',
   isPublic: 'isPublic',
+  categoryId: 'categoryId',
+  isPinned: 'isPinned',
+  pinnedOrder: 'pinnedOrder',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type ThoughtScalarFieldEnum = (typeof ThoughtScalarFieldEnum)[keyof typeof ThoughtScalarFieldEnum]
+
+
+export const ThoughtCategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  createdAt: 'createdAt'
+} as const
+
+export type ThoughtCategoryScalarFieldEnum = (typeof ThoughtCategoryScalarFieldEnum)[keyof typeof ThoughtCategoryScalarFieldEnum]
 
 
 export const CommentScalarFieldEnum = {

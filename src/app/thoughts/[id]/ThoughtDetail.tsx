@@ -26,6 +26,8 @@ type Thought = {
   contentEn?: string | null;
   contentFr?: string | null;
   isPublic: boolean;
+  isPinned?: boolean;
+  category?: { id: string; name: string } | null;
   createdAt: string;
   comments: Comment[];
 };
@@ -98,15 +100,29 @@ export function ThoughtDetail({ thoughtId }: { thoughtId: string }) {
   }
 
   return (
-    <article className="space-y-10">
+    <article className="space-y-12">
       <Link href="/thoughts" className="text-muted text-sm hover:text-fg transition-colors">
         {t("thoughtDetail.back")}
       </Link>
 
-      <header className="card p-5 sm:p-6">
-        <h1 className="text-3xl sm:text-4xl font-bold text-fg">
+      <header className="card p-6 sm:p-10">
+        <h1 className="text-4xl sm:text-6xl font-semibold text-fg tracking-tight leading-[0.98]">
           {pickThoughtTitle(thought, locale)}
         </h1>
+        {(thought.isPinned || thought.category?.name) && (
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            {thought.isPinned && (
+              <span className="status-badge text-xs px-2 py-0.5">
+                {t("thoughts.pinned")}
+              </span>
+            )}
+            {thought.category?.name && (
+              <span className="status-badge text-xs px-2 py-0.5">
+                #{thought.category.name}
+              </span>
+            )}
+          </div>
+        )}
         {isShowingMachineTranslation(thought, locale) && (
           <p className="mt-2 text-muted text-sm">{t("thoughts.machineTranslationNote")}</p>
         )}
@@ -115,15 +131,15 @@ export function ThoughtDetail({ thoughtId }: { thoughtId: string }) {
         </time>
       </header>
 
-      <div>
+      <div className="max-w-3xl mx-auto">
         <FormattedContent
           content={pickThoughtContent(thought, locale)}
           as="p"
-          className="text-fg reading whitespace-pre-wrap"
+          className="text-fg reading whitespace-pre-wrap text-lg sm:text-xl"
         />
       </div>
 
-      <section className="card p-5 sm:p-6">
+      <section className="card p-6 sm:p-8 max-w-4xl mx-auto w-full">
         <h2 className="section-label mb-4">
           {t("thoughtDetail.comments")} ({thought.comments.length})
         </h2>
@@ -151,7 +167,7 @@ export function ThoughtDetail({ thoughtId }: { thoughtId: string }) {
               value={author}
               onChange={(e) => setAuthor(e.target.value)}
               placeholder={t("thoughtDetail.authorPlaceholder")}
-              className="w-full max-w-md rounded-lg border border-border bg-bg/50 px-4 py-2.5 text-fg placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-fg/30 focus:border-fg"
+              className="form-control max-w-md"
               maxLength={64}
               required
             />
@@ -164,7 +180,7 @@ export function ThoughtDetail({ thoughtId }: { thoughtId: string }) {
               onChange={(e) => setContent(e.target.value)}
               placeholder={t("thoughtDetail.commentPlaceholder")}
               rows={3}
-              className="w-full rounded-lg border border-border bg-bg/50 px-4 py-2.5 text-fg placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-fg/30 focus:border-fg resize-none"
+              className="form-control resize-none"
               maxLength={2000}
               required
             />
@@ -172,7 +188,7 @@ export function ThoughtDetail({ thoughtId }: { thoughtId: string }) {
           <button
             type="submit"
             disabled={submitting}
-            className="rounded-lg bg-fg text-bg px-5 py-2.5 font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
+            className="button-primary px-5 py-2.5 font-medium hover:opacity-90 disabled:opacity-50"
           >
             {submitting ? t("thoughtDetail.submitting") : t("thoughtDetail.submit")}
           </button>

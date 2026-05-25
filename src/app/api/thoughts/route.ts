@@ -7,8 +7,15 @@ export async function GET(request: NextRequest) {
   const admin = await isAdmin();
   const thoughts = await prisma.thought.findMany({
     where: admin ? undefined : { isPublic: true },
-    orderBy: { createdAt: "desc" },
-    include: { comments: { orderBy: { createdAt: "asc" } } },
+    orderBy: [
+      { isPinned: "desc" },
+      { pinnedOrder: "asc" },
+      { createdAt: "desc" },
+    ],
+    include: {
+      category: true,
+      comments: { orderBy: { createdAt: "asc" } },
+    },
   });
   return NextResponse.json(thoughts);
 }
@@ -19,7 +26,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "未授权" }, { status: 401 });
   }
   const body = await request.json();
-  const { title, content, isPublic = true } = body;
+  const { title, content, isPublic = true, categoryId } = body;
   if (!title || !content) {
     return NextResponse.json(
       { error: "标题和内容不能为空" },
@@ -27,12 +34,17 @@ export async function POST(request: NextRequest) {
     );
   }
   const thought = await prisma.thought.create({
-    data: { title, content, isPublic: !!isPublic },
+    data: {
+      title,
+      content,
+      isPublic: !!isPublic,
+      ...(categoryId ? { categoryId } : {}),
+    },
   });
   await translateAndSaveThought(thought.id, thought.title, thought.content);
   const fresh = await prisma.thought.findUnique({
     where: { id: thought.id },
-    include: { comments: { orderBy: { createdAt: "asc" } } },
+    include: { category: true, comments: { orderBy: { createdAt: "asc" } } },
   });
   return NextResponse.json(fresh ?? thought);
 }

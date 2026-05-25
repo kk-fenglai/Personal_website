@@ -85,14 +85,18 @@ export function GalleryView() {
 
   return (
     <>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5 lg:gap-6">
         {photos.map((p, i) => (
           <button
             type="button"
             key={p.id}
             onClick={() => openLightbox(i)}
-            className="aspect-square relative rounded-xl overflow-hidden bg-bg-card border border-border shadow-sm hover:shadow-md hover:border-warm/40 focus:outline-none focus:ring-2 focus:ring-warm/50 focus:ring-offset-2 focus:ring-offset-bg transition-all duration-300 group text-left animate-in"
-            style={{ animationDelay: `${0.03 * i}s`, opacity: 0 }}
+            className="aspect-square relative overflow-hidden bg-bg-card border border-border shadow-sm hover:shadow-md hover:border-warm/40 focus:outline-none focus:ring-2 focus:ring-warm/50 focus:ring-offset-2 focus:ring-offset-bg transition-all duration-300 group text-left animate-in"
+            style={{
+              animationDelay: `${0.03 * i}s`,
+              opacity: 0,
+              borderRadius: "var(--radius-card)",
+            }}
           >
             <Image
               src={p.filename}

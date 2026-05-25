@@ -11,6 +11,15 @@
   --muted: #5c6478;
   --border: #d8dce6;
   --warm: #6b7fb5;
+  --surface: var(--bg-card);
+  --accent: var(--warm);
+  --control-bg: color-mix(in srgb, var(--bg-card) 82%, white);
+  --container-width: 70rem;
+  --radius-card: 14px;
+  --radius-control: 10px;
+  --shadow-card: 0 1px 4px rgba(44, 36, 25, 0.04), 0 2px 8px rgba(196, 167, 125, 0.06);
+  --shadow-card-hover: 0 6px 20px rgba(44, 36, 25, 0.08), 0 4px 12px rgba(196, 167, 125, 0.1);
+  --card-border-hover: color-mix(in srgb, var(--warm) 35%, var(--border));
 }
 
 @theme inline {
@@ -20,6 +29,7 @@
   --color-fg: var(--fg);
   --color-muted: var(--muted);
   --color-border: var(--border);
+  --color-warm: var(--warm);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -187,6 +197,14 @@ body {
   min-height: 100vh;
 }
 
+.site-container {
+  max-width: var(--container-width);
+}
+
+.site-main {
+  transition: max-width 0.25s ease;
+}
+
 /* 等风来：天空到地平线的渐变背景 */
 .bg-waiting-wind {
   position: fixed;
@@ -296,16 +314,99 @@ p, .reading {
 
 /* 温馨卡片 */
 .card {
-  background: var(--bg-card);
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  box-shadow: 0 1px 4px rgba(44, 36, 25, 0.04), 0 2px 8px rgba(196, 167, 125, 0.06);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
   transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
 }
 .card:hover {
-  box-shadow: 0 6px 20px rgba(44, 36, 25, 0.08), 0 4px 12px rgba(196, 167, 125, 0.1);
-  border-color: color-mix(in srgb, var(--warm) 35%, var(--border));
+  box-shadow: var(--shadow-card-hover);
+  border-color: var(--card-border-hover);
   transform: translateY(-1px);
+}
+
+.form-control {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--control-bg);
+  color: var(--fg);
+  padding: 0.7rem 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.form-control::placeholder {
+  color: var(--muted);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+/* Use :where() to keep these component classes low-specificity,
+   so Tailwind utility classes (e.g. text-*, bg-*) can override them. */
+:where(.button-primary),
+:where(.button-secondary),
+:where(.button-ghost) {
+  border-radius: var(--radius-control);
+  transition: opacity 0.2s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+:where(.button-primary) {
+  background: var(--warm);
+  color: var(--bg);
+}
+
+:where(.button-secondary) {
+  border: 1px solid var(--border);
+  background: var(--control-bg);
+  color: var(--fg);
+}
+
+:where(.button-ghost) {
+  color: var(--muted);
+}
+
+:where(.button-ghost:hover) {
+  color: var(--fg);
+}
+
+.status-badge {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--control-bg);
+  color: var(--muted);
+}
+
+.status-badge-public,
+.status-badge-approved {
+  border-color: color-mix(in srgb, #2f8a5f 35%, var(--border));
+  background: color-mix(in srgb, #2f8a5f 12%, var(--control-bg));
+  color: color-mix(in srgb, #2f8a5f 75%, var(--fg));
+}
+
+.status-badge-private,
+.status-badge-rejected {
+  border-color: var(--border);
+}
+
+.status-badge-pending {
+  border-color: color-mix(in srgb, #b7791f 35%, var(--border));
+  background: color-mix(in srgb, #b7791f 12%, var(--control-bg));
+  color: color-mix(in srgb, #b7791f 75%, var(--fg));
+}
+
+.danger-text {
+  color: #c2413b;
+}
+
+@media (prefers-color-scheme: dark) {
+  .danger-text {
+    color: #f08a83;
+  }
 }
 
 .tabular-nums {

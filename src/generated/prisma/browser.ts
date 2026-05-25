@@ -23,6 +23,11 @@ export * from './enums';
  */
 export type Thought = Prisma.ThoughtModel
 /**
+ * Model ThoughtCategory
+ * 
+ */
+export type ThoughtCategory = Prisma.ThoughtCategoryModel
+/**
  * Model Comment
  * 
  */

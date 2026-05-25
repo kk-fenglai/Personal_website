@@ -26,15 +26,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className="bg-waiting-wind" aria-hidden />
       <div className="bg-wind-flow" aria-hidden />
       <WaitingWindAtmosphere />
-      <header className="sticky top-0 z-50 border-b border-border bg-bg-sky/90 backdrop-blur-[2px]">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="site-header sticky top-0 z-50 border-b border-border bg-bg-sky/90 backdrop-blur-[2px]">
+        <div className="site-container mx-auto px-4 py-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
           <Link
             href="/"
-            className="text-fg font-semibold hover:opacity-80 transition-opacity"
+            className="text-fg font-bold tracking-tight hover:opacity-80 transition-opacity"
           >
             {t("nav.siteName")}
           </Link>
-          <nav className="flex items-center gap-5 text-base">
+          <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-base sm:justify-end">
             {NAV.map((item) => {
               const active = pathname === item.href || (item.href !== "/" && pathname?.startsWith(item.href));
               return (
@@ -52,12 +52,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </nav>
         </div>
       </header>
-      <main className="relative z-10 max-w-3xl mx-auto px-4 py-10">
+      <main className="site-main relative z-10 site-container mx-auto px-4 py-10">
         {children}
       </main>
       {season === "winter" && <Snowman />}
       <footer className="relative z-10 border-t border-border mt-16 py-6">
-        <div className="max-w-3xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-base text-muted">
+        <div className="site-container mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-base text-muted">
           <span className="font-medium text-fg">{t("nav.siteName")}</span>
           <div className="flex items-center gap-4">
             <button

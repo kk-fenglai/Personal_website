@@ -32,13 +32,7 @@ type SeasonContextValue = {
 const SeasonContext = createContext<SeasonContextValue | null>(null);
 
 export function SeasonProvider({ children }: { children: React.ReactNode }) {
-  const [season, setSeasonState] = useState<Season>("winter");
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setSeasonState(getStoredSeason());
-    setMounted(true);
-  }, []);
+  const [season, setSeasonState] = useState<Season>(getStoredSeason);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-season", season);
