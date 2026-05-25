@@ -60,6 +60,18 @@ model Photo {
   createdAt DateTime @default(now())
 }
 
+/// 访客点赞（每条内容每位访客仅计一次，由 cookie 标识）
+model Like {
+  id         String   @id @default(cuid())
+  targetType String
+  targetId   String
+  visitorKey String
+  createdAt  DateTime @default(now())
+
+  @@unique([targetType, targetId, visitorKey])
+  @@index([targetType, targetId])
+}
+
 model AccessRequest {
   id          String   @id @default(cuid())
   name        String

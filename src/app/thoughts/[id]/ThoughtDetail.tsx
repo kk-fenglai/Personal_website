@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { useLocale } from "@/contexts/LocaleContext";
 import { FormattedContent } from "@/components/FormattedContent";
+import { LikeButton } from "@/components/LikeButton";
 import {
   isShowingMachineTranslation,
   pickThoughtContent,
@@ -31,6 +32,8 @@ type Thought = {
   category?: { id: string; name: string } | null;
   createdAt: string;
   comments: Comment[];
+  likeCount?: number;
+  likedByVisitor?: boolean;
 };
 
 export function ThoughtDetail({ thoughtId }: { thoughtId: string }) {
@@ -44,9 +47,12 @@ export function ThoughtDetail({ thoughtId }: { thoughtId: string }) {
 
   useEffect(() => {
     fetch(`/api/thoughts/${thoughtId}`)
-      .then((res) => {
-        if (res.status === 404 || res.status === 403) return null;
-        return res.json();
+      .then(async (res) => {
+        const data = await res.json().catch(() => null);
+        if (!res.ok || !data?.id) {
+          return null;
+        }
+        return data as Thought;
       })
       .then((data) => {
         setThought(data);
@@ -143,7 +149,17 @@ export function ThoughtDetail({ thoughtId }: { thoughtId: string }) {
         />
       </ScrollReveal>
 
-      <section className="border-t border-border pt-12 md:pt-16">
+      <ScrollReveal className="mt-12 md:mt-16">
+        <LikeButton
+          targetType="thought"
+          targetId={thought.id}
+          initialCount={thought.likeCount}
+          initialLiked={thought.likedByVisitor}
+          skipFetch={thought.likeCount !== undefined}
+        />
+      </ScrollReveal>
+
+      <section className="border-t border-border pt-12 md:pt-16 mt-12 md:mt-16">
         <h2 className="section-label mb-8">
           {t("thoughtDetail.comments")} ({thought.comments.length})
         </h2>

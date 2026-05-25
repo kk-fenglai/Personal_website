@@ -55,6 +55,7 @@ export const ModelName = {
   ThoughtCategory: 'ThoughtCategory',
   Comment: 'Comment',
   Photo: 'Photo',
+  Like: 'Like',
   AccessRequest: 'AccessRequest',
   VisitLog: 'VisitLog'
 } as const
@@ -125,6 +126,17 @@ export const PhotoScalarFieldEnum = {
 } as const
 
 export type PhotoScalarFieldEnum = (typeof PhotoScalarFieldEnum)[keyof typeof PhotoScalarFieldEnum]
+
+
+export const LikeScalarFieldEnum = {
+  id: 'id',
+  targetType: 'targetType',
+  targetId: 'targetId',
+  visitorKey: 'visitorKey',
+  createdAt: 'createdAt'
+} as const
+
+export type LikeScalarFieldEnum = (typeof LikeScalarFieldEnum)[keyof typeof LikeScalarFieldEnum]
 
 
 export const AccessRequestScalarFieldEnum = {

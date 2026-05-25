@@ -6,6 +6,7 @@ import { PhotoImage } from "@/components/PhotoImage";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { useLocale } from "@/contexts/LocaleContext";
 import { GALLERY_LAYOUT_CYCLE, type GalleryLayoutSpec } from "@/lib/stitchPlaceholders";
+import { LikeButton } from "@/components/LikeButton";
 
 type Photo = {
   id: string;
@@ -24,6 +25,9 @@ export function GalleryView() {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [likeCounts, setLikeCounts] = useState<Record<string, number>>({});
+  const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
+  const [likesLoaded, setLikesLoaded] = useState(false);
 
   useEffect(() => {
     fetch("/api/photos")
@@ -34,6 +38,27 @@ export function GalleryView() {
       })
       .catch(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (photos.length === 0) return;
+    const params = new URLSearchParams({
+      targetType: "photo",
+      ids: photos.map((p) => p.id).join(","),
+    });
+    fetch(`/api/likes?${params}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!data) return;
+        const counts: Record<string, number> = {};
+        for (const p of photos) {
+          counts[p.id] = data.counts?.[p.id] ?? 0;
+        }
+        setLikeCounts(counts);
+        setLikedIds(new Set(Array.isArray(data.liked) ? data.liked : []));
+        setLikesLoaded(true);
+      })
+      .catch(() => {});
+  }, [photos]);
 
   const openLightbox = useCallback((index: number) => setLightboxIndex(index), []);
   const closeLightbox = useCallback(() => setLightboxIndex(null), []);
@@ -143,6 +168,19 @@ export function GalleryView() {
                   </div>
                 )}
               </button>
+              <div
+                className="mt-4"
+                onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
+              >
+                <LikeButton
+                  targetType="photo"
+                  targetId={p.id}
+                  initialCount={likeCounts[p.id]}
+                  initialLiked={likedIds.has(p.id)}
+                  skipFetch={likesLoaded}
+                />
+              </div>
             </ScrollReveal>
           );
         })}
@@ -215,10 +253,21 @@ export function GalleryView() {
               </>
             )}
 
-            <div className="p-4 text-center text-white/90 shrink-0">
+            <div className="p-4 text-center text-white/90 shrink-0 space-y-4">
               {current.caption && (
                 <p className="text-base sm:text-lg mb-1 max-w-2xl mx-auto">{current.caption}</p>
               )}
+              <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
+                <LikeButton
+                  key={current.id}
+                  targetType="photo"
+                  targetId={current.id}
+                  initialCount={likeCounts[current.id]}
+                  initialLiked={likedIds.has(current.id)}
+                  skipFetch={likesLoaded}
+                  variant="onDark"
+                />
+              </div>
               <p className="text-sm text-white/60">
                 {t("gallery.photoCount")
                   .replace("{current}", String(lightboxIndex + 1))

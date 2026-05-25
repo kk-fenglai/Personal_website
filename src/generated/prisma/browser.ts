@@ -38,6 +38,11 @@ export type Comment = Prisma.CommentModel
  */
 export type Photo = Prisma.PhotoModel
 /**
+ * Model Like
+ * 访客点赞（每条内容每位访客仅计一次，由 cookie 标识）
+ */
+export type Like = Prisma.LikeModel
+/**
  * Model AccessRequest
  * 
  */

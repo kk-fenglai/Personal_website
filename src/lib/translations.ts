@@ -90,6 +90,11 @@ export const translations: Record<
     "thoughtDetail.submit": "发表评论",
     "thoughtDetail.submitting": "发送中…",
 
+    "like.like": "点赞",
+    "like.liked": "已赞",
+    "like.unlike": "取消点赞",
+    "like.count": "{count} 人觉得好",
+
     "gallery.title": "相册",
     "gallery.subtitle": "照片与回忆",
     "gallery.visualArchive": "Visual Archive",
@@ -340,6 +345,11 @@ export const translations: Record<
     "thoughtDetail.submit": "Post comment",
     "thoughtDetail.submitting": "Sending…",
 
+    "like.like": "Like",
+    "like.liked": "Liked",
+    "like.unlike": "Remove like",
+    "like.count": "{count} likes",
+
     "gallery.title": "Gallery",
     "gallery.subtitle": "Photos and memories",
     "gallery.visualArchive": "Visual Archive",
@@ -589,6 +599,11 @@ export const translations: Record<
     "thoughtDetail.commentPlaceholder": "Partagez votre avis…",
     "thoughtDetail.submit": "Publier le commentaire",
     "thoughtDetail.submitting": "Envoi…",
+
+    "like.like": "J'aime",
+    "like.liked": "Aimé",
+    "like.unlike": "Retirer le j'aime",
+    "like.count": "{count} j'aime",
 
     "gallery.title": "Galerie",
     "gallery.subtitle": "Photos et souvenirs",

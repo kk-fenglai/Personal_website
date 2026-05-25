@@ -14,7 +14,7 @@ if (!connectionString) {
 const adapter = new PrismaPg({ connectionString });
 
 /** Bump when schema changes so dev HMR does not keep a stale PrismaClient. */
-const PRISMA_CLIENT_CACHE_VERSION = 2;
+const PRISMA_CLIENT_CACHE_VERSION = 4;
 
 type GlobalPrisma = {
   prisma?: PrismaClient;

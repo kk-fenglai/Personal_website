@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { isAdmin } from "@/lib/auth";
 import { translateAndSaveThought } from "@/lib/thoughtTranslateAndSave";
+import { getLikeStatsForOne } from "@/lib/likes";
+import { getVisitorLikeKeyFromRequest } from "@/lib/visitorLikeKey";
 
 export async function GET(
   _request: NextRequest,
@@ -19,7 +21,21 @@ export async function GET(
   if (!thought.isPublic && !admin) {
     return NextResponse.json({ error: "未授权" }, { status: 403 });
   }
-  return NextResponse.json(thought);
+  const { key: visitorKey } = getVisitorLikeKeyFromRequest(_request);
+  let likeCount = 0;
+  let likedByVisitor = false;
+  try {
+    const likeStats = await getLikeStatsForOne("thought", id, visitorKey);
+    likeCount = likeStats.count;
+    likedByVisitor = likeStats.liked;
+  } catch (e) {
+    console.error("[thoughts GET id] like stats skipped:", e);
+  }
+  return NextResponse.json({
+    ...thought,
+    likeCount,
+    likedByVisitor,
+  });
 }
 
 export async function PATCH(
