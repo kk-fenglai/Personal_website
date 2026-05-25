@@ -3,8 +3,12 @@ import { put } from "@vercel/blob";
 import { prisma } from "@/lib/db";
 import { isAdmin } from "@/lib/auth";
 import { isSiteSlot } from "@/lib/siteSlots";
+import { MAX_PHOTO_UPLOAD_BYTES } from "@/lib/photoUploadClient";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
+
+/** Vercel 上多图/大图上传需要更长执行时间 */
+export const maxDuration = 60;
 
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
 
@@ -61,6 +65,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "请选择要上传的图片" }, { status: 400 });
     }
 
+    if (file.size > MAX_PHOTO_UPLOAD_BYTES) {
+      const mb = (MAX_PHOTO_UPLOAD_BYTES / (1024 * 1024)).toFixed(0);
+      return NextResponse.json(
+        {
+          error: `单张图片不能超过 ${mb}MB（Vercel 限制）。请压缩后重试，或一次少选几张。`,
+        },
+        { status: 413 }
+      );
+    }
+
     const mime = resolveImageMime(file);
     if (!mime) {
       return NextResponse.json(
@@ -76,7 +90,7 @@ export async function POST(request: NextRequest) {
     const safeExt = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".heic", ".heif", ".avif"].includes(ext)
       ? ext
       : ".jpg";
-    const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}${safeExt}`;
+    const filename = `${Date.now()}-${performance.now().toString(36).replace(/\W/g, "")}-${Math.random().toString(36).slice(2)}${safeExt}`;
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 

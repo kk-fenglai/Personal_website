@@ -122,24 +122,25 @@ export function BoldableContentField({
         formData.append("caption", "");
         formData.append("isPublic", "true");
 
-        const res = await fetch("/api/photos/upload", {
-          method: "POST",
-          body: formData,
-          credentials: "same-origin",
+        const { uploadPhotoWithRetry } = await import("@/lib/photoUploadClient");
+        const result = await uploadPhotoWithRetry(file, {
+          caption: "",
+          isPublic: true,
         });
-        let data: { filename?: string; error?: string };
-        try {
-          data = (await res.json()) as { filename?: string; error?: string };
-        } catch {
-          setImageError(t("admin.imageUploadError"));
+        if (!result.ok) {
+          setImageError(
+            result.tooLarge
+              ? t("admin.uploadFileTooLarge", {
+                  name: file.name,
+                  max: "4 MB",
+                })
+              : result.error || t("admin.imageUploadError")
+          );
           return;
         }
-        if (!res.ok) {
-          setImageError(data.error || t("admin.imageUploadError"));
-          return;
-        }
-        const path = data.filename;
-        if (!path || !path.startsWith("/")) {
+        const path =
+          typeof result.photo.filename === "string" ? result.photo.filename : "";
+        if (!path || (!path.startsWith("/") && !path.startsWith("http"))) {
           setImageError(t("admin.imageUploadError"));
           return;
         }

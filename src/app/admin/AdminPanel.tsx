@@ -5,6 +5,11 @@ import Link from "next/link";
 import { useLocale } from "@/contexts/LocaleContext";
 import { BoldableContentField } from "@/components/BoldableContentField";
 import {
+  formatPhotoUploadBytes,
+  MAX_PHOTO_UPLOAD_BYTES,
+  uploadPhotoWithRetry,
+} from "@/lib/photoUploadClient";
+import {
   SITE_SLOT_ABOUT_PORTRAIT,
   SITE_SLOT_HOME_HERO,
   SITE_SLOTS,
@@ -1309,22 +1314,30 @@ function SiteImagesPanel({
   const uploadToSlot = async (slot: SiteSlot, file: File) => {
     setUploadingSlot(slot);
     setUploadError(null);
-    try {
-      const fd = new FormData();
-      fd.append("file", file);
-      fd.append("siteSlot", slot);
-      const res = await fetch("/api/photos/upload", { method: "POST", body: fd });
-      const data = (await res.json().catch(() => ({}))) as { error?: string };
-      if (!res.ok) {
-        setUploadError(data.error || t("admin.siteImages.uploadFailed"));
-        return;
-      }
-      onToggle();
-    } catch {
-      setUploadError(t("admin.siteImages.uploadFailed"));
-    } finally {
+    if (file.size > MAX_PHOTO_UPLOAD_BYTES) {
+      setUploadError(
+        t("admin.uploadFileTooLarge", {
+          name: file.name,
+          max: formatPhotoUploadBytes(MAX_PHOTO_UPLOAD_BYTES),
+        })
+      );
       setUploadingSlot(null);
+      return;
     }
+    const result = await uploadPhotoWithRetry(file, { siteSlot: slot });
+    if (!result.ok) {
+      setUploadError(
+        result.tooLarge
+          ? t("admin.uploadFileTooLarge", {
+              name: file.name,
+              max: formatPhotoUploadBytes(MAX_PHOTO_UPLOAD_BYTES),
+            })
+          : result.error || t("admin.siteImages.uploadFailed")
+      );
+    } else {
+      onToggle();
+    }
+    setUploadingSlot(null);
   };
 
   const removeSlot = async (slot: SiteSlot) => {
@@ -1624,38 +1637,62 @@ function UploadPhotoForm({ onSuccess }: { onSuccess: () => void }) {
       setError(t("admin.selectImage"));
       return;
     }
+
+    const oversized = files.filter((f) => f.size > MAX_PHOTO_UPLOAD_BYTES);
+    if (oversized.length > 0) {
+      setError(
+        t("admin.uploadBatchTooLarge", {
+          max: formatPhotoUploadBytes(MAX_PHOTO_UPLOAD_BYTES),
+          names: oversized.map((f) => f.name).join("、"),
+        })
+      );
+      return;
+    }
+
     setError("");
     setLoading(true);
     setUploadProgress({ current: 0, total: files.length });
-    try {
-      for (let i = 0; i < files.length; i++) {
-        setUploadProgress({ current: i + 1, total: files.length });
-        const form = new FormData();
-        form.append("file", files[i]);
-        form.append("caption", caption);
-        form.append("isPublic", String(isPublic));
-        const res = await fetch("/api/photos/upload", {
-          method: "POST",
-          body: form,
-          credentials: "same-origin",
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          setError(data.error || t("common.errorNetwork"));
-          setUploadProgress(null);
-          setLoading(false);
-          return;
-        }
+
+    const failures: string[] = [];
+    let successCount = 0;
+
+    for (let i = 0; i < files.length; i++) {
+      setUploadProgress({ current: i + 1, total: files.length });
+      const result = await uploadPhotoWithRetry(files[i], {
+        caption,
+        isPublic,
+      });
+      if (result.ok) {
+        successCount += 1;
+      } else {
+        failures.push(
+          `${files[i].name}: ${result.error || t("common.errorNetwork")}`
+        );
       }
+      if (i < files.length - 1) {
+        await new Promise((r) => setTimeout(r, 450));
+      }
+    }
+
+    if (successCount > 0) {
       clearAll();
       setCaption("");
       onSuccess();
-    } catch {
-      setError(t("common.errorNetwork"));
-    } finally {
-      setLoading(false);
-      setUploadProgress(null);
     }
+
+    if (failures.length > 0) {
+      setError(
+        successCount > 0
+          ? `${t("admin.uploadPartialFail", {
+              ok: successCount,
+              total: files.length,
+            })}\n${failures.join("\n")}`
+          : failures.join("\n")
+      );
+    }
+
+    setLoading(false);
+    setUploadProgress(null);
   };
 
   const onDragOver = (e: React.DragEvent) => {
@@ -1679,8 +1716,9 @@ function UploadPhotoForm({ onSuccess }: { onSuccess: () => void }) {
   return (
     <form onSubmit={handleSubmit} className="card p-5 sm:p-6 space-y-6 max-w-2xl">
       {error && (
-        <p className="text-base danger-text">{error}</p>
+        <p className="text-base danger-text whitespace-pre-wrap">{error}</p>
       )}
+      <p className="text-sm text-muted">{t("admin.uploadSizeHint")}</p>
       <div>
         <input
           type="file"
