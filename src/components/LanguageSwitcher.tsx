@@ -24,18 +24,18 @@ export function LanguageSwitcher() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-1 text-base text-muted hover:text-fg transition-colors"
+        className="nav-link flex items-center gap-1"
         aria-expanded={open}
         aria-haspopup="listbox"
         aria-label={languageSwitcherUiEn.button}
       >
         <span>{languageSwitcherUiEn.button}</span>
-        <span className="text-xs">▾</span>
+        <span className="text-[10px]">▾</span>
       </button>
       {open && (
         <ul
           role="listbox"
-          className="absolute right-0 top-full mt-2 min-w-[7rem] py-1 rounded-lg border border-border bg-bg-card shadow-lg z-50"
+          className="dropdown-panel absolute right-0 top-full mt-2 min-w-[7rem] py-1 z-50"
         >
           {(["zh", "en", "fr"] as const).map((loc) => (
             <li key={loc} role="option" aria-selected={locale === loc}>
@@ -45,8 +45,8 @@ export function LanguageSwitcher() {
                   setLocale(loc);
                   setOpen(false);
                 }}
-                className={`w-full text-left px-4 py-2 text-base transition-colors ${
-                  locale === loc ? "text-fg font-medium" : "text-muted hover:text-fg"
+                className={`w-full text-left px-4 py-2.5 nav-link ${
+                  locale === loc ? "nav-link-active !text-fg" : ""
                 }`}
               >
                 {languageSwitcherUiEn.option[loc]}

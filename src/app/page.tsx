@@ -1,81 +1,212 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
+import { ScrollReveal } from "@/components/ScrollReveal";
 import { useLocale } from "@/contexts/LocaleContext";
-import { useSeason } from "@/contexts/SeasonContext";
-import { FallingSnow } from "@/components/FallingSnow";
-import { FallingPetals } from "@/components/FallingPetals";
-import { FallingLeaves } from "@/components/FallingLeaves";
-import { FallingRain } from "@/components/FallingRain";
+import {
+  STITCH_HERO_IMAGE,
+  STITCH_HOME_GALLERY_IMAGES,
+  plainTextExcerpt,
+} from "@/lib/stitchPlaceholders";
+import {
+  pickThoughtContent,
+  pickThoughtTitle,
+} from "@/lib/pickThoughtLocale";
+
+type ThoughtPreview = {
+  id: string;
+  title: string;
+  content: string;
+  titleEn?: string | null;
+  titleFr?: string | null;
+  contentEn?: string | null;
+  contentFr?: string | null;
+  createdAt: string;
+};
+
+type PhotoPreview = {
+  id: string;
+  filename: string;
+  caption: string | null;
+};
+
+type SiteImagesResponse = {
+  home_hero: PhotoPreview | null;
+  about_portrait: PhotoPreview | null;
+  home_preview: (PhotoPreview | null)[];
+};
 
 export default function Home() {
-  const { t } = useLocale();
-  const { season } = useSeason();
-  const [stats, setStats] = useState({ thoughts: 0, photos: 0 });
+  const { t, locale, dateLocale } = useLocale();
+  const [thoughts, setThoughts] = useState<ThoughtPreview[]>([]);
+  const [photos, setPhotos] = useState<PhotoPreview[]>([]);
+  const [siteImages, setSiteImages] = useState<SiteImagesResponse | null>(null);
 
   useEffect(() => {
-    fetch("/api/stats")
-      .then((r) => r.json())
-      .then((data) => setStats({ thoughts: data.thoughts ?? 0, photos: data.photos ?? 0 }))
+    Promise.all([
+      fetch("/api/thoughts/home-featured").then((r) => r.json()),
+      fetch("/api/photos").then((r) => r.json()),
+      fetch("/api/site-images").then((r) => r.json()),
+    ])
+      .then(([tData, pData, sData]) => {
+        setThoughts(Array.isArray(tData) ? tData : []);
+        setPhotos(Array.isArray(pData) ? pData : []);
+        if (sData && typeof sData === "object" && Array.isArray(sData.home_preview)) {
+          setSiteImages(sData as SiteImagesResponse);
+        }
+      })
       .catch(() => {});
   }, []);
 
+  const heroImage =
+    siteImages?.home_hero?.filename ?? STITCH_HERO_IMAGE;
+
+  const galleryTiles = (() => {
+    const fromSlots = siteImages?.home_preview
+      .map((p, i) =>
+        p
+          ? { id: p.id, filename: p.filename, caption: p.caption }
+          : {
+              id: `stitch-${i}`,
+              filename: STITCH_HOME_GALLERY_IMAGES[i],
+              caption: null,
+            }
+      )
+      .slice(0, 5);
+    const hasAnySlot = siteImages?.home_preview.some(Boolean);
+    if (hasAnySlot && fromSlots) return fromSlots;
+    if (photos.length > 0) return photos.slice(0, 5);
+    return null;
+  })();
+
+  const previewCount = galleryTiles?.length ?? 5;
+
   return (
     <>
-      <div className="bg-warm-glow" aria-hidden />
-      {season === "winter" && <FallingSnow />}
-      {season === "spring" && <FallingPetals />}
-      {season === "summer" && <FallingRain />}
-      {season === "autumn" && <FallingLeaves />}
-      <div className="relative z-10 space-y-20">
-        <section className="pt-6 pb-12 animate-in animate-in-1">
-          <p className="section-label mb-3">{t("home.title")}</p>
-          <h1 className="text-3xl sm:text-4xl md:text-[2.25rem] font-bold text-fg tracking-tight">
-            {t("home.subtitle")}
-          </h1>
-          <p className="mt-6 text-muted max-w-xl reading text-[1.05rem]">
-            {t("home.intro")}
-          </p>
-          <p className="mt-8 text-muted/90 text-base sm:text-lg italic max-w-lg leading-relaxed">
-            {t("home.quote")}
-          </p>
-        </section>
-
-        <section className="grid sm:grid-cols-2 gap-4">
-          <Link href="/thoughts" className="card p-6 block animate-in animate-in-2">
-          <span className="section-label">01</span>
-          <h2 className="mt-2 text-xl sm:text-[1.35rem] font-semibold text-fg">
-            {t("home.cardThoughts")}
-          </h2>
-          <p className="mt-2 text-muted text-base reading">
-            {t("home.cardThoughtsDesc")}
-          </p>
-          <p className="mt-4 text-base text-muted tabular-nums">
-            {stats.thoughts ?? 0} {t("home.statsThoughts")} · {t("home.ctaThoughts")} →
-          </p>
-        </Link>
-        <Link href="/gallery" className="card p-6 block animate-in animate-in-3">
-          <span className="section-label">02</span>
-          <h2 className="mt-2 text-xl sm:text-[1.35rem] font-semibold text-fg">
-            {t("home.cardGallery")}
-          </h2>
-          <p className="mt-2 text-muted text-base reading">
-            {t("home.cardGalleryDesc")}
-          </p>
-          <p className="mt-4 text-base text-muted tabular-nums">
-            {stats.photos ?? 0} {t("home.statsPhotos")} · {t("home.ctaGallery")} →
-          </p>
-        </Link>
+      <section className="min-h-[85vh] flex flex-col justify-center site-container mx-auto mb-24 md:mb-40">
+        <div className="asymmetric-grid">
+          <div className="col-span-12 md:col-start-2 md:col-span-10 mb-12 md:mb-16">
+            <ScrollReveal className="home-hero-frame image-hover-zoom">
+              <Image
+                src={heroImage}
+                alt={t("home.subtitle")}
+                fill
+                className="object-cover"
+                priority
+                sizes="(max-width: 768px) 100vw, 80vw"
+              />
+            </ScrollReveal>
+          </div>
+          <div className="col-span-12 md:col-start-3 md:col-span-8">
+            <ScrollReveal delayMs={80}>
+              <h1 className="type-display-lg text-fg mb-8">{t("home.subtitle")}</h1>
+              <p className="type-body-lg text-muted max-w-2xl reading">
+                {t("home.intro")}
+                <br />
+                <span className="italic">{t("home.quote")}</span>
+              </p>
+            </ScrollReveal>
+          </div>
+        </div>
       </section>
 
-      <section className="card p-6 sm:p-8 animate-in animate-in-4">
-        <p className="section-label">03 · {t("home.aboutTitle")}</p>
-        <p className="mt-5 text-muted text-base reading">
-          {t("home.aboutText")}
-        </p>
+      <section className="site-container mx-auto mb-24 md:mb-40">
+        <div className="editorial-section-header">
+          <span className="section-label tracking-[0.2em]">01 · {t("home.cardThoughts")}</span>
+          <Link href="/thoughts" className="nav-link text-underline-expand">
+            {t("home.ctaThoughts")} →
+          </Link>
+        </div>
+        <div className="asymmetric-grid">
+          {(thoughts.length > 0
+            ? thoughts
+            : [
+                {
+                  id: "placeholder-1",
+                  title: t("home.cardThoughts"),
+                  content: t("home.cardThoughtsDesc"),
+                  createdAt: new Date().toISOString(),
+                },
+              ]
+          ).map((item, i) => (
+            <ScrollReveal
+              key={item.id}
+              delayMs={i * 100}
+              className="col-span-12 md:col-span-4"
+            >
+              <Link href={item.id.startsWith("placeholder") ? "/thoughts" : `/thoughts/${item.id}`} className="block py-10 group border-b border-border md:border-0">
+                <span className="section-label text-tertiary block mb-6 tabular-nums">
+                  {new Date(item.createdAt).toLocaleDateString(dateLocale)}
+                </span>
+                <h3 className="type-headline-md text-fg mb-6 group-hover:text-warm transition-colors">
+                  {pickThoughtTitle(item, locale) ?? item.title}
+                </h3>
+                <p className="text-muted reading mb-8 line-clamp-3">
+                  {plainTextExcerpt(pickThoughtContent(item, locale) ?? item.content, 120)}
+                </p>
+                <span className="read-article-link">{t("common.readMore")}</span>
+              </Link>
+            </ScrollReveal>
+          ))}
+        </div>
       </section>
-      </div>
+
+      <section className="site-container mx-auto mb-24 md:mb-40">
+        <div className="editorial-section-header">
+          <span className="section-label tracking-[0.2em]">02 · {t("home.cardGallery")}</span>
+          <Link href="/gallery" className="nav-link text-underline-expand">
+            {t("home.ctaGallery")} →
+          </Link>
+        </div>
+        <div
+          className={
+            previewCount >= 3
+              ? "home-gallery-mosaic"
+              : "home-gallery-mosaic home-gallery-mosaic-few"
+          }
+        >
+          {(galleryTiles ?? STITCH_HOME_GALLERY_IMAGES.map((src, i) => ({ id: `s-${i}`, filename: src, caption: null })))
+            .slice(0, 5)
+            .map((p, i) => (
+              <div
+                key={p.id}
+                className={`home-gallery-tile home-gallery-tile-${i} image-hover-zoom animate-in`}
+                style={{ animationDelay: `${0.06 * i}s`, opacity: 0 }}
+              >
+                <Link href="/gallery" className="home-gallery-tile-link">
+                  <Image
+                    src={p.filename}
+                    alt={p.caption || t("gallery.photoAlt")}
+                    fill
+                    className="object-cover"
+                    sizes={
+                      i === 0
+                        ? "(max-width: 768px) 100vw, 66vw"
+                        : "(max-width: 768px) 100vw, 33vw"
+                    }
+                  />
+                </Link>
+              </div>
+            ))}
+        </div>
+      </section>
+
+      <section className="surface-band py-24 md:py-32 mb-16">
+        <div className="site-container mx-auto asymmetric-grid">
+          <ScrollReveal className="col-span-12 md:col-start-2 md:col-span-4">
+            <span className="section-label block mb-4 tracking-[0.2em]">03 · {t("home.aboutTitle")}</span>
+            <h2 className="type-headline-md text-fg mb-6">{t("home.aboutText")}</h2>
+            <p className="text-muted reading">{t("home.quote")}</p>
+          </ScrollReveal>
+          <ScrollReveal delayMs={100} className="col-span-12 md:col-start-7 md:col-span-5 flex items-center">
+            <Link href="/about" className="read-article-link text-lg">
+              {t("about.learnMore")} →
+            </Link>
+          </ScrollReveal>
+        </div>
+      </section>
     </>
   );
 }

@@ -13,9 +13,29 @@ if (!connectionString) {
 // 嵌套的 @types/pg 和项目根目录 @types/pg 对 Pool 类型重复定义导致 TS 构建失败（如 Vercel）。
 const adapter = new PrismaPg({ connectionString });
 
-const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
+/** Bump when schema changes so dev HMR does not keep a stale PrismaClient. */
+const PRISMA_CLIENT_CACHE_VERSION = 2;
+
+type GlobalPrisma = {
+  prisma?: PrismaClient;
+  prismaCacheVersion?: number;
+};
+
+const globalForPrisma = globalThis as unknown as GlobalPrisma;
+
+if (
+  process.env.NODE_ENV !== "production" &&
+  globalForPrisma.prisma &&
+  globalForPrisma.prismaCacheVersion !== PRISMA_CLIENT_CACHE_VERSION
+) {
+  void globalForPrisma.prisma.$disconnect();
+  globalForPrisma.prisma = undefined;
+}
 
 export const prisma =
   globalForPrisma.prisma ?? new PrismaClient({ adapter });
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+if (process.env.NODE_ENV !== "production") {
+  globalForPrisma.prisma = prisma;
+  globalForPrisma.prismaCacheVersion = PRISMA_CLIENT_CACHE_VERSION;
+}

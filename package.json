@@ -10,7 +10,8 @@
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate-sqlite": "tsx scripts/migrate-sqlite-to-neon.ts",
-    "db:backfill-default-category": "tsx scripts/backfill-default-thought-category.ts"
+    "db:backfill-default-category": "tsx scripts/backfill-default-thought-category.ts",
+    "import:stitch-images": "tsx scripts/import-stitch-site-images.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.5.0",

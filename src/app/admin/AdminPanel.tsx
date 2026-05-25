@@ -4,6 +4,12 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useLocale } from "@/contexts/LocaleContext";
 import { BoldableContentField } from "@/components/BoldableContentField";
+import {
+  SITE_SLOT_ABOUT_PORTRAIT,
+  SITE_SLOT_HOME_HERO,
+  SITE_SLOTS,
+  type SiteSlot,
+} from "@/lib/siteSlots";
 
 type Thought = {
   id: string;
@@ -12,6 +18,7 @@ type Thought = {
   isPublic: boolean;
   isPinned: boolean;
   pinnedOrder: number | null;
+  homeFeaturedOrder: number | null;
   categoryId: string | null;
   category?: { id: string; name: string } | null;
   createdAt: string;
@@ -22,6 +29,7 @@ type Photo = {
   filename: string;
   caption: string | null;
   isPublic: boolean;
+  siteSlot: string | null;
   createdAt: string;
 };
 
@@ -59,22 +67,22 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div className="space-y-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="section-label mb-2">{t("nav.siteName")}</p>
-          <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight text-fg">{t("admin.title")}</h1>
+          <p className="section-label mb-1 normal-case tracking-normal">{t("nav.siteName")}</p>
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-fg">{t("admin.title")}</h1>
         </div>
         <button
           type="button"
           onClick={handleLogout}
-          className="button-secondary self-start px-4 py-2 text-base"
+          className="button-secondary self-start shrink-0"
         >
           {t("admin.logout")}
         </button>
       </div>
 
-      <div className="card p-2 flex flex-wrap gap-2 text-base">
+      <div className="admin-tabs card flex flex-wrap">
         {[
           ["thoughts", t("admin.tabThoughts")],
           ["new-thought", t("admin.tabNewThought")],
@@ -88,9 +96,7 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
             key={tab}
             type="button"
             onClick={() => setActiveTab(tab as typeof activeTab)}
-            className={`button-ghost px-3 py-2 text-sm sm:text-base ${
-              activeTab === tab ? "bg-warm text-bg font-medium" : "hover:bg-bg"
-            }`}
+            className={`admin-tab ${activeTab === tab ? "admin-tab-active" : ""}`}
           >
             {label}
           </button>
@@ -479,11 +485,6 @@ function ThoughtListAdmin({
   };
 
   if (loading) return <div className="text-muted">{t("admin.loading")}</div>;
-  if (thoughts.length === 0 && !editingThought) {
-    return (
-      <p className="text-muted">{t("admin.thoughtsEmpty")}</p>
-    );
-  }
 
   if (editingThought) {
     return (
@@ -509,6 +510,10 @@ function ThoughtListAdmin({
 
   return (
     <div className="space-y-6">
+      <HomeFeaturedPanel thoughts={thoughts} onToggle={onToggle} />
+      {thoughts.length === 0 && (
+        <p className="text-muted">{t("admin.thoughtsEmpty")}</p>
+      )}
       {selectedIds.length > 0 && (
         <div className="card p-4 flex flex-wrap items-center gap-3">
           <span className="text-sm text-fg font-medium">
@@ -1165,6 +1170,239 @@ function CategoryManager({
   );
 }
 
+const HOME_FEATURED_SLOTS = 3;
+
+function HomeFeaturedPanel({
+  thoughts,
+  onToggle,
+}: {
+  thoughts: Thought[];
+  onToggle: () => void;
+}) {
+  const { t } = useLocale();
+  const [saving, setSaving] = useState(false);
+  const [slots, setSlots] = useState<string[]>(["", "", ""]);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    const next = [1, 2, 3].map((order) => {
+      const hit = thoughts.find(
+        (th) => th.homeFeaturedOrder != null && Number(th.homeFeaturedOrder) === order
+      );
+      return hit?.id ?? "";
+    });
+    setSlots(next);
+  }, [thoughts]);
+
+  const save = async () => {
+    setSaving(true);
+    setError("");
+    setSuccess(false);
+    try {
+      const payload = slots.map((s) => (s.trim() ? s.trim() : null));
+      const res = await fetch("/api/thoughts/home-featured", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slots: payload }),
+      });
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) {
+        setError(data.error || t("admin.homeFeatured.saveFailed"));
+        return;
+      }
+      setSuccess(true);
+      onToggle();
+    } catch {
+      setError(t("admin.homeFeatured.saveFailed"));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const usedIds = new Set(slots.filter(Boolean));
+
+  return (
+    <div className="card p-5 sm:p-6 space-y-4">
+      <div>
+        <h2 className="text-lg font-semibold text-fg">{t("admin.homeFeatured.title")}</h2>
+        <p className="text-sm text-muted mt-1">{t("admin.homeFeatured.hint")}</p>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {Array.from({ length: HOME_FEATURED_SLOTS }, (_, i) => (
+          <div key={i} className="space-y-2">
+            <label className="text-xs font-medium text-muted uppercase tracking-wide block">
+              {t("admin.homeFeatured.slot", { n: i + 1 })}
+            </label>
+            <select
+              className="form-control text-sm w-full"
+              value={slots[i] ?? ""}
+              onChange={(e) => {
+                const v = e.target.value;
+                setSuccess(false);
+                setError("");
+                setSlots((prev) => {
+                  const next = [...prev];
+                  next[i] = v;
+                  return next;
+                });
+              }}
+            >
+              <option value="">{t("admin.homeFeatured.notSet")}</option>
+              {thoughts.map((th) => {
+                const takenElsewhere = usedIds.has(th.id) && slots[i] !== th.id;
+                return (
+                  <option key={th.id} value={th.id} disabled={takenElsewhere}>
+                    {th.title}
+                    {!th.isPublic ? ` (${t("admin.visibilityPrivate")})` : ""}
+                    {takenElsewhere ? ` (${t("admin.homeFeatured.alreadyPicked")})` : ""}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+        ))}
+      </div>
+      {error && (
+        <p className="text-sm text-red-600 dark:text-red-400" role="alert">
+          {error}
+        </p>
+      )}
+      {success && !error && (
+        <p className="text-sm text-warm">{t("admin.homeFeatured.saveSuccess")}</p>
+      )}
+      <button
+        type="button"
+        onClick={() => void save()}
+        disabled={saving || thoughts.length === 0}
+        className="button-primary"
+      >
+        {saving ? t("admin.homeFeatured.saving") : t("admin.homeFeatured.save")}
+      </button>
+    </div>
+  );
+}
+
+function slotLabel(t: (key: string, vars?: Record<string, string | number>) => string, slot: SiteSlot) {
+  if (slot === SITE_SLOT_HOME_HERO) return t("admin.siteImages.homeHero");
+  if (slot === SITE_SLOT_ABOUT_PORTRAIT) return t("admin.siteImages.aboutPortrait");
+  const m = slot.match(/^home_preview_(\d)$/);
+  if (m) return t("admin.siteImages.homePreview", { n: Number(m[1]) + 1 });
+  return slot;
+}
+
+function SiteImagesPanel({
+  photos,
+  onToggle,
+}: {
+  photos: Photo[];
+  onToggle: () => void;
+}) {
+  const { t } = useLocale();
+  const [uploadingSlot, setUploadingSlot] = useState<SiteSlot | null>(null);
+
+  const sitePhotos = photos.filter((p) => p.siteSlot);
+  const photoBySlot = (slot: SiteSlot) => sitePhotos.find((p) => p.siteSlot === slot);
+
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const uploadToSlot = async (slot: SiteSlot, file: File) => {
+    setUploadingSlot(slot);
+    setUploadError(null);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("siteSlot", slot);
+      const res = await fetch("/api/photos/upload", { method: "POST", body: fd });
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) {
+        setUploadError(data.error || t("admin.siteImages.uploadFailed"));
+        return;
+      }
+      onToggle();
+    } catch {
+      setUploadError(t("admin.siteImages.uploadFailed"));
+    } finally {
+      setUploadingSlot(null);
+    }
+  };
+
+  const removeSlot = async (slot: SiteSlot) => {
+    const current = photoBySlot(slot);
+    if (!current) return;
+    await fetch(`/api/photos/${current.id}`, { method: "DELETE" });
+    onToggle();
+  };
+
+  const accept = "image/jpeg,image/png,image/gif,image/webp";
+
+  return (
+    <div className="card p-5 sm:p-6 space-y-4">
+      <div>
+        <h2 className="text-lg font-semibold text-fg">{t("admin.siteImages.title")}</h2>
+        <p className="text-sm text-muted mt-1">{t("admin.siteImages.hint")}</p>
+        {uploadError && (
+          <p className="text-sm text-red-600 dark:text-red-400 mt-2" role="alert">
+            {uploadError}
+          </p>
+        )}
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {SITE_SLOTS.map((slot) => {
+          const assigned = photoBySlot(slot);
+          const uploading = uploadingSlot === slot;
+          return (
+            <div key={slot} className="border border-border rounded-lg p-3 space-y-2">
+              <span className="text-xs font-medium text-muted uppercase tracking-wide">
+                {slotLabel(t, slot)}
+              </span>
+              <div className="aspect-[4/3] relative bg-border rounded overflow-hidden">
+                {assigned ? (
+                  <img
+                    src={assigned.filename}
+                    alt={assigned.caption || ""}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-xs text-muted px-2 text-center">
+                    {t("admin.siteImages.notSet")}
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2 items-center">
+                <label className="button-primary px-3 py-1.5 text-sm cursor-pointer">
+                  {uploading ? t("admin.siteImages.uploading") : t("admin.siteImages.upload")}
+                  <input
+                    type="file"
+                    accept={accept}
+                    className="sr-only"
+                    disabled={uploading}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) void uploadToSlot(slot, file);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
+                {assigned && (
+                  <button
+                    type="button"
+                    className="button-secondary px-3 py-1.5 text-sm"
+                    onClick={() => void removeSlot(slot)}
+                    disabled={uploading}
+                  >
+                    {t("admin.siteImages.remove")}
+                  </button>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function PhotoListAdmin({
   photos,
   loading,
@@ -1178,6 +1416,8 @@ function PhotoListAdmin({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editCaption, setEditCaption] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const galleryPhotos = photos.filter((p) => !p.siteSlot);
 
   const toggleVisibility = async (id: string, isPublic: boolean) => {
     await fetch(`/api/photos/${id}`, {
@@ -1222,15 +1462,14 @@ function PhotoListAdmin({
       </div>
     );
   }
-  if (photos.length === 0) {
-    return (
-      <p className="text-muted py-6">{t("admin.photosEmpty")}</p>
-    );
-  }
-
   return (
+    <div className="space-y-8">
+      <SiteImagesPanel photos={photos} onToggle={onToggle} />
+      {galleryPhotos.length === 0 ? (
+        <p className="text-muted py-6">{t("admin.photosEmpty")}</p>
+      ) : (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-      {photos.map((p) => (
+      {galleryPhotos.map((p) => (
         <div
           key={p.id}
           className="card overflow-hidden"
@@ -1241,7 +1480,7 @@ function PhotoListAdmin({
               alt={p.caption || ""}
               className="w-full h-full object-cover"
             />
-            <div className="absolute top-2 right-2 flex gap-2">
+            <div className="absolute top-2 right-2 flex flex-col items-end gap-1">
               <span
                 className={`status-badge px-2.5 py-1 text-xs font-medium ${
                   p.isPublic
@@ -1340,6 +1579,8 @@ function PhotoListAdmin({
           </div>
         </div>
       ))}
+    </div>
+      )}
     </div>
   );
 }

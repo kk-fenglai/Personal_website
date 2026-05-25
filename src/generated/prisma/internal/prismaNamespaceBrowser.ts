@@ -87,6 +87,7 @@ export const ThoughtScalarFieldEnum = {
   categoryId: 'categoryId',
   isPinned: 'isPinned',
   pinnedOrder: 'pinnedOrder',
+  homeFeaturedOrder: 'homeFeaturedOrder',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -119,6 +120,7 @@ export const PhotoScalarFieldEnum = {
   filename: 'filename',
   caption: 'caption',
   isPublic: 'isPublic',
+  siteSlot: 'siteSlot',
   createdAt: 'createdAt'
 } as const
 

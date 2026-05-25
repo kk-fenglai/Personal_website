@@ -24,6 +24,8 @@ model Thought {
   category   ThoughtCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   isPinned   Boolean   @default(false)
   pinnedOrder Int?
+  /// 首页展示顺序 1–3；null 表示不在首页展示
+  homeFeaturedOrder Int? @unique
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   comments   Comment[]
@@ -53,6 +55,8 @@ model Photo {
   filename  String
   caption   String?
   isPublic  Boolean  @default(true)
+  /// 站点展示位：home_hero | about_portrait | home_preview_0..4；null 表示仅相册
+  siteSlot  String?  @unique
   createdAt DateTime @default(now())
 }
 

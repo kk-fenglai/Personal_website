@@ -21,16 +21,18 @@ export default function AdminPage() {
 
   if (isAdmin === null) {
     return (
-      <div className="py-12 text-center text-muted">{t("admin.loading")}</div>
+      <div className="py-16 text-center text-muted">{t("admin.loading")}</div>
     );
   }
 
   if (!isAdmin) {
     return (
-      <div className="max-w-sm mx-auto space-y-8">
-        <p className="section-label">04</p>
-        <h1 className="text-3xl font-bold text-fg">{t("admin.title")}</h1>
-        <p className="text-muted text-base">{t("admin.loginHint")}</p>
+      <div className="admin-login-card card max-w-md mx-auto space-y-6">
+        <div>
+          <p className="section-label mb-2 normal-case tracking-normal">{t("nav.siteName")}</p>
+          <h1 className="text-2xl font-semibold text-fg">{t("admin.title")}</h1>
+          <p className="text-muted text-sm mt-2">{t("admin.loginHint")}</p>
+        </div>
         <LoginForm onSuccess={onLogin} />
       </div>
     );

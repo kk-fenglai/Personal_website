@@ -3,7 +3,9 @@
 import { useEffect, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
+import { ScrollReveal } from "@/components/ScrollReveal";
 import { useLocale } from "@/contexts/LocaleContext";
+import { GALLERY_LAYOUT_CYCLE, type GalleryLayoutSpec } from "@/lib/stitchPlaceholders";
 
 type Photo = {
   id: string;
@@ -13,8 +15,12 @@ type Photo = {
   createdAt: string;
 };
 
+function layoutForIndex(i: number): GalleryLayoutSpec {
+  return GALLERY_LAYOUT_CYCLE[i % GALLERY_LAYOUT_CYCLE.length];
+}
+
 export function GalleryView() {
-  const { t } = useLocale();
+  const { t, dateLocale } = useLocale();
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -53,7 +59,6 @@ export function GalleryView() {
     return () => window.removeEventListener("keydown", onKey);
   }, [lightboxIndex, closeLightbox, goPrev, goNext]);
 
-  // 灯箱打开时锁定 body 滚动，避免背景露出横线/回到顶部
   useEffect(() => {
     if (lightboxIndex === null) return;
     const prev = document.body.style.overflow;
@@ -65,8 +70,8 @@ export function GalleryView() {
 
   if (loading) {
     return (
-      <div className="py-20 flex flex-col items-center gap-4 text-muted">
-        <div className="w-10 h-10 border-2 border-current border-t-transparent rounded-full animate-spin" />
+      <div className="site-container mx-auto py-20 flex flex-col items-center gap-4 text-muted">
+        <div className="w-10 h-10 border-2 border-current border-t-transparent animate-spin" />
         <span className="tabular-nums">{t("gallery.loading")}</span>
       </div>
     );
@@ -74,7 +79,7 @@ export function GalleryView() {
 
   if (photos.length === 0) {
     return (
-      <div className="py-20 text-center">
+      <div className="site-container mx-auto py-20 text-center">
         <p className="text-muted text-lg mb-2">{t("gallery.empty")}</p>
         <p className="text-muted/80 text-base">{t("gallery.emptyHint")}</p>
       </div>
@@ -85,40 +90,64 @@ export function GalleryView() {
 
   return (
     <>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5 lg:gap-6">
-        {photos.map((p, i) => (
-          <button
-            type="button"
-            key={p.id}
-            onClick={() => openLightbox(i)}
-            className="aspect-square relative overflow-hidden bg-bg-card border border-border shadow-sm hover:shadow-md hover:border-warm/40 focus:outline-none focus:ring-2 focus:ring-warm/50 focus:ring-offset-2 focus:ring-offset-bg transition-all duration-300 group text-left animate-in"
-            style={{
-              animationDelay: `${0.03 * i}s`,
-              opacity: 0,
-              borderRadius: "var(--radius-card)",
-            }}
-          >
-            <Image
-              src={p.filename}
-              alt={p.caption || t("gallery.photoAlt")}
-              fill
-              className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-              sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            {p.caption && (
-              <span className="absolute bottom-0 left-0 right-0 p-3 text-sm text-white truncate block">
-                {p.caption}
-              </span>
-            )}
-            <span className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/40 flex items-center justify-center text-white/90 text-lg leading-none opacity-0 group-hover:opacity-100 transition-opacity">
-              ⊕
-            </span>
-          </button>
-        ))}
-      </div>
+      <section className="site-container mx-auto asymmetric-grid">
+        {photos.map((p, i) => {
+          const layout = layoutForIndex(i);
+          const dateLabel = new Date(p.createdAt).toLocaleDateString(dateLocale, {
+            year: "numeric",
+            month: "short",
+          });
 
-      {/* Lightbox：用 Portal 挂到 body，避免被顶栏/底栏遮挡，并盖住整页消除横线 */}
+          return (
+            <ScrollReveal
+              key={p.id}
+              delayMs={(i % 5) * 60}
+              className={`${layout.cols} mb-12 md:mb-16 relative group cursor-pointer ${
+                layout.offset ? "md:mt-[var(--asymmetric-offset)]" : ""
+              }`}
+            >
+              <button
+                type="button"
+                onClick={() => openLightbox(i)}
+                className="w-full text-left"
+              >
+                <div
+                  className={`overflow-hidden bg-surface relative image-hover-zoom ${layout.aspect} ${
+                    layout.bordered ? "border border-border p-2" : ""
+                  }`}
+                >
+                  <Image
+                    src={p.filename}
+                    alt={p.caption || t("gallery.photoAlt")}
+                    fill
+                    className="object-cover transition-transform duration-700"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                  {layout.overlay && (
+                    <div className="gallery-item-overlay text-white">
+                      <div>
+                        <p className="section-label !text-white/90 mb-2">{dateLabel}</p>
+                        {p.caption && (
+                          <h3 className="type-headline-sm !text-white">{p.caption}</h3>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {layout.captionBelow && (
+                  <div className="mt-4">
+                    <p className="section-label">{dateLabel}</p>
+                    {p.caption && (
+                      <h3 className="type-headline-sm text-fg mt-1">{p.caption}</h3>
+                    )}
+                  </div>
+                )}
+              </button>
+            </ScrollReveal>
+          );
+        })}
+      </section>
+
       {current &&
         lightboxIndex !== null &&
         typeof document !== "undefined" &&
@@ -134,16 +163,15 @@ export function GalleryView() {
               <a
                 href={current.filename}
                 download={current.filename.split("/").pop() || "photo.jpg"}
-                className="w-10 h-10 rounded-full bg-white/10 text-white hover:bg-white/20 flex items-center justify-center text-lg transition-colors"
+                className="w-10 h-10 bg-white/10 text-white hover:bg-white/20 flex items-center justify-center text-lg transition-colors"
                 aria-label={t("gallery.download")}
-                title={t("gallery.download")}
               >
                 ↓
               </a>
               <button
                 type="button"
                 onClick={closeLightbox}
-                className="w-10 h-10 rounded-full bg-white/10 text-white hover:bg-white/20 flex items-center justify-center text-xl transition-colors"
+                className="w-10 h-10 bg-white/10 text-white hover:bg-white/20 flex items-center justify-center text-xl transition-colors"
                 aria-label={t("gallery.close")}
               >
                 ×
@@ -152,7 +180,7 @@ export function GalleryView() {
 
             <div className="flex-1 flex items-center justify-center p-4 min-h-0">
               <div
-                className="relative w-full h-full max-w-5xl max-h-[85vh] flex items-center justify-center"
+                className="relative w-full h-full max-w-5xl max-h-[85vh]"
                 onClick={(e) => e.stopPropagation()}
               >
                 <Image
@@ -171,7 +199,7 @@ export function GalleryView() {
                 <button
                   type="button"
                   onClick={goPrev}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white/10 text-white hover:bg-white/20 flex items-center justify-center text-2xl transition-colors"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white/10 text-white hover:bg-white/20 text-2xl"
                   aria-label={t("gallery.prev")}
                 >
                   ‹
@@ -179,7 +207,7 @@ export function GalleryView() {
                 <button
                   type="button"
                   onClick={goNext}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white/10 text-white hover:bg-white/20 flex items-center justify-center text-2xl transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white/10 text-white hover:bg-white/20 text-2xl"
                   aria-label={t("gallery.next")}
                 >
                   ›
@@ -189,9 +217,7 @@ export function GalleryView() {
 
             <div className="p-4 text-center text-white/90 shrink-0">
               {current.caption && (
-                <p className="text-base sm:text-lg mb-1 max-w-2xl mx-auto">
-                  {current.caption}
-                </p>
+                <p className="text-base sm:text-lg mb-1 max-w-2xl mx-auto">{current.caption}</p>
               )}
               <p className="text-sm text-white/60">
                 {t("gallery.photoCount")

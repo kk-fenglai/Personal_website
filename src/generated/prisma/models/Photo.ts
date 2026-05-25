@@ -29,6 +29,7 @@ export type PhotoMinAggregateOutputType = {
   filename: string | null
   caption: string | null
   isPublic: boolean | null
+  siteSlot: string | null
   createdAt: Date | null
 }
 
@@ -37,6 +38,7 @@ export type PhotoMaxAggregateOutputType = {
   filename: string | null
   caption: string | null
   isPublic: boolean | null
+  siteSlot: string | null
   createdAt: Date | null
 }
 
@@ -45,6 +47,7 @@ export type PhotoCountAggregateOutputType = {
   filename: number
   caption: number
   isPublic: number
+  siteSlot: number
   createdAt: number
   _all: number
 }
@@ -55,6 +58,7 @@ export type PhotoMinAggregateInputType = {
   filename?: true
   caption?: true
   isPublic?: true
+  siteSlot?: true
   createdAt?: true
 }
 
@@ -63,6 +67,7 @@ export type PhotoMaxAggregateInputType = {
   filename?: true
   caption?: true
   isPublic?: true
+  siteSlot?: true
   createdAt?: true
 }
 
@@ -71,6 +76,7 @@ export type PhotoCountAggregateInputType = {
   filename?: true
   caption?: true
   isPublic?: true
+  siteSlot?: true
   createdAt?: true
   _all?: true
 }
@@ -152,6 +158,7 @@ export type PhotoGroupByOutputType = {
   filename: string
   caption: string | null
   isPublic: boolean
+  siteSlot: string | null
   createdAt: Date
   _count: PhotoCountAggregateOutputType | null
   _min: PhotoMinAggregateOutputType | null
@@ -181,6 +188,7 @@ export type PhotoWhereInput = {
   filename?: Prisma.StringFilter<"Photo"> | string
   caption?: Prisma.StringNullableFilter<"Photo"> | string | null
   isPublic?: Prisma.BoolFilter<"Photo"> | boolean
+  siteSlot?: Prisma.StringNullableFilter<"Photo"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Photo"> | Date | string
 }
 
@@ -189,11 +197,13 @@ export type PhotoOrderByWithRelationInput = {
   filename?: Prisma.SortOrder
   caption?: Prisma.SortOrderInput | Prisma.SortOrder
   isPublic?: Prisma.SortOrder
+  siteSlot?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type PhotoWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  siteSlot?: string
   AND?: Prisma.PhotoWhereInput | Prisma.PhotoWhereInput[]
   OR?: Prisma.PhotoWhereInput[]
   NOT?: Prisma.PhotoWhereInput | Prisma.PhotoWhereInput[]
@@ -201,13 +211,14 @@ export type PhotoWhereUniqueInput = Prisma.AtLeast<{
   caption?: Prisma.StringNullableFilter<"Photo"> | string | null
   isPublic?: Prisma.BoolFilter<"Photo"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Photo"> | Date | string
-}, "id">
+}, "id" | "siteSlot">
 
 export type PhotoOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   filename?: Prisma.SortOrder
   caption?: Prisma.SortOrderInput | Prisma.SortOrder
   isPublic?: Prisma.SortOrder
+  siteSlot?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.PhotoCountOrderByAggregateInput
   _max?: Prisma.PhotoMaxOrderByAggregateInput
@@ -222,6 +233,7 @@ export type PhotoScalarWhereWithAggregatesInput = {
   filename?: Prisma.StringWithAggregatesFilter<"Photo"> | string
   caption?: Prisma.StringNullableWithAggregatesFilter<"Photo"> | string | null
   isPublic?: Prisma.BoolWithAggregatesFilter<"Photo"> | boolean
+  siteSlot?: Prisma.StringNullableWithAggregatesFilter<"Photo"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Photo"> | Date | string
 }
 
@@ -230,6 +242,7 @@ export type PhotoCreateInput = {
   filename: string
   caption?: string | null
   isPublic?: boolean
+  siteSlot?: string | null
   createdAt?: Date | string
 }
 
@@ -238,6 +251,7 @@ export type PhotoUncheckedCreateInput = {
   filename: string
   caption?: string | null
   isPublic?: boolean
+  siteSlot?: string | null
   createdAt?: Date | string
 }
 
@@ -246,6 +260,7 @@ export type PhotoUpdateInput = {
   filename?: Prisma.StringFieldUpdateOperationsInput | string
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  siteSlot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -254,6 +269,7 @@ export type PhotoUncheckedUpdateInput = {
   filename?: Prisma.StringFieldUpdateOperationsInput | string
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  siteSlot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -262,6 +278,7 @@ export type PhotoCreateManyInput = {
   filename: string
   caption?: string | null
   isPublic?: boolean
+  siteSlot?: string | null
   createdAt?: Date | string
 }
 
@@ -270,6 +287,7 @@ export type PhotoUpdateManyMutationInput = {
   filename?: Prisma.StringFieldUpdateOperationsInput | string
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  siteSlot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -278,6 +296,7 @@ export type PhotoUncheckedUpdateManyInput = {
   filename?: Prisma.StringFieldUpdateOperationsInput | string
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  siteSlot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -286,6 +305,7 @@ export type PhotoCountOrderByAggregateInput = {
   filename?: Prisma.SortOrder
   caption?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
+  siteSlot?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -294,6 +314,7 @@ export type PhotoMaxOrderByAggregateInput = {
   filename?: Prisma.SortOrder
   caption?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
+  siteSlot?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -302,6 +323,7 @@ export type PhotoMinOrderByAggregateInput = {
   filename?: Prisma.SortOrder
   caption?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
+  siteSlot?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -312,6 +334,7 @@ export type PhotoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   filename?: boolean
   caption?: boolean
   isPublic?: boolean
+  siteSlot?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["photo"]>
 
@@ -320,6 +343,7 @@ export type PhotoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   filename?: boolean
   caption?: boolean
   isPublic?: boolean
+  siteSlot?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["photo"]>
 
@@ -328,6 +352,7 @@ export type PhotoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   filename?: boolean
   caption?: boolean
   isPublic?: boolean
+  siteSlot?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["photo"]>
 
@@ -336,10 +361,11 @@ export type PhotoSelectScalar = {
   filename?: boolean
   caption?: boolean
   isPublic?: boolean
+  siteSlot?: boolean
   createdAt?: boolean
 }
 
-export type PhotoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "filename" | "caption" | "isPublic" | "createdAt", ExtArgs["result"]["photo"]>
+export type PhotoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "filename" | "caption" | "isPublic" | "siteSlot" | "createdAt", ExtArgs["result"]["photo"]>
 
 export type $PhotoPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Photo"
@@ -349,6 +375,10 @@ export type $PhotoPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     filename: string
     caption: string | null
     isPublic: boolean
+    /**
+     * 站点展示位：home_hero | about_portrait | home_preview_0..4；null 表示仅相册
+     */
+    siteSlot: string | null
     createdAt: Date
   }, ExtArgs["result"]["photo"]>
   composites: {}
@@ -777,6 +807,7 @@ export interface PhotoFieldRefs {
   readonly filename: Prisma.FieldRef<"Photo", 'String'>
   readonly caption: Prisma.FieldRef<"Photo", 'String'>
   readonly isPublic: Prisma.FieldRef<"Photo", 'Boolean'>
+  readonly siteSlot: Prisma.FieldRef<"Photo", 'String'>
   readonly createdAt: Prisma.FieldRef<"Photo", 'DateTime'>
 }
     

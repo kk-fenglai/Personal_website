@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import { prisma } from "@/lib/db";
 import { isAdmin } from "@/lib/auth";
+import { isSiteSlot } from "@/lib/siteSlots";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 
@@ -51,7 +52,10 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
     const caption = (formData.get("caption") as string) || "";
-    const isPublic = formData.get("isPublic") !== "false";
+    const siteSlotRaw = (formData.get("siteSlot") as string) || "";
+    const siteSlot =
+      siteSlotRaw && isSiteSlot(siteSlotRaw) ? siteSlotRaw : null;
+    const isPublic = siteSlot ? true : formData.get("isPublic") !== "false";
 
     if (!file || file.size === 0) {
       return NextResponse.json({ error: "请选择要上传的图片" }, { status: 400 });
@@ -103,11 +107,19 @@ export async function POST(request: NextRequest) {
       publicUrl = `/uploads/${filename}`;
     }
 
+    if (siteSlot) {
+      const existing = await prisma.photo.findFirst({ where: { siteSlot } });
+      if (existing) {
+        await prisma.photo.delete({ where: { id: existing.id } });
+      }
+    }
+
     const photo = await prisma.photo.create({
       data: {
         filename: publicUrl,
         caption: caption.slice(0, 500) || null,
         isPublic,
+        ...(siteSlot ? { siteSlot } : {}),
       },
     });
     return NextResponse.json(photo);

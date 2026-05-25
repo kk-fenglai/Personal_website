@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { ScrollReveal } from "@/components/ScrollReveal";
 import { useLocale } from "@/contexts/LocaleContext";
-import { FormattedContent } from "@/components/FormattedContent";
+import { plainTextExcerpt } from "@/lib/stitchPlaceholders";
 import {
   pickThoughtContent,
   pickThoughtTitle,
@@ -26,6 +27,12 @@ type Thought = {
 };
 
 type Category = { id: string; name: string };
+
+function formatEditorialDate(iso: string, dateLocale: string) {
+  return new Date(iso)
+    .toLocaleDateString(dateLocale, { year: "numeric", month: "short", day: "numeric" })
+    .toUpperCase();
+}
 
 export function ThoughtList() {
   const { t, dateLocale, locale } = useLocale();
@@ -51,15 +58,11 @@ export function ThoughtList() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="py-20 text-muted tabular-nums">{t("thoughts.loading")}</div>
-    );
+    return <div className="py-20 text-muted tabular-nums">{t("thoughts.loading")}</div>;
   }
 
   if (thoughts.length === 0) {
-    return (
-      <p className="py-20 text-muted">{t("thoughts.empty")}</p>
-    );
+    return <p className="py-20 text-muted">{t("thoughts.empty")}</p>;
   }
 
   const normalizedQuery = query.trim().toLowerCase();
@@ -78,126 +81,91 @@ export function ThoughtList() {
     })
     .filter(matchesQuery);
 
-  const allCount = thoughts.length;
-  const uncategorizedCount = thoughts.filter((x) => !x.category?.id).length;
-  const countsById = thoughts.reduce<Record<string, number>>((acc, item) => {
-    const id = item.category?.id;
-    if (!id) return acc;
-    acc[id] = (acc[id] || 0) + 1;
-    return acc;
-  }, {});
-
   const setCategory = (id: string) => {
     const url = id === "all" ? "/thoughts" : `/thoughts?category=${encodeURIComponent(id)}`;
     router.push(url);
   };
 
+  const filterItems = [
+    { id: "all", label: t("thoughts.all") },
+    { id: "uncategorized", label: t("thoughts.uncategorized") },
+    ...categories.map((c) => ({ id: c.id, label: c.name })),
+  ];
+
   return (
-    <div className="grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)]">
-      <aside className="card p-3 sm:p-4 h-fit lg:sticky lg:top-24 space-y-4">
-        <div>
-          <p className="section-label mb-2">{t("thoughts.folders")}</p>
-          <div className="lg:hidden">
-            <select
-              value={selectedCategoryId}
-              onChange={(e) => setCategory(e.target.value)}
-              className="form-control"
-            >
-              <option value="all">{t("thoughts.all")} ({allCount})</option>
-              <option value="uncategorized">{t("thoughts.uncategorized")} ({uncategorizedCount})</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name} ({countsById[c.id] || 0})
-                </option>
-              ))}
-            </select>
-          </div>
-          <ul className="hidden lg:block space-y-1">
-            {[
-              { id: "all", name: t("thoughts.all"), count: allCount },
-              { id: "uncategorized", name: t("thoughts.uncategorized"), count: uncategorizedCount },
-              ...categories.map((c) => ({ id: c.id, name: c.name, count: countsById[c.id] || 0 })),
-            ].map((c) => {
-              const active = selectedCategoryId === c.id;
-              return (
-                <li key={c.id}>
-                  <button
-                    type="button"
-                    onClick={() => setCategory(c.id)}
-                    className={`w-full text-left px-2.5 py-1.5 rounded-[var(--radius-control)] transition-colors ${
-                      active ? "bg-bg-card text-fg" : "text-muted hover:text-fg hover:bg-bg-card"
-                    }`}
-                  >
-                    <span className="flex items-center justify-between gap-3">
-                      <span className="truncate">{c.name}</span>
-                      <span className="tabular-nums text-sm">{c.count}</span>
-                    </span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+    <>
+      <nav className="flex flex-wrap gap-x-8 gap-y-4 mb-8">
+        {filterItems.map((c) => (
+          <button
+            key={c.id}
+            type="button"
+            onClick={() => setCategory(c.id)}
+            className={
+              selectedCategoryId === c.id ? "filter-tab filter-tab-active" : "filter-tab"
+            }
+          >
+            {c.label}
+          </button>
+        ))}
+      </nav>
 
-        <div>
-          <label className="block section-label mb-2">{t("thoughts.search")}</label>
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="form-control"
-            placeholder={t("thoughts.searchPlaceholder")}
-          />
-        </div>
-      </aside>
+      <div className="mb-16 border-b border-border pb-4">
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="w-full bg-transparent border-none focus:ring-0 text-base placeholder:text-muted/50 py-2"
+          placeholder={t("thoughts.searchPlaceholder")}
+          aria-label={t("thoughts.search")}
+        />
+      </div>
 
-      <section className="space-y-4">
-        {filtered.length === 0 ? (
-          <p className="py-12 text-muted">{t("thoughts.emptyInFolder")}</p>
-        ) : (
-          <ul className="editorial-list space-y-4 sm:space-y-5">
-            {filtered.map((item, i) => (
-              <li
-                key={item.id}
-                className="animate-in"
-                style={{ animationDelay: `${0.04 * i}s`, opacity: 0 }}
-              >
-                <Link href={`/thoughts/${item.id}`} className="card p-6 sm:p-8 block">
-                  <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-start">
-                    <div className="min-w-0">
-                      <h2 className="text-3xl sm:text-4xl text-fg font-semibold tracking-tight">
+      {filtered.length === 0 ? (
+        <p className="py-12 text-muted">{t("thoughts.emptyInFolder")}</p>
+      ) : (
+        <section className="space-y-24 md:space-y-32">
+          {filtered.map((item) => {
+            const body = pickThoughtContent(item, locale) ?? "";
+
+            return (
+              <ScrollReveal key={item.id}>
+                <article className="asymmetric-entry group">
+                  <div className="flex flex-col gap-6">
+                    <div className="flex flex-wrap items-center gap-4">
+                      <time
+                        className="section-label !text-muted tabular-nums"
+                        dateTime={item.createdAt}
+                      >
+                        {formatEditorialDate(item.createdAt, dateLocale)}
+                      </time>
+                      <span className="w-1 h-1 bg-border rounded-full" aria-hidden />
+                      {item.category?.name && (
+                        <span className="section-label">{item.category.name}</span>
+                      )}
+                      {item.isPinned && (
+                        <span className="status-badge px-2 py-0.5">{t("thoughts.pinned")}</span>
+                      )}
+                    </div>
+                    <Link
+                      href={`/thoughts/${item.id}`}
+                      className="block group-hover:opacity-80 transition-opacity"
+                    >
+                      <h2 className="type-headline-md text-fg leading-tight mb-4 group-hover:text-warm transition-colors">
                         {pickThoughtTitle(item, locale)}
                       </h2>
-                      <div className="mt-2 flex flex-wrap items-center gap-2">
-                        {item.isPinned && (
-                          <span className="status-badge text-xs px-2 py-0.5">
-                            {t("thoughts.pinned")}
-                          </span>
-                        )}
-                        {item.category?.name && (
-                          <span className="status-badge text-xs px-2 py-0.5">
-                            #{item.category.name}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <span className="text-muted text-sm sm:text-base tabular-nums sm:text-right">
-                      {new Date(item.createdAt).toLocaleDateString(dateLocale)}
-                      {item.comments.length > 0 && ` · ${t("thoughts.commentsCount", { count: item.comments.length })}`}
-                    </span>
+                      <p className="type-body-lg text-muted max-w-[600px] reading line-clamp-4">
+                        {plainTextExcerpt(body)}
+                      </p>
+                    </Link>
+                    <Link href={`/thoughts/${item.id}`} className="read-article-link">
+                      {t("common.readArticle")}
+                    </Link>
                   </div>
-                  <p className="mt-4 text-muted text-base line-clamp-2 reading max-w-3xl">
-                    <FormattedContent
-                      content={pickThoughtContent(item, locale)}
-                      stripImages
-                      as="span"
-                    />
-                  </p>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-    </div>
+                </article>
+              </ScrollReveal>
+            );
+          })}
+        </section>
+      )}
+    </>
   );
 }

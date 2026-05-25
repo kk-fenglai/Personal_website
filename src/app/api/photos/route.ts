@@ -5,7 +5,9 @@ import { isAdmin } from "@/lib/auth";
 export async function GET() {
   const admin = await isAdmin();
   const photos = await prisma.photo.findMany({
-    where: admin ? undefined : { isPublic: true },
+    where: admin
+      ? undefined
+      : { isPublic: true, siteSlot: null },
     orderBy: { createdAt: "desc" },
   });
   return NextResponse.json(photos);

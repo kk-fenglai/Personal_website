@@ -28,23 +28,31 @@ colors:
 
 typography:
   fonts:
-    headline: "EB Garamond, serif"
-    body: "Inter, system-ui, sans-serif"
+    headline-latin: "Instrument Serif, serif"
+    body: "Source Sans 3, system-ui, sans-serif"
     art-zh: "'Noto Serif SC', 'Source Han Serif CN', serif"
   
   strategies:
     ZH (Chinese):
       family: "art-zh"
-      style: "Classical scholar aesthetic, emphasized stroke terminals, generous tracking (0.05em)."
-      usage: "Focus on vertical balance and calligraphic elegance."
+      style: "Museum Song aesthetic; display weight 300, tracking ~0.08em; body uses Source Sans 3."
+      usage: "Display titles in Noto Serif SC; UI and long-form body in Source Sans 3."
     EN (English):
-      family: "headline"
-      style: "High-contrast serifs, modern editorial feel, classic Garamond proportions."
-      usage: "Italicize for emphasis and 'artistic' fragments."
+      family: "headline-latin"
+      style: "Contemporary gallery serif (Instrument Serif); italic for quotes; body Source Sans 3."
+      usage: "High-contrast display headlines; Source Sans 3 for nav, labels, and reading text."
     FR (French):
-      family: "headline"
-      style: "Elegant handling of diacritics, fluid ligatures, sophisticated curves."
-      usage: "Maintain rhythmic spacing for long-form narrative text."
+      family: "headline-latin"
+      style: "Latin Extended via Instrument Serif + Source Sans 3; diacritics (é, à, ç) supported."
+      usage: "Same stack as EN; maintain rhythmic spacing for narrative fragments."
+
+site_images:
+  admin_tab: "相册 (Photos)"
+  slots:
+    - home_hero: "首页顶部大图"
+    - about_portrait: "关于页肖像"
+    - home_preview_0..4: "首页相册预览 mosaic（五格）"
+  notes: "Assigned photos are excluded from public /gallery; empty slots fall back to Stitch placeholders."
 
 principles:
   - name: "The Void & The Murmur (留白与沉吟)"
