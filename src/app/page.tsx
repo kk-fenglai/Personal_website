@@ -217,7 +217,7 @@ export default function Home() {
                       }
                     />
                   ) : (
-                    <div className="absolute inset-0 bg-surface-container" aria-hidden />
+                    <div className="absolute inset-0 bg-surface" aria-hidden />
                   )}
                 </Link>
               </div>
