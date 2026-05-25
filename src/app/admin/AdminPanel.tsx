@@ -6,9 +6,18 @@ import { useLocale } from "@/contexts/LocaleContext";
 import { BoldableContentField } from "@/components/BoldableContentField";
 import {
   formatPhotoUploadBytes,
-  MAX_PHOTO_UPLOAD_BYTES,
+  getPhotoUploadConfig,
   uploadPhotoWithRetry,
 } from "@/lib/photoUploadClient";
+import { MAX_FORM_UPLOAD_BYTES } from "@/lib/photoUploadLimits";
+
+function usePhotoUploadMaxBytes() {
+  const [maxBytes, setMaxBytes] = useState(MAX_FORM_UPLOAD_BYTES);
+  useEffect(() => {
+    void getPhotoUploadConfig().then((c) => setMaxBytes(c.maxBytes));
+  }, []);
+  return maxBytes;
+}
 import {
   SITE_SLOT_ABOUT_PORTRAIT,
   SITE_SLOT_HOME_HERO,
@@ -1304,6 +1313,7 @@ function SiteImagesPanel({
   onToggle: () => void;
 }) {
   const { t } = useLocale();
+  const maxUploadBytes = usePhotoUploadMaxBytes();
   const [uploadingSlot, setUploadingSlot] = useState<SiteSlot | null>(null);
 
   const sitePhotos = photos.filter((p) => p.siteSlot);
@@ -1314,11 +1324,11 @@ function SiteImagesPanel({
   const uploadToSlot = async (slot: SiteSlot, file: File) => {
     setUploadingSlot(slot);
     setUploadError(null);
-    if (file.size > MAX_PHOTO_UPLOAD_BYTES) {
+    if (file.size > maxUploadBytes) {
       setUploadError(
         t("admin.uploadFileTooLarge", {
           name: file.name,
-          max: formatPhotoUploadBytes(MAX_PHOTO_UPLOAD_BYTES),
+          max: formatPhotoUploadBytes(maxUploadBytes),
         })
       );
       setUploadingSlot(null);
@@ -1330,7 +1340,7 @@ function SiteImagesPanel({
         result.tooLarge
           ? t("admin.uploadFileTooLarge", {
               name: file.name,
-              max: formatPhotoUploadBytes(MAX_PHOTO_UPLOAD_BYTES),
+              max: formatPhotoUploadBytes(maxUploadBytes),
             })
           : result.error || t("admin.siteImages.uploadFailed")
       );
@@ -1599,6 +1609,7 @@ function PhotoListAdmin({
 }
 
 function UploadPhotoForm({ onSuccess }: { onSuccess: () => void }) {
+  const maxUploadBytes = usePhotoUploadMaxBytes();
   const { t } = useLocale();
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
@@ -1638,11 +1649,11 @@ function UploadPhotoForm({ onSuccess }: { onSuccess: () => void }) {
       return;
     }
 
-    const oversized = files.filter((f) => f.size > MAX_PHOTO_UPLOAD_BYTES);
+    const oversized = files.filter((f) => f.size > maxUploadBytes);
     if (oversized.length > 0) {
       setError(
         t("admin.uploadBatchTooLarge", {
-          max: formatPhotoUploadBytes(MAX_PHOTO_UPLOAD_BYTES),
+          max: formatPhotoUploadBytes(maxUploadBytes),
           names: oversized.map((f) => f.name).join("、"),
         })
       );
@@ -1718,7 +1729,11 @@ function UploadPhotoForm({ onSuccess }: { onSuccess: () => void }) {
       {error && (
         <p className="text-base danger-text whitespace-pre-wrap">{error}</p>
       )}
-      <p className="text-sm text-muted">{t("admin.uploadSizeHint")}</p>
+      <p className="text-sm text-muted">
+        {t("admin.uploadSizeHint", {
+          max: formatPhotoUploadBytes(maxUploadBytes),
+        })}
+      </p>
       <div>
         <input
           type="file"

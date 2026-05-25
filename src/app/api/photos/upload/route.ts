@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { put } from "@vercel/blob";
-import { prisma } from "@/lib/db";
 import { isAdmin } from "@/lib/auth";
-import { isSiteSlot } from "@/lib/siteSlots";
-import { MAX_PHOTO_UPLOAD_BYTES } from "@/lib/photoUploadClient";
+import { MAX_FORM_UPLOAD_BYTES } from "@/lib/photoUploadLimits";
+import { generateUploadFilename, resolveImageMime } from "@/lib/photoMime";
+import { createPhotoRecord } from "@/lib/photoStorage";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 
@@ -12,40 +11,6 @@ export const maxDuration = 60;
 
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
 
-const ALLOWED_MIME = new Set([
-  "image/jpeg",
-  "image/png",
-  "image/gif",
-  "image/webp",
-  "image/heic",
-  "image/heif",
-  "image/avif",
-]);
-
-/** 部分浏览器/系统不填 file.type，用扩展名推断 */
-function inferMimeFromName(name: string): string | null {
-  const ext = path.extname(name).toLowerCase();
-  const map: Record<string, string> = {
-    ".jpg": "image/jpeg",
-    ".jpeg": "image/jpeg",
-    ".png": "image/png",
-    ".gif": "image/gif",
-    ".webp": "image/webp",
-    ".heic": "image/heic",
-    ".heif": "image/heif",
-    ".avif": "image/avif",
-  };
-  return map[ext] ?? null;
-}
-
-function resolveImageMime(file: File): string | null {
-  const t = file.type?.trim();
-  if (t && ALLOWED_MIME.has(t)) return t;
-  const inferred = inferMimeFromName(file.name);
-  if (inferred && ALLOWED_MIME.has(inferred)) return inferred;
-  return null;
-}
-
 export async function POST(request: NextRequest) {
   try {
     const admin = await isAdmin();
@@ -53,23 +18,32 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "未授权，请先登录管理后台" }, { status: 401 });
     }
 
+    if (process.env.BLOB_READ_WRITE_TOKEN?.trim()) {
+      return NextResponse.json(
+        {
+          error:
+            "当前环境已启用 Blob 直传，请使用管理后台上传（自动走高清直传通道）。",
+        },
+        { status: 400 }
+      );
+    }
+
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
     const caption = (formData.get("caption") as string) || "";
     const siteSlotRaw = (formData.get("siteSlot") as string) || "";
-    const siteSlot =
-      siteSlotRaw && isSiteSlot(siteSlotRaw) ? siteSlotRaw : null;
+    const siteSlot = siteSlotRaw.trim() || null;
     const isPublic = siteSlot ? true : formData.get("isPublic") !== "false";
 
     if (!file || file.size === 0) {
       return NextResponse.json({ error: "请选择要上传的图片" }, { status: 400 });
     }
 
-    if (file.size > MAX_PHOTO_UPLOAD_BYTES) {
-      const mb = (MAX_PHOTO_UPLOAD_BYTES / (1024 * 1024)).toFixed(0);
+    if (file.size > MAX_FORM_UPLOAD_BYTES) {
+      const mb = (MAX_FORM_UPLOAD_BYTES / (1024 * 1024)).toFixed(0);
       return NextResponse.json(
         {
-          error: `单张图片不能超过 ${mb}MB（Vercel 限制）。请压缩后重试，或一次少选几张。`,
+          error: `单张图片不能超过 ${mb}MB。线上请配置 BLOB_READ_WRITE_TOKEN 以支持高清直传（最高 50MB）。`,
         },
         { status: 413 }
       );
@@ -86,55 +60,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const ext = path.extname(file.name).toLowerCase() || ".jpg";
-    const safeExt = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".heic", ".heif", ".avif"].includes(ext)
-      ? ext
-      : ".jpg";
-    const filename = `${Date.now()}-${performance.now().toString(36).replace(/\W/g, "")}-${Math.random().toString(36).slice(2)}${safeExt}`;
+    const filename = generateUploadFilename(file.name);
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const useBlob = Boolean(process.env.BLOB_READ_WRITE_TOKEN);
     const onVercel = process.env.VERCEL === "1";
-
     let publicUrl: string;
 
-    if (useBlob) {
-      const blob = await put(`uploads/${filename}`, buffer, {
-        access: "public",
-        contentType: mime,
-        addRandomSuffix: false,
-      });
-      publicUrl = blob.url;
-    } else if (onVercel) {
+    if (onVercel) {
       return NextResponse.json(
         {
           error:
-            "当前为 Vercel 部署：无法在服务器本地写文件。请在 Vercel 项目 → Storage 创建 Blob，并添加环境变量 BLOB_READ_WRITE_TOKEN 后重新部署。",
+            "当前为 Vercel 部署：请在项目 → Storage → Blob 添加 BLOB_READ_WRITE_TOKEN 后重新部署，以支持高清图片上传。",
         },
         { status: 503 }
       );
-    } else {
-      await mkdir(UPLOAD_DIR, { recursive: true });
-      const filepath = path.join(UPLOAD_DIR, filename);
-      await writeFile(filepath, buffer);
-      publicUrl = `/uploads/${filename}`;
     }
 
-    if (siteSlot) {
-      const existing = await prisma.photo.findFirst({ where: { siteSlot } });
-      if (existing) {
-        await prisma.photo.delete({ where: { id: existing.id } });
-      }
-    }
+    await mkdir(UPLOAD_DIR, { recursive: true });
+    const filepath = path.join(UPLOAD_DIR, filename);
+    await writeFile(filepath, buffer);
+    publicUrl = `/uploads/${filename}`;
 
-    const photo = await prisma.photo.create({
-      data: {
-        filename: publicUrl,
-        caption: caption.slice(0, 500) || null,
-        isPublic,
-        ...(siteSlot ? { siteSlot } : {}),
-      },
+    const photo = await createPhotoRecord({
+      filename: publicUrl,
+      caption,
+      isPublic,
+      siteSlot,
     });
     return NextResponse.json(photo);
   } catch (e) {

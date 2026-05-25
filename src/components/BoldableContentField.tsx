@@ -122,7 +122,9 @@ export function BoldableContentField({
         formData.append("caption", "");
         formData.append("isPublic", "true");
 
-        const { uploadPhotoWithRetry } = await import("@/lib/photoUploadClient");
+        const { uploadPhotoWithRetry, getPhotoUploadConfig, formatPhotoUploadBytes } =
+          await import("@/lib/photoUploadClient");
+        const config = await getPhotoUploadConfig();
         const result = await uploadPhotoWithRetry(file, {
           caption: "",
           isPublic: true,
@@ -132,7 +134,7 @@ export function BoldableContentField({
             result.tooLarge
               ? t("admin.uploadFileTooLarge", {
                   name: file.name,
-                  max: "4 MB",
+                  max: formatPhotoUploadBytes(config.maxBytes),
                 })
               : result.error || t("admin.imageUploadError")
           );
