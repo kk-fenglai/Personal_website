@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Home (English Edition) | Awaiting the Wind</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-primary": "#c8c6c5",
+                    "secondary-fixed": "#ffdcbd",
+                    "on-tertiary-fixed-variant": "#3c494b",
+                    "primary": "#1a1a1a", /* Obsidian */
+                    "inverse-on-surface": "#f1f1f1",
+                    "outline": "#747878",
+                    "surface-bright": "#f9f9f9",
+                    "tertiary": "#7d562d", /* Ochre tone */
+                    "primary-container": "#1c1b1b",
+                    "outline-variant": "#c4c7c7",
+                    "on-secondary-container": "#7a532a",
+                    "primary-fixed-dim": "#c8c6c5",
+                    "on-tertiary-fixed": "#111e1f",
+                    "tertiary-container": "#111e1f",
+                    "on-error-container": "#93000a",
+                    "on-surface-variant": "#444748",
+                    "surface-variant": "#e2e2e2",
+                    "surface-dim": "#dadada",
+                    "secondary-container": "#ffca98",
+                    "on-tertiary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "error": "#ba1a1a",
+                    "error-container": "#ffdad6",
+                    "surface-container": "#eeeeee",
+                    "on-tertiary-container": "#798688",
+                    "secondary-fixed-dim": "#f0bd8b",
+                    "primary-fixed": "#e5e2e1",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed": "#1c1b1b",
+                    "background": "#f9f9f9",
+                    "surface-container-low": "#f3f3f3",
+                    "on-surface": "#1a1c1c",
+                    "on-primary-fixed-variant": "#474746",
+                    "on-primary-container": "#858383",
+                    "on-primary": "#ffffff",
+                    "tertiary-fixed-dim": "#bbc9cb",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary": "#7d562d", /* Ochre */
+                    "on-secondary-fixed-variant": "#623f18",
+                    "surface": "#f9f9f9",
+                    "surface-container-high": "#e8e8e8",
+                    "inverse-surface": "#2f3131",
+                    "tertiary-fixed": "#d7e5e7",
+                    "surface-container-highest": "#e2e2e2",
+                    "on-background": "#1a1c1c",
+                    "on-secondary-fixed": "#2c1600",
+                    "surface-tint": "#5f5e5e"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "24px",
+                    "container-max": "1280px",
+                    "unit": "8px",
+                    "gutter": "32px",
+                    "asymmetric-offset": "120px",
+                    "margin-desktop": "64px"
+            },
+            "fontFamily": {
+                    "display-lg-mobile": ["EB Garamond"],
+                    "label-caps": ["DM Sans"],
+                    "headline-md": ["EB Garamond"],
+                    "headline-sm": ["EB Garamond"],
+                    "caption": ["DM Sans"],
+                    "body-md": ["DM Sans"],
+                    "body-lg": ["DM Sans"],
+                    "display-lg": ["EB Garamond"]
+            },
+            "fontSize": {
+                    "display-lg-mobile": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.15em", "fontWeight": "700"}],
+                    "headline-md": ["36px", {"lineHeight": "1.3", "fontWeight": "400"}],
+                    "headline-sm": ["24px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                    "caption": ["14px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "1.7", "fontWeight": "400"}],
+                    "body-lg": ["19px", {"lineHeight": "1.7", "fontWeight": "400"}],
+                    "display-lg": ["72px", {"lineHeight": "1.1", "letterSpacing": "-0.03em", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+        }
+        .asymmetric-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 32px;
+        }
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .image-hover-zoom {
+            overflow: hidden;
+            background-color: #1a1a1a;
+        }
+        .image-hover-zoom img {
+            transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.8s ease;
+            opacity: 0.9;
+        }
+        .image-hover-zoom:hover img {
+            transform: scale(1.05);
+            opacity: 1;
+        }
+        .text-underline-expand {
+            position: relative;
+            display: inline-block;
+        }
+        .text-underline-expand::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: -4px;
+            left: 0;
+            background-color: currentColor;
+            transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .text-underline-expand:hover::after {
+            width: 100%;
+        }
+        .lang-switcher a.active {
+            color: #7d562d;
+            font-weight: 700;
+        }
+        h1, h2, h3 {
+            font-variant-ligatures: common-ligatures;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md flex justify-between items-center px-margin-mobile md:px-margin-desktop py-8 transition-all duration-500 ease-in-out">
+<div class="text-headline-sm font-headline-sm text-primary tracking-tight">Awaiting the Wind</div>
+<div class="hidden md:flex items-center space-x-12">
+<a class="text-label-caps font-label-caps text-secondary font-bold" href="#">HOME</a>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors duration-300" href="#">JOURNAL</a>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors duration-300" href="#">GALLERY</a>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors duration-300" href="#">ABOUT</a>
+</div>
+<div class="flex items-center gap-8">
+<div class="hidden md:flex lang-switcher items-center space-x-3 text-[10px] font-label-caps tracking-widest text-on-surface-variant/60">
+<a class="hover:text-primary transition-colors" href="#">ZH</a>
+<span>/</span>
+<a class="active" href="#">EN</a>
+<span>/</span>
+<a class="hover:text-primary transition-colors" href="#">FR</a>
+</div>
+<button class="p-2 hover:opacity-50 transition-opacity duration-300">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+</div>
+</nav>
+<main class="pt-32">
+<!-- Hero Section -->
+<section class="min-h-[90vh] flex flex-col justify-center px-margin-mobile md:px-margin-desktop mb-40">
+<div class="asymmetric-grid">
+<div class="col-span-12 md:col-start-2 md:col-span-10 mb-20">
+<div class="w-full h-[700px] image-hover-zoom">
+<img class="w-full h-full object-cover" data-alt="Minimalist landscape with misty mountains" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-9FT2lfbn0eeYBw7dFVpXRudADXgGgBS5Jhf9OEuxpqTbm00iIaL1CjD3g0RYoiFlSnq0TF4IvK4tk0Qu7WEixhUjxSQVGj2YTXtlxwNUm65aEN8FaBew9BpUUI4gPKbfRZJxCt1ECIiMhvZPvexdwNKpPrAjNiSfu3K6AMsT11XNm4RrbcAX-DmAtbhqnWoMytQZTge4uqnismVfOzkAfLzGl0MjAmyVbU8mI4oPWSXpm5rRfj2FlSgGRNtZx0x9L6q3E8bhiw"/>
+</div>
+</div>
+<div class="col-span-12 md:col-start-3 md:col-span-8 reveal">
+<h1 class="text-display-lg-mobile md:text-display-lg font-display-lg leading-[1.05] mb-10 italic">
+                    The Void &amp; The Murmur
+                </h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant max-w-2xl leading-relaxed">
+                    A space for pause and preservation. Observations and imagery, held or revealed, are crafted in the quietude.<br/>
+                    The wind may arrive, or it may not. In the waiting, one finds clarity.
+                </p>
+</div>
+</div>
+</section>
+<!-- Latest Thoughts -->
+<section class="px-margin-mobile md:px-margin-desktop mb-48">
+<div class="flex flex-col md:flex-row justify-between items-baseline mb-20 border-b border-primary/5 pb-8">
+<span class="text-label-caps font-label-caps text-secondary uppercase tracking-[0.25em]">01 Journal</span>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors text-underline-expand" href="#">View all entries →</a>
+</div>
+<div class="asymmetric-grid">
+<!-- Thought Card 1 -->
+<div class="col-span-12 md:col-span-4 reveal">
+<div class="py-12 group cursor-pointer border-b border-outline-variant/10 md:border-none">
+<span class="text-label-caps font-label-caps text-on-surface-variant/50 block mb-8">March 12, 2024</span>
+<h3 class="text-headline-md font-headline-md mb-8 group-hover:text-secondary transition-colors duration-500 italic">Thoughts Cultivated in Solitude</h3>
+<p class="text-body-md font-body-md text-on-surface-variant mb-10">Reflections on the necessity of the pause, and finding the silent "white space" amidst the modern clamor.</p>
+<button class="text-label-caps font-label-caps font-bold tracking-[0.2em] text-primary border-b border-primary/20 pb-1 hover:border-secondary hover:text-secondary transition-all">READ MORE</button>
+</div>
+</div>
+<!-- Thought Card 2 -->
+<div class="col-span-12 md:col-span-4 reveal" style="transition-delay: 150ms;">
+<div class="py-12 group cursor-pointer border-b border-outline-variant/10 md:border-none">
+<span class="text-label-caps font-label-caps text-on-surface-variant/50 block mb-8">February 28, 2024</span>
+<h3 class="text-headline-md font-headline-md mb-8 group-hover:text-secondary transition-colors duration-500 italic">Whether the Wind Comes</h3>
+<p class="text-body-md font-body-md text-on-surface-variant mb-10">The act of waiting is an end in itself. In the long duration of expectancy, we finally hear our own voice.</p>
+<button class="text-label-caps font-label-caps font-bold tracking-[0.2em] text-primary border-b border-primary/20 pb-1 hover:border-secondary hover:text-secondary transition-all">READ MORE</button>
+</div>
+</div>
+<!-- Thought Card 3 -->
+<div class="col-span-12 md:col-span-4 reveal" style="transition-delay: 300ms;">
+<div class="py-12 group cursor-pointer md:border-none">
+<span class="text-label-caps font-label-caps text-on-surface-variant/50 block mb-8">January 15, 2024</span>
+<h3 class="text-headline-md font-headline-md mb-8 group-hover:text-secondary transition-colors duration-500 italic">A Small Corner of One's Own</h3>
+<p class="text-body-md font-body-md text-on-surface-variant mb-10">Not for the gaze of everyone, but for those meant to see. Notes on the genesis of this digital sanctuary.</p>
+<button class="text-label-caps font-label-caps font-bold tracking-[0.2em] text-primary border-b border-primary/20 pb-1 hover:border-secondary hover:text-secondary transition-all">READ MORE</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Gallery Preview -->
+<section class="px-margin-mobile md:px-margin-desktop mb-48">
+<div class="flex flex-col md:flex-row justify-between items-baseline mb-20 border-b border-primary/5 pb-8">
+<span class="text-label-caps font-label-caps text-secondary uppercase tracking-[0.25em]">02 Gallery</span>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors text-underline-expand" href="#">Enter the gallery →</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-6 gap-8 md:gap-10">
+<div class="md:col-span-4 h-[500px] md:h-[750px] image-hover-zoom reveal">
+<img class="w-full h-full object-cover" data-alt="Minimalist concrete structure" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACtjS698zgvR0X0TupzUYkX5PZnrX4ujU_0rAHfc8nuuZ1CfEo8cWwmIbgQEfJmOsh6TD541SPwmf0cGOGHSxo71t3EDEyRZR2BNmMXf42DWdeA9i-QOMCM65x84FpRv8QEF6DmoWp3wWuJn2_6yVY4TzRoSG0MnGmfwODr9RUaulPTmdZn2p376YJiwYAYkGiaSIXGwzleJ773rp7ZFI1c64kwLceZ9kn3lgi79LQ9JTfWNHXbrzdQkzdk9_UQ-jSUZJCuvnpNg"/>
+</div>
+<div class="md:col-span-2 h-[350px] image-hover-zoom reveal" style="transition-delay: 200ms;">
+<img class="w-full h-full object-cover" data-alt="Water ripples macro" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1p5gRsYkrZOQkW3JAJjcG8DgnggEc4KAxUHLu0gxNFeUkUXy4jG_bnPBEH0QwE7FjrtZIm0GAvgxxkZpAMlJAOLALd_XoxRWqrrUdcfY0blrqqDyt-QTooUMI8IreGX2BOXilENPFNZgutB1rPQCMv0xsAURhTCpmnQoJtfNnmeRHGSWlc0afFXfV_vbrGF_epdXlinIoIg-eKFtRJ--8udLSYKIod5AWRJSKSO_Zxq50u1tKJZv4UqfkJT0sm9HGY5stFp-7NQ"/>
+</div>
+<div class="md:col-span-2 h-[350px] md:-mt-[370px] image-hover-zoom reveal" style="transition-delay: 400ms;">
+<img class="w-full h-full object-cover" data-alt="Foggy forest" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_7AELt_F3Tsf4tmL-gpmTDf-r3wMc1eGrvW0X1WbaUbcTyTCFn4RZfFzVF9bvUMZQvFLsEZlqpNxGSk-Uqxow7Ur3tx160uVjPkxPGekmcAqPfScKOquSLnBTx618uoFq7QPQ25qXyI_cP-8fli-TieAU4rjrXKyIpFhH9leBq9eJ2m_8v-ZoR9jehozvZ6VZKysvepP_jy5iKH4TH6zgBtfVj-OuL-1NlY9QivLK-JDvy_5VDSOwtjpdVedkGrp9yXnE1I7RIQ"/>
+</div>
+<div class="md:col-span-3 h-[450px] image-hover-zoom reveal" style="transition-delay: 300ms;">
+<img class="w-full h-full object-cover" data-alt="Minimalist studio" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyAFS_Ng2rdI4wN0NYQfrSzf4b-kVq3uC6dl_9E5PXVQUSO23iFiTI5T7KTWJNay6P1jM3mxra3ege6CFTgfUVIJZ_OvJgDerEoOemRcSHa-pd-9f_OV1BhHHon6jHTH7GaH1HZh_KPHGelL9vYWzjVwW_gWAAE66gp0kYluv_2ChVr0Jjf5aVHRvba6XQ9ArujkN4VyaefKMaqDTJS46eWWHfE54fvx0f_JBKqY3cvpxQYWD8My8pjm0VS3Y0xVOdr698R5kIhQ"/>
+</div>
+<div class="md:col-span-3 h-[450px] image-hover-zoom reveal" style="transition-delay: 500ms;">
+<img class="w-full h-full object-cover" data-alt="Calm lake" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyDncr2B-oA7HO5tPaNNHGJ4aphy91RQEqGmTvFnc7DZyzeyppeOiMsDshmzlqq2y6DOh0NjvtQRDTUpCuKGD1UyjANR-C6CydawhxwkOJaLRQSG75ccO2Un2R7GEkmJQJETgR2Lk4D_tQSVgD-n6wap9QGMc63S1IhvO_suMj2B7zl5QLN4gAoCDXPWlUARMgB-v-ojHYY0Re255lr9TI-kFu6r-bbiI7yuvt-Wxv5oSJOhNjVjNMqHDTni-LpNqDPsq9v2fBKQ"/>
+</div>
+</div>
+</section>
+<!-- About Section -->
+<section class="bg-surface-container-low py-40 px-margin-mobile md:px-margin-desktop mb-20">
+<div class="asymmetric-grid">
+<div class="col-span-12 md:col-start-2 md:col-span-4 reveal">
+<span class="text-label-caps font-label-caps text-secondary block mb-6 uppercase tracking-widest">03 Essence</span>
+<h2 class="text-headline-md font-headline-md mb-8 italic">This is a space reserved for the quiet self.</h2>
+<p class="text-body-md font-body-md text-on-surface-variant max-w-sm">To write what lingers, to archive what is seen. Not intended for the masses, but for those who seek the resonance of a still moment.</p>
+</div>
+<div class="col-span-12 md:col-start-7 md:col-span-5 reveal flex items-center" style="transition-delay: 200ms;">
+<form class="w-full flex flex-col gap-10">
+<div class="border-b border-primary/10 py-5">
+<input class="bg-transparent border-none w-full focus:ring-0 placeholder:text-outline/40 text-body-md italic" placeholder="Subscribe to updates (Email)" type="email"/>
+</div>
+<button class="bg-primary text-on-primary text-label-caps font-label-caps py-6 px-12 self-start hover:bg-secondary transition-colors duration-500 tracking-[0.25em]">SUBSCRIBE</button>
+</form>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-24 bg-surface border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-center px-margin-mobile md:px-margin-desktop gap-12">
+<div class="text-label-caps font-label-caps text-on-surface/60 tracking-widest text-[10px]">© 2026 AWAITING THE WIND. ALL RIGHTS RESERVED.</div>
+<div class="flex items-center space-x-12">
+<a class="text-caption font-caption text-on-surface-variant hover:text-secondary transition-colors duration-500 text-underline-expand" href="#">Instagram</a>
+<a class="text-caption font-caption text-on-surface-variant hover:text-secondary transition-colors duration-500 text-underline-expand" href="#">Twitter</a>
+<a class="text-caption font-caption text-on-surface-variant hover:text-secondary transition-colors duration-500 text-underline-expand" href="#">Journal</a>
+</div>
+</footer>
+<script>
+    // Reveal animation on scroll
+    const observerOptions = { threshold: 0.05 };
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Navbar interaction on scroll
+    const navbar = document.querySelector('nav');
+    window.addEventListener('scroll', () => {
+        let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        if (scrollTop > 80) {
+            navbar.classList.add('py-5', 'bg-surface/95', 'shadow-[0_1px_0_0_rgba(0,0,0,0.03)]');
+            navbar.classList.remove('py-8', 'bg-surface/80');
+        } else {
+            navbar.classList.add('py-8', 'bg-surface/80');
+            navbar.classList.remove('py-5', 'bg-surface/95', 'shadow-[0_1px_0_0_rgba(0,0,0,0.03)]');
+        }
+    });
+</script>
+</body></html>

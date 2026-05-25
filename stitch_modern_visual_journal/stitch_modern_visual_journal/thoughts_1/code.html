@@ -1,0 +1,268 @@
+<!DOCTYPE html><html class="scroll-smooth" lang="zh-CN"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Thoughts (Chinese Edition) | 等风来的小站</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .asymmetric-entry:nth-child(even) {
+            padding-left: var(--asymmetric-offset, 120px);
+        }
+        @media (max-width: 768px) {
+            .asymmetric-entry:nth-child(even) {
+                padding-left: 0;
+            }
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#bbc9cb",
+                        "on-primary-container": "#858383",
+                        "on-error": "#ffffff",
+                        "on-secondary-container": "#7a532a",
+                        "on-primary-fixed": "#1c1b1b",
+                        "secondary-fixed": "#ffdcbd",
+                        "primary-container": "#1c1b1b",
+                        "surface-container-highest": "#e2e2e2",
+                        "surface-container-high": "#e8e8e8",
+                        "on-tertiary-fixed-variant": "#3c494b",
+                        "on-tertiary-fixed": "#111e1f",
+                        "surface-container-low": "#f3f3f3",
+                        "on-error-container": "#93000a",
+                        "on-primary": "#ffffff",
+                        "outline": "#747878",
+                        "surface-dim": "#dadada",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed": "#2c1600",
+                        "surface-tint": "#5f5e5e",
+                        "surface-container": "#eeeeee",
+                        "secondary-fixed-dim": "#f0bd8b",
+                        "on-secondary-fixed-variant": "#623f18",
+                        "primary-fixed": "#e5e2e1",
+                        "on-surface": "#1a1c1c",
+                        "error": "#ba1a1a",
+                        "tertiary-container": "#111e1f",
+                        "surface": "#f9f9f9",
+                        "background": "#f9f9f9",
+                        "secondary-container": "#ffca98",
+                        "secondary": "#7d562d",
+                        "tertiary-fixed": "#d7e5e7",
+                        "on-tertiary-container": "#798688",
+                        "primary-fixed-dim": "#c8c6c5",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#c4c7c7",
+                        "error-container": "#ffdad6",
+                        "on-background": "#1a1c1c",
+                        "surface-bright": "#f9f9f9",
+                        "inverse-primary": "#c8c6c5",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#474746",
+                        "inverse-on-surface": "#f1f1f1",
+                        "surface-variant": "#e2e2e2",
+                        "tertiary": "#000000",
+                        "primary": "#000000",
+                        "on-surface-variant": "#444748",
+                        "inverse-surface": "#2f3131"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "24px",
+                        "margin-desktop": "64px",
+                        "asymmetric-offset": "120px",
+                        "unit": "8px",
+                        "container-max": "1280px",
+                        "gutter": "32px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["DM Sans"],
+                        "caption": ["DM Sans"],
+                        "label-caps": ["DM Sans"],
+                        "headline-md": ["EB Garamond"],
+                        "headline-sm": ["EB Garamond"],
+                        "body-lg": ["DM Sans"],
+                        "display-lg": ["EB Garamond"],
+                        "display-lg-mobile": ["EB Garamond"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "caption": ["14px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                        "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "400"}],
+                        "headline-sm": ["24px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "display-lg": ["64px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                        "display-lg-mobile": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&amp;display=swap" rel="stylesheet"></head>
+<body class="bg-background text-on-background selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl border-b border-outline-variant/30 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-6 transition-all duration-300 ease-in-out">
+<div class="text-headline-sm font-headline-sm text-primary tracking-tighter">等风来 (Davin Lian)</div>
+<div class="hidden md:flex items-center gap-10">
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors duration-300" href="/">首页</a>
+<a class="text-label-caps font-label-caps text-secondary font-bold border-b border-secondary" href="/thoughts">随想</a>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors duration-300" href="/gallery">相册</a>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors duration-300" href="/admin">管理</a>
+</div>
+<div class="flex items-center gap-4 mr-4 border-r border-outline-variant/30 pr-4"><a href="#" class="text-label-caps font-bold text-primary">ZH</a><span class="text-outline-variant text-xs">/</span><a href="#" class="text-label-caps text-on-surface-variant hover:text-primary transition-colors">EN</a><span class="text-outline-variant text-xs">/</span><a href="#" class="text-label-caps text-on-surface-variant hover:text-primary transition-colors">FR</a></div><div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:opacity-70 transition-opacity">menu</button>
+</div>
+</nav>
+<!-- Main Canvas -->
+<main class="pt-40 pb-20 px-margin-mobile md:px-margin-desktop max-w-[800px] mx-auto overflow-x-hidden">
+<!-- Header Section -->
+<header class="mb-24 md:mb-32">
+<p class="text-label-caps font-label-caps text-secondary mb-4 uppercase tracking-widest">Thought Stream</p>
+<h1 class="text-display-lg-mobile md:text-display-lg font-display-lg text-primary font-bold font-['Noto_Serif_SC','Eb_Garamond',serif]" style="opacity: 0;">Thoughts (Chinese Edition)</h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant mt-6">写下的思考与感悟，支持评论互动。</p>
+<div class="w-16 h-px bg-secondary mt-8"></div>
+</header>
+<!-- Category Filters -->
+<nav class="flex flex-wrap gap-x-8 gap-y-4 mb-20">
+<button class="text-label-caps font-label-caps text-primary border-b-2 border-primary pb-1">ALL</button>
+<div class="relative group">
+<button class="text-label-caps font-label-caps text-on-surface-variant hover:text-secondary transition-colors pb-1 flex items-center gap-1">
+                    季节 (SEASONS) <span class="material-symbols-outlined text-xs">keyboard_arrow_down</span>
+</button>
+<div class="absolute top-full left-0 mt-2 bg-surface border border-outline-variant/30 py-2 w-32 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-10">
+<a class="block px-4 py-2 text-label-caps text-on-surface-variant hover:bg-surface-container hover:text-primary" href="#">春 (Spring)</a>
+<a class="block px-4 py-2 text-label-caps text-on-surface-variant hover:bg-surface-container hover:text-primary" href="#">夏 (Summer)</a>
+<a class="block px-4 py-2 text-label-caps text-on-surface-variant hover:bg-surface-container hover:text-primary" href="#">秋 (Autumn)</a>
+<a class="block px-4 py-2 text-label-caps text-on-surface-variant hover:bg-surface-container hover:text-primary" href="#">冬 (Winter)</a>
+</div>
+</div>
+<button class="text-label-caps font-label-caps text-on-surface-variant hover:text-secondary transition-colors pb-1">DESIGN</button>
+<button class="text-label-caps font-label-caps text-on-surface-variant hover:text-secondary transition-colors pb-1">LIFE</button>
+<button class="text-label-caps font-label-caps text-on-surface-variant hover:text-secondary transition-colors pb-1">ART</button>
+</nav>
+<!-- Post Stream -->
+<section class="space-y-24 md:space-y-32">
+<!-- Placeholder Post 1 -->
+<article class="group asymmetric-entry transition-all duration-1000 ease-out opacity-100 translate-y-0">
+<div class="flex flex-col gap-6">
+<div class="flex items-center gap-4">
+<time class="text-label-caps font-label-caps text-on-surface-variant" datetime="2024-10-12">OCT 12, 2024</time>
+<span class="w-1 h-1 bg-outline-variant rounded-full"></span>
+<span class="text-label-caps font-label-caps text-secondary">DESIGN</span>
+</div>
+<a class="block group-hover:opacity-80 transition-opacity" href="#">
+<h2 class="text-headline-md font-headline-md text-primary leading-tight mb-4">留白与沉吟：关于停顿的记录</h2>
+<p class="text-body-lg font-body-lg text-on-surface-variant max-w-[600px]">这里是停顿与记录。随想、相册，或藏或显，皆在静处完成。风会来，或不来。等的时候，正好想想。</p>
+</a>
+<a class="inline-flex items-center text-label-caps font-label-caps text-primary border-b border-primary w-fit pb-1 group-hover:gap-2 transition-all duration-300" href="#">
+                        READ ARTICLE
+                    </a>
+</div>
+</article>
+<!-- Image Interstitial -->
+<div class="py-12 md:py-20 -mx-margin-mobile md:-mx-asymmetric-offset">
+<figure class="aspect-[16/9] overflow-hidden bg-surface-container">
+<img alt="Minimalist study" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000" data-alt="A serene, minimalist architectural interior with clean concrete walls and a single designer wooden chair. Soft, directional sunlight streams from a high window, creating dramatic shadows and a peaceful, introspective mood. The aesthetic is monochromatic and high-end editorial, emphasizing professional visual artistry and intentional silence." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4vOsGGpwVNcWo4w-5bv8OElkZ4RkSxyOCli9SM8SGWnnLhSBO4bNPdEHv7gtTaafok09goKX2UVW3-veFQzCuYIbB4sppxjhsFC2vlkwZ_sEDPqf6qV-os5MY0_zL2jvyo3B-KYihK2jQpkbTU8N0ousJTb5l_UgyX2az45RlVyJ0dQedGLkmFvlyaZPXvAgtWpPDEqkjCjtLONTPmCsYYbs7wwC7DKpEt-v1ePJavXBOcpmOCtBied-pSaDooOSdmXlzHNllGg">
+<figcaption class="mt-4 text-caption font-caption text-on-surface-variant italic">Study of Light (2024)</figcaption>
+</figure>
+</div>
+<!-- Placeholder Post 2 -->
+<article class="group asymmetric-entry transition-all duration-1000 ease-out opacity-100 translate-y-0">
+<div class="flex flex-col gap-6">
+<div class="flex items-center gap-4">
+<time class="text-label-caps font-label-caps text-on-surface-variant" datetime="2024-09-28">SEP 28, 2024</time>
+<span class="w-1 h-1 bg-outline-variant rounded-full"></span>
+<span class="text-label-caps font-label-caps text-secondary">LIFE</span>
+</div>
+<a class="block group-hover:opacity-80 transition-opacity" href="#">
+<h2 class="text-headline-md font-headline-md text-primary leading-tight mb-4">等风来：给自己留的一小块地方</h2>
+<p class="text-body-lg font-body-lg text-on-surface-variant max-w-[600px]">写点随想、存些照片，不必给所有人看，但可以给想见的人看。在数字时代的喧嚣中，寻找一片属于自己的宁静。</p>
+</a>
+<a class="inline-flex items-center text-label-caps font-label-caps text-primary border-b border-primary w-fit pb-1 group-hover:gap-2 transition-all duration-300" href="#">
+                        READ ARTICLE
+                    </a>
+</div>
+</article>
+</section>
+<!-- Pagination -->
+<footer class="mt-32 pt-16 border-t border-outline-variant/30 flex justify-between items-center">
+<button class="flex items-center gap-2 text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors group">
+<span class="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                PREVIOUS
+            </button>
+<div class="flex gap-4">
+<span class="text-label-caps font-label-caps text-primary">01</span>
+<span class="text-label-caps font-label-caps text-outline-variant">02</span>
+</div>
+<button class="flex items-center gap-2 text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors group">
+                NEXT
+                <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</footer>
+</main>
+<!-- Footer Shared Component -->
+<footer class="w-full py-16 bg-surface border-t border-outline-variant/20 px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="text-label-caps font-label-caps text-on-surface uppercase tracking-widest">等风来 (Studio Journal)</div>
+<div class="text-caption font-caption text-on-surface-variant text-center md:text-left">
+            © 2026 等风来的小站. All rights reserved.
+        </div>
+<div class="flex gap-8">
+<a class="text-caption font-caption text-secondary hover:text-secondary transition-colors duration-300" href="#">Instagram</a>
+<a class="text-caption font-caption text-secondary hover:text-secondary transition-colors duration-300" href="#">Twitter</a>
+<a class="text-caption font-caption text-secondary hover:text-secondary transition-colors duration-300" href="#">LinkedIn</a>
+</div>
+</footer>
+<script>
+        // Simple scroll reveal for post items
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                    entry.target.classList.remove('opacity-0', 'translate-y-8');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('article').forEach(article => {
+            article.classList.add('transition-all', 'duration-1000', 'ease-out', 'opacity-0', 'translate-y-8');
+            observer.observe(article);
+        });
+
+        // Sticky nav shadow on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 20) {
+                nav.classList.add('shadow-sm');
+                nav.classList.remove('py-6');
+                nav.classList.add('py-4');
+            } else {
+                nav.classList.remove('shadow-sm');
+                nav.classList.add('py-6');
+                nav.classList.remove('py-4');
+            }
+        });
+    </script>
+
+
+</body></html>

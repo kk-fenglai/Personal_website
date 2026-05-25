@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>等风来 | 留白与沉吟</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed": "#111e1f",
+                    "secondary-fixed": "#ffdcbd",
+                    "primary-fixed": "#e5e2e1",
+                    "on-background": "#1a1c1c",
+                    "on-primary-fixed": "#1c1b1b",
+                    "outline": "#747878",
+                    "inverse-surface": "#2f3131",
+                    "surface-tint": "#5f5e5e",
+                    "on-surface": "#1a1c1c",
+                    "error-container": "#ffdad6",
+                    "primary-container": "#1c1b1b",
+                    "secondary": "#7d562d",
+                    "primary": "#000000",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-fixed": "#2c1600",
+                    "surface-container-high": "#e8e8e8",
+                    "on-secondary-container": "#7a532a",
+                    "outline-variant": "#c4c7c7",
+                    "surface": "#f9f9f9",
+                    "tertiary": "#000000",
+                    "on-error-container": "#93000a",
+                    "on-primary": "#ffffff",
+                    "tertiary-container": "#111e1f",
+                    "surface-bright": "#f9f9f9",
+                    "on-tertiary-container": "#798688",
+                    "on-tertiary-fixed-variant": "#3c494b",
+                    "tertiary-fixed-dim": "#bbc9cb",
+                    "on-error": "#ffffff",
+                    "surface-container": "#eeeeee",
+                    "surface-container-low": "#f3f3f3",
+                    "on-tertiary": "#ffffff",
+                    "background": "#f9f9f9",
+                    "on-primary-fixed-variant": "#474746",
+                    "secondary-fixed-dim": "#f0bd8b",
+                    "surface-dim": "#dadada",
+                    "error": "#ba1a1a",
+                    "surface-variant": "#e2e2e2",
+                    "inverse-primary": "#c8c6c5",
+                    "on-secondary-fixed-variant": "#623f18",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-fixed-dim": "#c8c6c5",
+                    "tertiary-fixed": "#d7e5e7",
+                    "surface-container-highest": "#e2e2e2",
+                    "on-surface-variant": "#444748",
+                    "on-primary-container": "#858383",
+                    "inverse-on-surface": "#f1f1f1",
+                    "secondary-container": "#ffca98"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "container-max": "1280px",
+                    "margin-mobile": "24px",
+                    "gutter": "32px",
+                    "asymmetric-offset": "120px",
+                    "margin-desktop": "64px",
+                    "unit": "8px"
+            },
+            "fontFamily": {
+                    "headline-sm": ["EB Garamond"],
+                    "headline-md": ["EB Garamond"],
+                    "caption": ["DM Sans"],
+                    "body-md": ["DM Sans"],
+                    "display-lg": ["EB Garamond"],
+                    "body-lg": ["DM Sans"],
+                    "label-caps": ["DM Sans"],
+                    "display-lg-mobile": ["EB Garamond"]
+            },
+            "fontSize": {
+                    "headline-sm": ["24px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                    "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "400"}],
+                    "caption": ["14px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "display-lg": ["64px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                    "display-lg-mobile": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+        }
+        .asymmetric-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 32px;
+        }
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .image-hover-zoom {
+            overflow: hidden;
+        }
+        .image-hover-zoom img {
+            transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .image-hover-zoom:hover img {
+            transform: scale(1.03);
+        }
+        .text-underline-expand {
+            position: relative;
+            display: inline-block;
+        }
+        .text-underline-expand::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: -2px;
+            left: 0;
+            background-color: currentColor;
+            transition: width 0.3s ease;
+        }
+        .text-underline-expand:hover::after {
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl border-b border-outline-variant/30 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-6 transition-all duration-300 ease-in-out">
+<div class="text-headline-sm font-headline-sm text-primary tracking-tighter">等风来</div>
+<div class="hidden md:flex items-center space-x-12">
+<a class="text-label-caps font-label-caps text-secondary font-bold border-b border-secondary" href="#">首页</a>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors hover:opacity-70 transition-opacity duration-300" href="#">随想</a>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors hover:opacity-70 transition-opacity duration-300" href="#">相册</a>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors hover:opacity-70 transition-opacity duration-300" href="#">关于</a>
+</div>
+<div class="flex items-center">
+<button class="p-2 hover:opacity-70 transition-opacity duration-300">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+</div>
+</nav>
+<main class="pt-24">
+<!-- Hero Section -->
+<section class="min-h-[90vh] flex flex-col justify-center px-margin-mobile md:px-margin-desktop mb-40">
+<div class="asymmetric-grid">
+<div class="col-span-12 md:col-start-2 md:col-span-10 mb-16">
+<div class="w-full h-[650px] image-hover-zoom">
+<img class="w-full h-full object-cover" data-alt="Minimalist landscape with misty mountains" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-9FT2lfbn0eeYBw7dFVpXRudADXgGgBS5Jhf9OEuxpqTbm00iIaL1CjD3g0RYoiFlSnq0TF4IvK4tk0Qu7WEixhUjxSQVGj2YTXtlxwNUm65aEN8FaBew9BpUUI4gPKbfRZJxCt1ECIiMhvZPvexdwNKpPrAjNiSfu3K6AMsT11XNm4RrbcAX-DmAtbhqnWoMytQZTge4uqnismVfOzkAfLzGl0MjAmyVbU8mI4oPWSXpm5rRfj2FlSgGRNtZx0x9L6q3E8bhiw"/>
+</div>
+</div>
+<div class="col-span-12 md:col-start-3 md:col-span-8 reveal">
+<h1 class="text-display-lg-mobile md:text-display-lg font-display-lg leading-tight mb-8">
+                    留白与沉吟
+                </h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant max-w-2xl leading-relaxed">
+                    这里是停顿与记录。随想、相册，或藏或显，皆在静处完成。<br/>
+                    风会来，或不来。等的时候，正好想想。
+                </p>
+</div>
+</div>
+</section>
+<!-- Latest Thoughts -->
+<section class="px-margin-mobile md:px-margin-desktop mb-40">
+<div class="flex flex-col md:flex-row justify-between items-baseline mb-16 border-b border-primary/10 pb-6">
+<span class="text-label-caps font-label-caps text-secondary uppercase tracking-[0.2em]">01 随想</span>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors text-underline-expand" href="#">看看随想 →</a>
+</div>
+<div class="asymmetric-grid">
+<!-- Thought Card 1 -->
+<div class="col-span-12 md:col-span-4 reveal">
+<div class="py-10 group cursor-pointer border-b border-outline-variant/10 md:border-none">
+<span class="text-label-caps font-label-caps text-on-surface-variant block mb-6">2024.03.12</span>
+<h3 class="text-headline-md font-headline-md mb-6 group-hover:text-secondary transition-colors duration-300">静处完成的思考</h3>
+<p class="text-body-md font-body-md text-on-surface-variant mb-8">关于生活中的停顿，以及如何在喧嚣中找寻那一抹留白。</p>
+<button class="text-label-caps font-label-caps font-bold tracking-widest text-primary border-b border-primary py-1 hover:border-secondary hover:text-secondary transition-all">READ MORE</button>
+</div>
+</div>
+<!-- Thought Card 2 -->
+<div class="col-span-12 md:col-span-4 reveal" style="transition-delay: 100ms;">
+<div class="py-10 group cursor-pointer border-b border-outline-variant/10 md:border-none">
+<span class="text-label-caps font-label-caps text-on-surface-variant block mb-6">2024.02.28</span>
+<h3 class="text-headline-md font-headline-md mb-6 group-hover:text-secondary transition-colors duration-300">风来或者不来</h3>
+<p class="text-body-md font-body-md text-on-surface-variant mb-8">等待本身就是一种意义。在漫长的等候中，我们与自己对话。</p>
+<button class="text-label-caps font-label-caps font-bold tracking-widest text-primary border-b border-primary py-1 hover:border-secondary hover:text-secondary transition-all">READ MORE</button>
+</div>
+</div>
+<!-- Thought Card 3 -->
+<div class="col-span-12 md:col-span-4 reveal" style="transition-delay: 200ms;">
+<div class="py-10 group cursor-pointer md:border-none">
+<span class="text-label-caps font-label-caps text-on-surface-variant block mb-6">2024.01.15</span>
+<h3 class="text-headline-md font-headline-md mb-6 group-hover:text-secondary transition-colors duration-300">给自己留的一小块地方</h3>
+<p class="text-body-md font-body-md text-on-surface-variant mb-8">不必给所有人看，但可以给想见的人看。关于这里的建立初衷。</p>
+<button class="text-label-caps font-label-caps font-bold tracking-widest text-primary border-b border-primary py-1 hover:border-secondary hover:text-secondary transition-all">READ MORE</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Gallery Preview -->
+<section class="px-margin-mobile md:px-margin-desktop mb-40">
+<div class="flex flex-col md:flex-row justify-between items-baseline mb-16 border-b border-primary/10 pb-6">
+<span class="text-label-caps font-label-caps text-secondary uppercase tracking-[0.2em]">02 相册</span>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors text-underline-expand" href="#">逛逛相册 →</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-6 gap-6 md:gap-8">
+<div class="md:col-span-4 h-[500px] md:h-[700px] image-hover-zoom reveal">
+<img class="w-full h-full object-cover" data-alt="Minimalist concrete structure" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACtjS698zgvR0X0TupzUYkX5PZnrX4ujU_0rAHfc8nuuZ1CfEo8cWwmIbgQEfJmOsh6TD541SPwmf0cGOGHSxo71t3EDEyRZR2BNmMXf42DWdeA9i-QOMCM65x84FpRv8QEF6DmoWp3wWuJn2_6yVY4TzRoSG0MnGmfwODr9RUaulPTmdZn2p376YJiwYAYkGiaSIXGwzleJ773rp7ZFI1c64kwLceZ9kn3lgi79LQ9JTfWNHXbrzdQkzdk9_UQ-jSUZJCuvnpNg"/>
+</div>
+<div class="md:col-span-2 h-[330px] image-hover-zoom reveal" style="transition-delay: 150ms;">
+<img class="w-full h-full object-cover" data-alt="Water ripples macro" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1p5gRsYkrZOQkW3JAJjcG8DgnggEc4KAxUHLu0gxNFeUkUXy4jG_bnPBEH0QwE7FjrtZIm0GAvgxxkZpAMlJAOLALd_XoxRWqrrUdcfY0blrqqDyt-QTooUMI8IreGX2BOXilENPFNZgutB1rPQCMv0xsAURhTCpmnQoJtfNnmeRHGSWlc0afFXfV_vbrGF_epdXlinIoIg-eKFtRJ--8udLSYKIod5AWRJSKSO_Zxq50u1tKJZv4UqfkJT0sm9HGY5stFp-7NQ"/>
+</div>
+<div class="md:col-span-2 h-[330px] md:-mt-[340px] image-hover-zoom reveal" style="transition-delay: 200ms;">
+<img class="w-full h-full object-cover" data-alt="Foggy forest" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_7AELt_F3Tsf4tmL-gpmTDf-r3wMc1eGrvW0X1WbaUbcTyTCFn4RZfFzVF9bvUMZQvFLsEZlqpNxGSk-Uqxow7Ur3tx160uVjPkxPGekmcAqPfScKOquSLnBTx618uoFq7QPQ25qXyI_cP-8fli-TieAU4rjrXKyIpFhH9leBq9eJ2m_8v-ZoR9jehozvZ6VZKysvepP_jy5iKH4TH6zgBtfVj-OuL-1NlY9QivLK-JDvy_5VDSOwtjpdVedkGrp9yXnE1I7RIQ"/>
+</div>
+<div class="md:col-span-3 h-[400px] image-hover-zoom reveal" style="transition-delay: 250ms;">
+<img class="w-full h-full object-cover" data-alt="Minimalist studio" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyAFS_Ng2rdI4wN0NYQfrSzf4b-kVq3uC6dl_9E5PXVQUSO23iFiTI5T7KTWJNay6P1jM3mxra3ege6CFTgfUVIJZ_OvJgDerEoOemRcSHa-pd-9f_OV1BhHHon6jHTH7GaH1HZh_KPHGelL9vYWzjVwW_gWAAE66gp0kYluv_2ChVr0Jjf5aVHRvba6XQ9ArujkN4VyaefKMaqDTJS46eWWHfE54fvx0f_JBKqY3cvpxQYWD8My8pjm0VS3Y0xVOdr698R5kIhQ"/>
+</div>
+<div class="md:col-span-3 h-[400px] image-hover-zoom reveal" style="transition-delay: 300ms;">
+<img class="w-full h-full object-cover" data-alt="Calm lake" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyDncr2B-oA7HO5tPaNNHGJ4aphy91RQEqGmTvFnc7DZyzeyppeOiMsDshmzlqq2y6DOh0NjvtQRDTUpCuKGD1UyjANR-C6CydawhxwkOJaLRQSG75ccO2Un2R7GEkmJQJETgR2Lk4D_tQSVgD-n6wap9QGMc63S1IhvO_suMj2B7zl5QLN4gAoCDXPWlUARMgB-v-ojHYY0Re255lr9TI-kFu6r-bbiI7yuvt-Wxv5oSJOhNjVjNMqHDTni-LpNqDPsq9v2fBKQ"/>
+</div>
+</div>
+</section>
+<!-- About Section (tone from old site) -->
+<section class="bg-surface-container-low py-32 px-margin-mobile md:px-margin-desktop mb-16">
+<div class="asymmetric-grid">
+<div class="col-span-12 md:col-start-2 md:col-span-4 reveal">
+<span class="text-label-caps font-label-caps text-secondary block mb-4 uppercase">03 关于这里</span>
+<h2 class="text-headline-md font-headline-md mb-6">等风来，是给自己留的一小块地方。</h2>
+<p class="text-body-md font-body-md text-on-surface-variant">写点随想、存些照片，不必给所有人看，但可以给想见的人看。</p>
+</div>
+<div class="col-span-12 md:col-start-7 md:col-span-5 reveal flex items-center" style="transition-delay: 100ms;">
+<form class="w-full flex flex-col gap-8">
+<div class="border-b border-primary/20 py-4">
+<input class="bg-transparent border-none w-full focus:ring-0 placeholder:text-outline/50 text-body-md" placeholder="订阅更新 (Email)" type="email"/>
+</div>
+<button class="bg-primary text-on-primary text-label-caps font-label-caps py-5 px-10 self-start hover:opacity-90 transition-opacity tracking-widest">SUBSCRIBE</button>
+</form>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-20 bg-surface border-t border-outline-variant/20 flex flex-col md:flex-row justify-between items-center px-margin-mobile md:px-margin-desktop gap-8">
+<div class="text-label-caps font-label-caps text-on-surface tracking-widest">© 2026 等风来的小站. ALL RIGHTS RESERVED.</div>
+<div class="flex items-center space-x-12">
+<a class="text-caption font-caption text-on-surface-variant hover:text-secondary transition-colors duration-300" href="#">Instagram</a>
+<a class="text-caption font-caption text-on-surface-variant hover:text-secondary transition-colors duration-300" href="#">Twitter</a>
+<a class="text-caption font-caption text-on-surface-variant hover:text-secondary transition-colors duration-300" href="#">Weibo</a>
+</div>
+</footer>
+<script>
+    // Reveal animation on scroll
+    const observerOptions = { threshold: 0.1 };
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Navbar interaction on scroll
+    let lastScrollTop = 0;
+    const navbar = document.querySelector('nav');
+    window.addEventListener('scroll', () => {
+        let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        if (scrollTop > 50) {
+            navbar.classList.add('py-4', 'shadow-sm', 'bg-surface/95');
+            navbar.classList.remove('py-6', 'bg-surface/90');
+        } else {
+            navbar.classList.add('py-6', 'bg-surface/90');
+            navbar.classList.remove('py-4', 'shadow-sm', 'bg-surface/95');
+        }
+        lastScrollTop = scrollTop;
+    });
+</script>
+</body></html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>À Propos (French Edition) | L’Attente du Vent</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed": "#111e1f",
+                    "secondary-fixed": "#ffdcbd",
+                    "primary-fixed": "#e5e2e1",
+                    "on-background": "#1a1c1c",
+                    "on-primary-fixed": "#1c1b1b",
+                    "outline": "#747878",
+                    "inverse-surface": "#2f3131",
+                    "surface-tint": "#5f5e5e",
+                    "on-surface": "#1a1c1c",
+                    "error-container": "#ffdad6",
+                    "primary-container": "#1c1b1b",
+                    "secondary": "#7d562d",
+                    "primary": "#000000",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-fixed": "#2c1600",
+                    "surface-container-high": "#e8e8e8",
+                    "on-secondary-container": "#7a532a",
+                    "outline-variant": "#c4c7c7",
+                    "surface": "#f9f9f9",
+                    "tertiary": "#000000",
+                    "on-error-container": "#93000a",
+                    "on-primary": "#ffffff",
+                    "tertiary-container": "#111e1f",
+                    "surface-bright": "#f9f9f9",
+                    "on-tertiary-container": "#798688",
+                    "on-tertiary-fixed-variant": "#3c494b",
+                    "tertiary-fixed-dim": "#bbc9cb",
+                    "on-error": "#ffffff",
+                    "surface-container": "#eeeeee",
+                    "surface-container-low": "#f3f3f3",
+                    "on-tertiary": "#ffffff",
+                    "background": "#f9f9f9",
+                    "on-primary-fixed-variant": "#474746",
+                    "secondary-fixed-dim": "#f0bd8b",
+                    "surface-dim": "#dadada",
+                    "error": "#ba1a1a",
+                    "surface-variant": "#e2e2e2",
+                    "inverse-primary": "#c8c6c5",
+                    "on-secondary-fixed-variant": "#623f18",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-fixed-dim": "#c8c6c5",
+                    "tertiary-fixed": "#d7e5e7",
+                    "surface-container-highest": "#e2e2e2",
+                    "on-surface-variant": "#444748",
+                    "on-primary-container": "#858383",
+                    "inverse-on-surface": "#f1f1f1",
+                    "secondary-container": "#ffca98"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "container-max": "1280px",
+                    "margin-mobile": "24px",
+                    "gutter": "32px",
+                    "asymmetric-offset": "120px",
+                    "margin-desktop": "64px",
+                    "unit": "8px"
+            },
+            "fontFamily": {
+                    "headline-sm": ["EB Garamond"],
+                    "headline-md": ["EB Garamond"],
+                    "caption": ["DM Sans"],
+                    "body-md": ["DM Sans"],
+                    "display-lg": ["EB Garamond"],
+                    "body-lg": ["DM Sans"],
+                    "label-caps": ["DM Sans"],
+                    "display-lg-mobile": ["EB Garamond"]
+            },
+            "fontSize": {
+                    "headline-sm": ["24px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                    "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "400"}],
+                    "caption": ["14px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "display-lg": ["64px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                    "display-lg-mobile": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .reveal-on-scroll.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .image-zoom-container {
+            overflow: hidden;
+        }
+        .image-zoom-container img {
+            transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .image-zoom-container:hover img {
+            transform: scale(1.05);
+        }
+        input:focus, textarea:focus {
+            outline: none !important;
+            border-bottom-color: #7d562d !important;
+        }
+        /* Custom artistic diacritics styling for EB Garamond */
+        .artistic-typography {
+            font-feature-settings: "ss01", "ss02", "swsh", "liga";
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-secondary-fixed selection:text-on-secondary-fixed font-body-md overflow-x-hidden artistic-typography">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl border-b border-outline-variant/30 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-6 transition-all duration-300 ease-in-out">
+<div class="text-headline-sm font-headline-sm text-primary tracking-tighter">
+        L’Attente du Vent
+    </div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors hover:opacity-70 transition-opacity duration-300" href="/">Accueil</a>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors hover:opacity-70 transition-opacity duration-300" href="/thoughts">Pensées</a>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors hover:opacity-70 transition-opacity duration-300" href="/gallery">Galerie</a>
+<a class="text-label-caps font-label-caps text-secondary font-bold border-b border-secondary hover:opacity-70 transition-opacity duration-300" href="#">À Propos</a>
+</nav>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 text-[10px] font-label-caps tracking-[0.2em] text-on-surface-variant">
+<a class="hover:text-primary transition-colors" href="?lang=zh">ZH</a>
+<span class="opacity-30">/</span>
+<a class="hover:text-primary transition-colors" href="?lang=en">EN</a>
+<span class="opacity-30">/</span>
+<a class="text-secondary font-bold" href="?lang=fr">FR</a>
+</div>
+<button class="material-symbols-outlined text-primary hover:opacity-70 transition-opacity duration-300" data-icon="menu">menu</button>
+</div>
+</header>
+<main class="pt-32 pb-16">
+<!-- Hero Section: Split Layout -->
+<section class="px-margin-mobile md:px-margin-desktop mb-40">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter items-start">
+<!-- Left: Portrait Image -->
+<div class="md:col-span-6 image-zoom-container reveal-on-scroll">
+<img alt="Portrait" class="w-full h-[700px] object-cover grayscale hover:grayscale-0 transition-all duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcqSrpIQVIfocrAmONvUj3-vaAQp7n5oPcj7lLlVDZF57UkVTD8h3cdfggN1RdaGrF5tF20ck5RXvLMLldwrXeK3YUP8DuDDALMWTAdZkFRG5EnknQdr69EppGtIG8mPlWh6wB4fjU-Th8XYV2fcb98BnhtlE_SatHc_GzQlWlQmD46e5YI80wjcF4XyCNTb6ayREFMD5bRyH2JWy3RJxMVo8vnxEX3IWxoRlUB72vghm_DvoDZflp0wCAOK1i51zpsMW_8Mqeew"/>
+</div>
+<!-- Right: Story Section -->
+<div class="md:col-span-5 md:col-start-8 mt-12 md:mt-24 reveal-on-scroll" style="transition-delay: 200ms;">
+<span class="text-label-caps font-label-caps text-secondary uppercase block mb-6 tracking-[0.2em]">À propos de la Station</span>
+<h1 class="text-display-lg-mobile md:text-display-lg font-display-lg text-primary mb-12 leading-tight">
+                    À propos d’ici <br/><i class="font-headline-md italic">(Le Calme)</i>.
+                </h1>
+<div class="space-y-8 text-body-lg font-body-lg text-on-surface-variant leading-relaxed">
+<p>
+                        "L’Attente du Vent" est un petit espace réservé. Un lieu pour consigner quelques pensées, conserver quelques photographies, loin du tumulte des regards impromptus.
+                    </p>
+<p>
+                        C’est une pause, une archive. Les pensées, les albums, tantôt cachés, tantôt révélés, s’épanouissent dans le silence. Le vent viendra, ou ne viendra pas. En attendant, on réfléchit simplement.
+                    </p>
+<div class="pt-8 border-t border-outline-variant/30">
+<div class="flex items-center gap-12">
+<div>
+<span class="text-label-caps font-label-caps text-primary block mb-1">Établi en</span>
+<span class="text-headline-sm font-headline-sm">2026</span>
+</div>
+<div>
+<span class="text-label-caps font-label-caps text-primary block mb-1">Thème</span>
+<span class="text-headline-sm font-headline-sm">Obsidienne &amp; Ocre</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Values Section: Asymmetric Grid -->
+<section class="bg-surface-container-low py-32 mb-40">
+<div class="px-margin-mobile md:px-margin-desktop">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<div class="md:col-span-4 reveal-on-scroll">
+<h2 class="text-headline-md font-headline-md text-primary mb-8">Espace &amp; Murmure</h2>
+<p class="text-body-md font-body-md text-on-surface-variant">
+                        Dans le vacarme du monde numérique, nous recherchons une expression et un enregistrement minimalistes.
+                    </p>
+</div>
+<div class="md:col-span-7 md:col-start-6 grid grid-cols-1 sm:grid-cols-2 gap-12">
+<div class="reveal-on-scroll" style="transition-delay: 100ms;">
+<span class="text-secondary font-headline-sm block mb-4 italic">01. Pensées</span>
+<p class="text-body-md font-body-md text-on-surface-variant">Réflexions et émotions écrites, ouvertes au dialogue subtil. Un dialogue avec soi-même et ceux qui partagent la même vision.</p>
+</div>
+<div class="reveal-on-scroll" style="transition-delay: 200ms;">
+<span class="text-secondary font-headline-sm block mb-4 italic">02. Galerie</span>
+<p class="text-body-md font-body-md text-on-surface-variant">Photographies capturées, qu'elles soient publiques ou intimes. Saisir l'instant pour toucher l'éternel.</p>
+</div>
+<div class="reveal-on-scroll" style="transition-delay: 300ms;">
+<span class="text-secondary font-headline-sm block mb-4 italic">03. Sérénité</span>
+<p class="text-body-md font-body-md text-on-surface-variant">Ici, le temps ralentit. Chaque mot, chaque image a bénéficié d'un temps de décantation nécessaire.</p>
+</div>
+<div class="reveal-on-scroll" style="transition-delay: 400ms;">
+<span class="text-secondary font-headline-sm block mb-4 italic">04. Pureté</span>
+<p class="text-body-md font-body-md text-on-surface-variant">Aucun algorithme, seulement une expression authentique et un vide apaisant.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Contact Form Section -->
+<section class="px-margin-mobile md:px-margin-desktop mb-40">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<div class="md:col-span-5 reveal-on-scroll">
+<h2 class="text-display-lg-mobile md:text-display-lg font-display-lg text-primary mb-8">Initier un <br/>Dialogue.</h2>
+<p class="text-body-lg font-body-lg text-on-surface-variant mb-12">
+                    Si vous souhaitez partager une idée, ou simplement adresser un salut, n'hésitez pas à laisser un message.
+                </p>
+<div class="space-y-6">
+<div class="group">
+<span class="text-label-caps font-label-caps text-secondary block mb-2">Par Courriel</span>
+<a class="text-headline-sm font-headline-sm text-primary hover:text-secondary transition-colors duration-300" href="mailto:hello@example.com">hello@example.com</a>
+</div>
+</div>
+</div>
+<div class="md:col-span-6 md:col-start-7 mt-16 md:mt-0 reveal-on-scroll" style="transition-delay: 300ms;">
+<form class="space-y-12" id="contactForm">
+<div class="relative">
+<input class="w-full bg-transparent border-t-0 border-x-0 border-b border-outline-variant py-4 text-body-lg font-body-lg placeholder:text-outline-variant focus:border-secondary transition-all duration-300 px-0" id="name" placeholder="Nom complet" type="text"/>
+</div>
+<div class="relative">
+<input class="w-full bg-transparent border-t-0 border-x-0 border-b border-outline-variant py-4 text-body-lg font-body-lg placeholder:text-outline-variant focus:border-secondary transition-all duration-300 px-0" id="email" placeholder="Adresse de courriel" type="email"/>
+</div>
+<div class="relative">
+<textarea class="w-full bg-transparent border-t-0 border-x-0 border-b border-outline-variant py-4 text-body-lg font-body-lg placeholder:text-outline-variant focus:border-secondary transition-all duration-300 px-0 resize-none" id="message" placeholder="Votre message..." rows="4"></textarea>
+</div>
+<div class="pt-4">
+<button class="group relative inline-flex items-center text-label-caps font-label-caps text-primary tracking-widest overflow-hidden" type="submit">
+<span class="relative z-10 py-2 border-b border-primary group-hover:text-secondary group-hover:border-secondary transition-colors duration-300">Envoyer le message</span>
+<span class="material-symbols-outlined ml-4 group-hover:translate-x-2 transition-transform duration-300" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-16 bg-surface border-t border-outline-variant/20 flex flex-col md:flex-row justify-between items-center px-margin-mobile md:px-margin-desktop gap-8">
+<div class="text-label-caps font-label-caps text-on-surface tracking-widest">
+        L’Attente du Vent
+    </div>
+<div class="flex gap-12">
+<a class="text-caption font-caption text-on-surface-variant hover:text-secondary transition-colors duration-300" href="#">Instagram</a>
+<a class="text-caption font-caption text-on-surface-variant hover:text-secondary transition-colors duration-300" href="#">Flux RSS</a>
+</div>
+<div class="text-caption font-caption text-on-surface-variant">
+        © 2026 L’Attente du Vent. Tous droits réservés.
+    </div>
+</footer>
+<script>
+    // Intersection Observer for reveal animations
+    const observerOptions = {
+        threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.reveal-on-scroll').forEach(el => {
+        observer.observe(el);
+    });
+
+    // Simple Form Interaction
+    const contactForm = document.getElementById('contactForm');
+    if (contactForm) {
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const button = e.target.querySelector('button');
+            const span = button.querySelector('span');
+            const originalText = span.innerText;
+            
+            span.innerText = 'Envoyé avec succès';
+            button.style.pointerEvents = 'none';
+            
+            setTimeout(() => {
+                span.innerText = originalText;
+                button.style.pointerEvents = 'auto';
+                contactForm.reset();
+            }, 3000);
+        });
+    }
+
+    // Header scroll effect
+    window.addEventListener('scroll', () => {
+        const header = document.querySelector('header');
+        if (window.scrollY > 50) {
+            header.classList.add('py-4', 'bg-surface/95', 'shadow-sm');
+            header.classList.remove('py-6');
+        } else {
+            header.classList.add('py-6');
+            header.classList.remove('py-4', 'bg-surface/95', 'shadow-sm');
+        }
+    });
+</script>
+</body></html>

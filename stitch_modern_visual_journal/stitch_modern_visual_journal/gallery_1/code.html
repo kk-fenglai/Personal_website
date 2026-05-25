@@ -1,0 +1,298 @@
+<!DOCTYPE html><html class="light" lang="zh-CN"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>相册 (Chinese Edition) | 等风来的小站</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&amp;family=EB+Garamond:ital,wght@0,400;0,500;1,400&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#111e1f",
+                        "secondary-fixed": "#ffdcbd",
+                        "primary-fixed": "#e5e2e1",
+                        "on-background": "#1a1c1c",
+                        "on-primary-fixed": "#1c1b1b",
+                        "outline": "#747878",
+                        "inverse-surface": "#2f3131",
+                        "surface-tint": "#5f5e5e",
+                        "on-surface": "#1a1c1c",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#1c1b1b",
+                        "secondary": "#7d562d",
+                        "primary": "#000000",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#2c1600",
+                        "surface-container-high": "#e8e8e8",
+                        "on-secondary-container": "#7a532a",
+                        "outline-variant": "#c4c7c7",
+                        "surface": "#f9f9f9",
+                        "tertiary": "#000000",
+                        "on-error-container": "#93000a",
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#111e1f",
+                        "surface-bright": "#f9f9f9",
+                        "on-tertiary-container": "#798688",
+                        "on-tertiary-fixed-variant": "#3c494b",
+                        "tertiary-fixed-dim": "#bbc9cb",
+                        "on-error": "#ffffff",
+                        "surface-container": "#eeeeee",
+                        "surface-container-low": "#f3f3f3",
+                        "on-tertiary": "#ffffff",
+                        "background": "#f9f9f9",
+                        "on-primary-fixed-variant": "#474746",
+                        "secondary-fixed-dim": "#f0bd8b",
+                        "surface-dim": "#dadada",
+                        "error": "#ba1a1a",
+                        "surface-variant": "#e2e2e2",
+                        "inverse-primary": "#c8c6c5",
+                        "on-secondary-fixed-variant": "#623f18",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed-dim": "#c8c6c5",
+                        "tertiary-fixed": "#d7e5e7",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-surface-variant": "#444748",
+                        "on-primary-container": "#858383",
+                        "inverse-on-surface": "#f1f1f1",
+                        "secondary-container": "#ffca98"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-max": "1280px",
+                        "margin-mobile": "24px",
+                        "gutter": "32px",
+                        "asymmetric-offset": "120px",
+                        "margin-desktop": "64px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["EB Garamond"],
+                        "headline-md": ["EB Garamond"],
+                        "caption": ["DM Sans"],
+                        "body-md": ["DM Sans"],
+                        "display-lg": ["EB Garamond"],
+                        "body-lg": ["DM Sans"],
+                        "label-caps": ["DM Sans"],
+                        "display-lg-mobile": ["EB Garamond"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["24px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                        "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "400"}],
+                        "caption": ["14px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "display-lg": ["64px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                        "display-lg-mobile": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .gallery-item {
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+        .gallery-item:hover img {
+            transform: scale(1.02);
+        }
+        .asymmetric-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 32px;
+        }
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-secondary-fixed selection:text-on-secondary-fixed">
+<!-- TopNavBar Component -->
+<nav class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl border-b border-outline-variant/30 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-6 transition-all duration-300 ease-in-out">
+<div class="text-headline-sm font-headline-sm text-primary tracking-tighter font-display">
+            等风来的小站
+        </div>
+<div class="hidden md:flex items-center gap-10">
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors" href="/">首页</a>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors" href="/thoughts">随想</a>
+<a class="text-label-caps font-label-caps text-secondary font-bold border-b border-secondary" href="/gallery">相册</a>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors" href="/admin">管理</a>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-3 mr-4 text-[10px] font-bold tracking-[0.2em] uppercase"><span class="text-primary cursor-default underline underline-offset-4">ZH</span><a href="#" class="text-on-surface-variant/40 hover:text-primary transition-colors">EN</a><a href="#" class="text-on-surface-variant/40 hover:text-primary transition-colors">FR</a></div><button class="material-symbols-outlined text-primary hover:opacity-70 transition-opacity">menu</button>
+</div>
+</nav>
+<main class="pt-32 pb-32">
+<!-- Hero Section -->
+<header class="px-margin-mobile md:px-margin-desktop mb-24 md:mb-40">
+<div class="max-w-4xl">
+<span class="text-label-caps font-label-caps text-secondary mb-6 block tracking-widest uppercase">Visual Archive</span>
+<h1 class="text-display-lg-mobile md:text-display-lg font-display-lg leading-tight mb-8">影像方寸，记叙那些被光温柔触碰的瞬息。</h1>
+<div class="h-px w-24 bg-secondary/40"></div>
+</div>
+</header>
+<!-- Category Filter -->
+<section class="px-margin-mobile md:px-margin-desktop mb-16">
+<div class="flex flex-wrap gap-8 items-center border-b border-outline-variant/20 pb-6">
+<button class="category-btn text-label-caps font-label-caps text-primary border-b-2 border-primary pb-1 transition-all" onclick="filterGallery('all')">全部记录</button>
+<button class="category-btn text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-all pb-1" onclick="filterGallery('urban')">城市</button>
+<button class="category-btn text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-all pb-1" onclick="filterGallery('nature')">自然</button>
+<button class="category-btn text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-all pb-1" onclick="filterGallery('portrait')">人像</button>
+</div>
+</section>
+<!-- Gallery Grid -->
+<section class="px-margin-mobile md:px-margin-desktop asymmetric-grid" id="gallery-container">
+<!-- Item 1 (Wide) -->
+<div class="gallery-item reveal col-span-12 md:col-span-8 md:col-start-1 mb-16 relative group cursor-crosshair active" data-category="urban">
+<div class="overflow-hidden aspect-[16/9] bg-surface-container">
+<img alt="" class="w-full h-full object-cover gallery-image transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAMu9mtM5ImFbIED9cYlwnk47r7JdS95CWlDv2vDI76twNTCdWtoBSVlt0A_R9tC_eSBzF8JYr6LZz7RuupXmAivEt8t3A2X_FwdN8OrfrGTXIv54_Lo3Yc0Zt-BXuDaw85USHfXk_deXIW-SkOiov6m-qPNmuugEgGCv3U23YqzWQLXCWNGtE3WEul_wLZtt3gAg1WSbEADaJsvNxpjTKbUytL4mT0AUGzoJzHSFFSwfdNA6IRp_8UX_UdSzs7HU0E96ceM23dA">
+</div>
+<div class="gallery-overlay absolute inset-0 bg-primary/20 opacity-0 transition-opacity duration-500 flex items-end p-8">
+<div class="text-white">
+<p class="text-label-caps font-label-caps mb-2">东京, 2023</p>
+<h3 class="text-headline-sm font-headline-sm">都市几何 (Metropolitan Geometry)</h3>
+</div>
+</div>
+</div>
+<!-- Item 2 (Vertical Asymmetric Offset) -->
+<div class="gallery-item reveal col-span-12 md:col-span-4 md:col-start-9 md:mt-asymmetric-offset mb-16 group cursor-crosshair active" data-category="portrait">
+<div class="overflow-hidden aspect-[3/4] bg-surface-container">
+<img alt="" class="w-full h-full object-cover transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC87Tmw_3oSfnd_IM0GCqMYNjRnPB2I-UepDCKkQTOIT81Nz8xmLPVeu1H5v2mwhzYGl68baBvwEMqeZrV9Xg2eF2x3FqN31OfkXe3Ryd7ZJBR1nbB3VoSg6Ov4sagmexDhHHzNYnGuxgCtgGULmO0inIOGhqXORU6NMFEtUGfdRwhoqmru6ArJpb9_FZPj3NULgoow7bU_POxHsJk96-lTa9Fv3fvFw5VLcmxaQs6cV_UwfaRqLxyGlYc1gVYX74OGRt0T68Ushg">
+</div>
+<div class="mt-4">
+<p class="text-label-caps font-label-caps text-secondary">人像系列</p>
+<h3 class="text-headline-sm font-headline-sm mt-1">无声对话 (Silent Dialogue)</h3>
+</div>
+</div>
+<!-- Item 3 (Small) -->
+<div class="gallery-item reveal col-span-12 md:col-span-4 md:col-start-2 mb-16 group cursor-crosshair active" data-category="nature">
+<div class="overflow-hidden aspect-square bg-surface-container border border-outline-variant/30 p-2">
+<img alt="" class="w-full h-full object-cover transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuClEgT9lzhgE_YZbo-OM2enhN-FhnZ_YbpkNG3C0b6CbyhAAFTntuhMMyML_HDyAoCG7xZXKDDzGlkorGjw5X7E7rXjiDskgH3WCq67NTVVTwSdGdJZ-yAzzyd2b9ES3d44U_nj-svsphiYslgbuzbkQ_XSARfaZBh08m04bdYoNb-pkyUA4Y3wH9FgrMPvqBUg9NIzqys25tfZm7fcMIpU-F3Z1e0pKuDiOHHD9ArgbpaRGKP53B5JqwMx8lmhy_iA8Eel6BH4XQ">
+</div>
+<div class="mt-4">
+<p class="text-label-caps font-label-caps text-secondary">自然风景</p>
+<h3 class="text-headline-sm font-headline-sm mt-1">瓦斯特拉的雾 (Mist over Vastra)</h3>
+</div>
+</div>
+<!-- Item 4 (Tall) -->
+<div class="gallery-item reveal col-span-12 md:col-span-6 md:col-start-7 mb-16 group cursor-crosshair active" data-category="urban">
+<div class="overflow-hidden aspect-[4/5] bg-surface-container">
+<img alt="" class="w-full h-full object-cover transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuOZOXmiZ13XGVMRs5QpB7VmWV8Vhyk2LKQb_GF2c3T_FCnUq7mPoyNHY4KfWOMk0uDc2PjPa53WBnUigyBIaAF4CSFYiY4ODgmvQ41XdMpA1BQnGh-BKOi5EhHs3zsN0VYJO-C-kzrBV9D-SiNcmblsiIfTZCW9i3LNX6SU18ppYZNN3LNKO6lRejbzY4q36rMPsqHaj58rMK0EKfrAnvc2gsq4MqdYHyflYiSbFNdfog383RuzlvConj8EjY9Q3DKJJM07_Yqw">
+</div>
+<div class="gallery-overlay absolute inset-0 bg-primary/20 opacity-0 transition-opacity duration-500 flex items-center justify-center p-8 text-center">
+<div class="text-white">
+<p class="text-label-caps font-label-caps mb-2">曼哈顿</p>
+<h3 class="text-headline-sm font-headline-sm">行进中的荧光 (Fluorescence in Transit)</h3>
+</div>
+</div>
+</div>
+<!-- Item 5 (Full Width) -->
+<div class="gallery-item reveal col-span-12 mb-32 group cursor-crosshair active" data-category="nature">
+<div class="overflow-hidden aspect-[21/9] bg-surface-container">
+<img alt="" class="w-full h-full object-cover transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2yWP3jG246L7hispDGeg3J0KAt4PNP4za70DR5YYlByrt-N-VF_Y85cacAJyvMWbdmb9QszmyiXXWUFxkCwAx3XjLAFLVd_hgUGtYq-RyBLEmyFzZLCkscN0gulm7ZbWPQwwISbK7dOhiFfYYMVsC4ZCGYl5Sfsol59cM4RiO_HvRbybNlrqnVUDQUSxNckJYA-2dCknX8al8pZeXiE2orjxiTEribA05PFBNUrGEhAtlbrqtpJPrUl--Q4U1Vt5rqw6iIVe_JQ">
+</div>
+<div class="flex justify-between items-start mt-6">
+<div>
+<p class="text-label-caps font-label-caps text-secondary">自然系列</p>
+<h3 class="text-headline-sm font-headline-sm mt-1">永恒的清晨 (The Morning Eternal)</h3>
+</div>
+<button class="text-label-caps font-label-caps border-b border-primary hover:text-secondary hover:border-secondary transition-all pb-1 uppercase">浏览专题</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer Component -->
+<footer class="w-full py-16 bg-surface border-t border-outline-variant/20 flex flex-col md:flex-row justify-between items-center px-margin-mobile md:px-margin-desktop gap-8">
+<div class="text-label-caps font-label-caps text-on-surface">
+            等风来的小站
+        </div>
+<div class="text-caption font-caption text-on-surface-variant text-center">
+            © 2026 等风来的小站. All rights reserved.
+        </div>
+<div class="flex gap-8">
+<a class="text-caption font-caption text-secondary hover:opacity-70 transition-opacity" href="#">Instagram</a>
+<a class="text-caption font-caption text-secondary hover:opacity-70 transition-opacity" href="#">Twitter</a>
+<a class="text-caption font-caption text-secondary hover:opacity-70 transition-opacity" href="#">Weibo</a>
+</div>
+</footer>
+<script>
+        // Filtering logic
+        function filterGallery(category) {
+            const items = document.querySelectorAll('.gallery-item');
+            const buttons = document.querySelectorAll('.category-btn');
+            
+            // Update buttons
+            buttons.forEach(btn => {
+                btn.classList.remove('text-primary', 'border-b-2', 'border-primary');
+                btn.classList.add('text-on-surface-variant');
+                if (btn.getAttribute('onclick').includes(category)) {
+                    btn.classList.add('text-primary', 'border-b-2', 'border-primary');
+                    btn.classList.remove('text-on-surface-variant');
+                }
+            });
+
+            // Update items
+            items.forEach(item => {
+                if (category === 'all' || item.dataset.category === category) {
+                    item.style.display = 'block';
+                    setTimeout(() => item.style.opacity = '1', 10);
+                } else {
+                    item.style.opacity = '0';
+                    setTimeout(() => item.style.display = 'none', 500);
+                }
+            });
+        }
+
+        // Scroll Reveal logic
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Atmospheric Micro-interaction for images
+        document.querySelectorAll('.gallery-item').forEach(item => {
+            item.addEventListener('mousemove', (e) => {
+                const img = item.querySelector('img');
+                if (!img) return;
+                const rect = item.getBoundingClientRect();
+                const x = (e.clientX - rect.left) / rect.width;
+                const y = (e.clientY - rect.top) / rect.height;
+                
+                img.style.transformOrigin = `${x * 100}% ${y * 100}%`;
+            });
+        });
+    </script>
+
+
+
+
+</body></html>
