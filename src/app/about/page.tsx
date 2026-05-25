@@ -102,6 +102,7 @@ export default function AboutPage() {
               >
                 {t("about.email")}
               </a>
+              <p className="mt-4 text-muted reading type-body-lg">{t("about.emailBizNote")}</p>
             </div>
           </ScrollReveal>
           <ScrollReveal delayMs={150} className="col-span-12 md:col-span-6 md:col-start-7 mt-12 md:mt-0">
