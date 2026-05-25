@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
-import Image from "next/image";
+import { PhotoImage } from "@/components/PhotoImage";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { useLocale } from "@/contexts/LocaleContext";
 import { GALLERY_LAYOUT_CYCLE, type GalleryLayoutSpec } from "@/lib/stitchPlaceholders";
@@ -116,7 +116,7 @@ export function GalleryView() {
                     layout.bordered ? "border border-border p-2" : ""
                   }`}
                 >
-                  <Image
+                  <PhotoImage
                     src={p.filename}
                     alt={p.caption || t("gallery.photoAlt")}
                     fill
@@ -183,7 +183,7 @@ export function GalleryView() {
                 className="relative w-full h-full max-w-5xl max-h-[85vh]"
                 onClick={(e) => e.stopPropagation()}
               >
-                <Image
+                <PhotoImage
                   src={current.filename}
                   alt={current.caption || t("gallery.photoAlt")}
                   fill

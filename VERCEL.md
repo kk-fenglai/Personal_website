@@ -89,9 +89,24 @@
 - 确认 Vercel 里 `DATABASE_URL` 已配置，且 **Build** 环境也能读取（变量界面勾选 **Production** 时，注意 Preview 是否也要）。
 - 连接串必须是 **PostgreSQL**，且 Neon 侧防火墙 / IP 策略允许 Vercel 访问（Neon 默认一般无需额外 IP 白名单）。
 
-### 相册上传后图片消失
+### 相册在 Vercel 上看不到 / 是空的
 
-Vercel 是无持久本地磁盘的，**`public/uploads/` 在重新部署后可能丢失**。长期方案：把上传迁到 **对象存储**（如 Cloudflare R2、S3 等），见根目录 **[DEPLOY.md](./DEPLOY.md)** 第七节。
+常见有 **三类原因**（可同时存在）：
+
+1. **未配置 Vercel Blob**  
+   服务器不能写 `public/uploads/`。请在 Vercel 项目 → **Storage → Blob** 创建存储，把 **`BLOB_READ_WRITE_TOKEN`** 加到环境变量后 **Redeploy**。否则在后台「上传照片」会失败，或库里仍是本地路径 `/uploads/...`，线上访问 404。
+
+2. **图片地址是本地路径**  
+   若在本地开发时上传，数据库里可能是 `/uploads/xxx.jpg`。这类文件 **不会** 随 Git 部署（已在 `.gitignore`），线上相册会空白或裂图。解决：在 Vercel 配好 Blob 后，到 **管理后台 → 上传照片** 重新上传（会得到 `https://….blob.vercel-storage.com/...` 地址）。
+
+3. **照片被标成「站点展示图」**  
+   公开相册 API 只返回 **`siteSlot` 为空** 的照片。首页大图、关于肖像、首页预览位用的图 **不会** 出现在 `/gallery`。若你只导入过 Stitch 站点图，相册页会显示「相册还是空的」——需在「上传照片」里单独上传仅供相册展示的图片。
+
+构建后若图片仍不显示，确认 `next.config.ts` 已允许 `*.public.blob.vercel-storage.com`（本仓库已配置）。
+
+### 相册上传后图片消失（旧说明）
+
+Vercel 是无持久本地磁盘的，**`public/uploads/` 在重新部署后可能丢失**。生产环境请使用 **Vercel Blob**（见上）或对象存储。
 
 ### 自定义域名
 

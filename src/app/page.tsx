@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
+import { PhotoImage } from "@/components/PhotoImage";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { useLocale } from "@/contexts/LocaleContext";
 import {
@@ -89,7 +89,7 @@ export default function Home() {
         <div className="asymmetric-grid">
           <div className="col-span-12 md:col-start-2 md:col-span-10 mb-12 md:mb-16">
             <ScrollReveal className="home-hero-frame image-hover-zoom">
-              <Image
+              <PhotoImage
                 src={heroImage}
                 alt={t("home.subtitle")}
                 fill
@@ -176,7 +176,7 @@ export default function Home() {
                 style={{ animationDelay: `${0.06 * i}s`, opacity: 0 }}
               >
                 <Link href="/gallery" className="home-gallery-tile-link">
-                  <Image
+                  <PhotoImage
                     src={p.filename}
                     alt={p.caption || t("gallery.photoAlt")}
                     fill

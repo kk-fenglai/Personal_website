@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
+import { PhotoImage } from "@/components/PhotoImage";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { useLocale } from "@/contexts/LocaleContext";
 import { STITCH_ABOUT_PORTRAIT } from "@/lib/stitchPlaceholders";
@@ -34,7 +34,7 @@ export default function AboutPage() {
       <section className="site-container mx-auto mb-24 md:mb-40">
         <div className="asymmetric-grid items-start">
           <ScrollReveal className="col-span-12 md:col-span-6 image-hover-zoom relative min-h-[min(70vh,700px)]">
-            <Image
+            <PhotoImage
               src={portraitSrc}
               alt={t("about.portraitAlt")}
               fill
