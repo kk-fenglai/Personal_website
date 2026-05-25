@@ -16,17 +16,17 @@ const VALUE_KEYS = [
 
 export default function AboutPage() {
   const { t } = useLocale();
-  const [portraitSrc, setPortraitSrc] = useState(STITCH_ABOUT_PORTRAIT);
+  const [portraitSrc, setPortraitSrc] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/site-images")
       .then((r) => r.json())
       .then((data) => {
-        if (data?.about_portrait?.filename) {
-          setPortraitSrc(data.about_portrait.filename);
-        }
+        setPortraitSrc(
+          data?.about_portrait?.filename ?? STITCH_ABOUT_PORTRAIT
+        );
       })
-      .catch(() => {});
+      .catch(() => setPortraitSrc(STITCH_ABOUT_PORTRAIT));
   }, []);
 
   return (
@@ -34,14 +34,18 @@ export default function AboutPage() {
       <section className="site-container mx-auto mb-24 md:mb-40">
         <div className="asymmetric-grid items-start">
           <ScrollReveal className="col-span-12 md:col-span-6 image-hover-zoom relative min-h-[min(70vh,700px)]">
-            <PhotoImage
-              src={portraitSrc}
-              alt={t("about.portraitAlt")}
-              fill
-              className="object-cover grayscale hover:grayscale-0 transition-all duration-700"
-              sizes="(max-width: 768px) 100vw, 50vw"
-              priority
-            />
+            {portraitSrc ? (
+              <PhotoImage
+                src={portraitSrc}
+                alt={t("about.portraitAlt")}
+                fill
+                className="object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                sizes="(max-width: 768px) 100vw, 50vw"
+                priority
+              />
+            ) : (
+              <div className="absolute inset-0 bg-surface" aria-hidden />
+            )}
           </ScrollReveal>
           <div className="col-span-12 md:col-span-5 md:col-start-8 mt-10 md:mt-24">
             <ScrollReveal delayMs={120}>

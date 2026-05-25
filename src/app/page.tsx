@@ -38,10 +38,24 @@ type SiteImagesResponse = {
   home_preview: (PhotoPreview | null)[];
 };
 
+const EMPTY_SITE_IMAGES: SiteImagesResponse = {
+  home_hero: null,
+  about_portrait: null,
+  home_preview: [null, null, null, null, null],
+};
+
+function parseSiteImages(data: unknown): SiteImagesResponse {
+  if (data && typeof data === "object" && Array.isArray((data as SiteImagesResponse).home_preview)) {
+    return data as SiteImagesResponse;
+  }
+  return EMPTY_SITE_IMAGES;
+}
+
 export default function Home() {
   const { t, locale, dateLocale } = useLocale();
   const [thoughts, setThoughts] = useState<ThoughtPreview[]>([]);
   const [photos, setPhotos] = useState<PhotoPreview[]>([]);
+  /** null = 站点图尚未加载，避免先显示 Stitch 占位再闪成用户上传的图 */
   const [siteImages, setSiteImages] = useState<SiteImagesResponse | null>(null);
 
   useEffect(() => {
@@ -53,18 +67,21 @@ export default function Home() {
       .then(([tData, pData, sData]) => {
         setThoughts(Array.isArray(tData) ? tData : []);
         setPhotos(Array.isArray(pData) ? pData : []);
-        if (sData && typeof sData === "object" && Array.isArray(sData.home_preview)) {
-          setSiteImages(sData as SiteImagesResponse);
-        }
+        setSiteImages(parseSiteImages(sData));
       })
-      .catch(() => {});
+      .catch(() => setSiteImages(EMPTY_SITE_IMAGES));
   }, []);
 
-  const heroImage =
-    siteImages?.home_hero?.filename ?? STITCH_HERO_IMAGE;
+  const siteImagesReady = siteImages !== null;
 
-  const galleryTiles = (() => {
-    const fromSlots = siteImages?.home_preview
+  const heroImage = siteImagesReady
+    ? (siteImages!.home_hero?.filename ?? STITCH_HERO_IMAGE)
+    : null;
+
+  const galleryTiles = !siteImagesReady
+    ? null
+    : (() => {
+    const fromSlots = siteImages!.home_preview
       .map((p, i) =>
         p
           ? { id: p.id, filename: p.filename, caption: p.caption }
@@ -82,6 +99,13 @@ export default function Home() {
   })();
 
   const previewCount = galleryTiles?.length ?? 5;
+  const mosaicTiles =
+    galleryTiles ??
+    STITCH_HOME_GALLERY_IMAGES.map((src, i) => ({
+      id: `s-${i}`,
+      filename: src,
+      caption: null,
+    }));
 
   return (
     <>
@@ -89,14 +113,18 @@ export default function Home() {
         <div className="asymmetric-grid">
           <div className="col-span-12 md:col-start-2 md:col-span-10 mb-12 md:mb-16">
             <ScrollReveal className="home-hero-frame image-hover-zoom">
-              <PhotoImage
-                src={heroImage}
-                alt={t("home.subtitle")}
-                fill
-                className="object-cover"
-                priority
-                sizes="(max-width: 768px) 100vw, 80vw"
-              />
+              {siteImagesReady && heroImage ? (
+                <PhotoImage
+                  src={heroImage}
+                  alt={t("home.subtitle")}
+                  fill
+                  className="object-cover"
+                  priority
+                  sizes="(max-width: 768px) 100vw, 80vw"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-surface" aria-hidden />
+              )}
             </ScrollReveal>
           </div>
           <div className="col-span-12 md:col-start-3 md:col-span-8">
@@ -167,7 +195,7 @@ export default function Home() {
               : "home-gallery-mosaic home-gallery-mosaic-few"
           }
         >
-          {(galleryTiles ?? STITCH_HOME_GALLERY_IMAGES.map((src, i) => ({ id: `s-${i}`, filename: src, caption: null })))
+          {(siteImagesReady ? mosaicTiles : Array.from({ length: 5 }, (_, i) => ({ id: `sk-${i}`, filename: "", caption: null })))
             .slice(0, 5)
             .map((p, i) => (
               <div
@@ -176,17 +204,21 @@ export default function Home() {
                 style={{ animationDelay: `${0.06 * i}s`, opacity: 0 }}
               >
                 <Link href="/gallery" className="home-gallery-tile-link">
-                  <PhotoImage
-                    src={p.filename}
-                    alt={p.caption || t("gallery.photoAlt")}
-                    fill
-                    className="object-cover"
-                    sizes={
-                      i === 0
-                        ? "(max-width: 768px) 100vw, 66vw"
-                        : "(max-width: 768px) 100vw, 33vw"
-                    }
-                  />
+                  {p.filename ? (
+                    <PhotoImage
+                      src={p.filename}
+                      alt={p.caption || t("gallery.photoAlt")}
+                      fill
+                      className="object-cover"
+                      sizes={
+                        i === 0
+                          ? "(max-width: 768px) 100vw, 66vw"
+                          : "(max-width: 768px) 100vw, 33vw"
+                      }
+                    />
+                  ) : (
+                    <div className="absolute inset-0 bg-surface-container" aria-hidden />
+                  )}
                 </Link>
               </div>
             ))}
