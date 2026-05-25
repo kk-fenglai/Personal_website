@@ -758,11 +758,13 @@ export const translations: Record<
 
 const STORAGE_KEY = "locale";
 
+export const DEFAULT_LOCALE: Locale = "en";
+
 export function getStoredLocale(): Locale {
-  if (typeof window === "undefined") return "zh";
+  if (typeof window === "undefined") return DEFAULT_LOCALE;
   const stored = localStorage.getItem(STORAGE_KEY) as Locale | null;
   if (stored === "zh" || stored === "en" || stored === "fr") return stored;
-  return "zh";
+  return DEFAULT_LOCALE;
 }
 
 export function setStoredLocale(locale: Locale): void {
