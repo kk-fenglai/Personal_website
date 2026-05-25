@@ -10,7 +10,7 @@ export function InlineLanguageSwitcher() {
 
   return (
     <div
-      className="hidden sm:flex items-center gap-3 mr-2 pr-4 border-r border-border"
+      className="flex items-center gap-2 sm:gap-3 md:mr-2 md:pr-4 md:border-r md:border-border"
       role="group"
       aria-label={languageSwitcherUiEn.button}
     >

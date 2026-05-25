@@ -511,6 +511,26 @@ p,
   border-bottom: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
 }
 
+.site-header-mobile-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 1rem;
+  padding-top: 0.75rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+}
+
+.site-header-mobile-nav .nav-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.375rem 0.5rem;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
 .nav-link {
   font-size: 0.75rem;
   font-weight: 700;
@@ -722,7 +742,7 @@ p,
 }
 
 .site-main {
-  padding-top: 7rem;
+  padding-top: clamp(9.25rem, 26vw, 11.5rem);
 }
 
 @media (min-width: 768px) {

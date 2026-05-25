@@ -19,12 +19,36 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <header className="site-header fixed top-0 left-0 right-0 z-50">
-        <div className="site-container mx-auto py-6 flex items-center justify-between gap-6">
-          <Link href="/" className="site-brand text-fg hover:opacity-80 transition-opacity shrink-0">
-            {t("nav.siteName")}
-          </Link>
-          <nav className="hidden md:flex items-center gap-10">
+      <header className="site-header fixed top-0 left-0 right-0 z-50 isolate">
+        <div className="site-container mx-auto py-4 md:py-6">
+          <div className="flex items-center justify-between gap-4 min-w-0">
+            <Link
+              href="/"
+              className="site-brand text-fg hover:opacity-80 transition-opacity min-w-0 max-w-[58%] truncate md:max-w-none md:truncate-none shrink"
+            >
+              {t("nav.siteName")}
+            </Link>
+            <nav className="hidden md:flex items-center gap-10 shrink-0">
+              {NAV.map((item) => {
+                const active =
+                  pathname === item.href ||
+                  (item.href !== "/" && pathname?.startsWith(item.href));
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={active ? "nav-link nav-link-active" : "nav-link"}
+                  >
+                    {t(item.key)}
+                  </Link>
+                );
+              })}
+            </nav>
+            <div className="shrink-0">
+              <InlineLanguageSwitcher />
+            </div>
+          </div>
+          <nav className="site-header-mobile-nav md:hidden">
             {NAV.map((item) => {
               const active =
                 pathname === item.href ||
@@ -40,25 +64,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               );
             })}
           </nav>
-          <div className="flex items-center gap-2">
-            <InlineLanguageSwitcher />
-            <nav className="flex md:hidden items-center gap-4 overflow-x-auto">
-              {NAV.map((item) => {
-                const active =
-                  pathname === item.href ||
-                  (item.href !== "/" && pathname?.startsWith(item.href));
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`nav-link whitespace-nowrap ${active ? "nav-link-active" : ""}`}
-                  >
-                    {t(item.key)}
-                  </Link>
-                );
-              })}
-            </nav>
-          </div>
         </div>
       </header>
       <main className="site-main relative z-10 w-full">{children}</main>
