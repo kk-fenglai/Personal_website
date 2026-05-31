@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { isAdmin } from "@/lib/auth";
 import { translateAndSaveThought } from "@/lib/thoughtTranslateAndSave";
+import {
+  ensureThoughtTranslations,
+  thoughtNeedsTranslation,
+} from "@/lib/ensureThoughtTranslations";
 import { getLikeStatsForOne } from "@/lib/likes";
 import { getVisitorLikeKeyFromRequest } from "@/lib/visitorLikeKey";
 
@@ -11,7 +15,7 @@ export async function GET(
 ) {
   const { id } = await params;
   const admin = await isAdmin();
-  const thought = await prisma.thought.findUnique({
+  let thought = await prisma.thought.findUnique({
     where: { id },
     include: { category: true, comments: { orderBy: { createdAt: "asc" } } },
   });
@@ -20,6 +24,16 @@ export async function GET(
   }
   if (!thought.isPublic && !admin) {
     return NextResponse.json({ error: "未授权" }, { status: 403 });
+  }
+  if (thoughtNeedsTranslation(thought)) {
+    await ensureThoughtTranslations(id, thought.title, thought.content);
+    thought = await prisma.thought.findUnique({
+      where: { id },
+      include: { category: true, comments: { orderBy: { createdAt: "asc" } } },
+    });
+    if (!thought) {
+      return NextResponse.json({ error: "未找到" }, { status: 404 });
+    }
   }
   const { key: visitorKey } = getVisitorLikeKeyFromRequest(_request);
   let likeCount = 0;

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { isAdmin } from "@/lib/auth";
+import { scheduleThoughtTranslationBackfill } from "@/lib/ensureThoughtTranslations";
 
 const MAX_HOME_FEATURED = 3;
 
@@ -15,6 +16,7 @@ export async function GET() {
   });
 
   if (featured.length > 0) {
+    scheduleThoughtTranslationBackfill(featured);
     return NextResponse.json(featured);
   }
 
@@ -23,6 +25,7 @@ export async function GET() {
     orderBy: { createdAt: "desc" },
     take: MAX_HOME_FEATURED,
   });
+  scheduleThoughtTranslationBackfill(fallback);
   return NextResponse.json(fallback);
 }
 

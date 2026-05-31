@@ -46,6 +46,7 @@ export function ThoughtDetail({ thoughtId }: { thoughtId: string }) {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    setLoading(true);
     fetch(`/api/thoughts/${thoughtId}`)
       .then(async (res) => {
         const data = await res.json().catch(() => null);
@@ -59,7 +60,7 @@ export function ThoughtDetail({ thoughtId }: { thoughtId: string }) {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [thoughtId]);
+  }, [thoughtId, locale]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

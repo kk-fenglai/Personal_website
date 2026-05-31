@@ -11,6 +11,7 @@
     "db:push": "prisma db push",
     "db:migrate-sqlite": "tsx scripts/migrate-sqlite-to-neon.ts",
     "db:backfill-default-category": "tsx scripts/backfill-default-thought-category.ts",
+    "db:backfill-thought-translations": "tsx scripts/backfill-thought-translations.ts",
     "import:stitch-images": "tsx scripts/import-stitch-site-images.ts"
   },
   "dependencies": {

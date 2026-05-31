@@ -60,17 +60,23 @@ export default function Home() {
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/thoughts/home-featured").then((r) => r.json()),
       fetch("/api/photos").then((r) => r.json()),
       fetch("/api/site-images").then((r) => r.json()),
     ])
-      .then(([tData, pData, sData]) => {
-        setThoughts(Array.isArray(tData) ? tData : []);
+      .then(([pData, sData]) => {
         setPhotos(Array.isArray(pData) ? pData : []);
         setSiteImages(parseSiteImages(sData));
       })
       .catch(() => setSiteImages(EMPTY_SITE_IMAGES));
   }, []);
+
+  useEffect(() => {
+    fetch("/api/thoughts/home-featured")
+      .then((r) => r.json())
+      .then((tData) => {
+        setThoughts(Array.isArray(tData) ? tData : []);
+      });
+  }, [locale]);
 
   const siteImagesReady = siteImages !== null;
 

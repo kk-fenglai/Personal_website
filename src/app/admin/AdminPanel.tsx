@@ -743,6 +743,8 @@ function EditThoughtForm({
   const [categoryId, setCategoryId] = useState<string>(thought.categoryId ?? "");
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [translating, setTranslating] = useState(false);
+  const [translateNotice, setTranslateNotice] = useState("");
   const [error, setError] = useState("");
 
   const handleDelete = async () => {
@@ -764,6 +766,28 @@ function EditThoughtForm({
       setError(t("common.errorNetwork"));
     } finally {
       setDeleting(false);
+    }
+  };
+
+  const handleTranslate = async () => {
+    setError("");
+    setTranslateNotice("");
+    setTranslating(true);
+    try {
+      const res = await fetch(`/api/thoughts/${thought.id}/translate`, {
+        method: "POST",
+        credentials: "same-origin",
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError((data as { error?: string }).error || t("common.errorNetwork"));
+        return;
+      }
+      setTranslateNotice(t("admin.regenerateTranslationDone"));
+    } catch {
+      setError(t("common.errorNetwork"));
+    } finally {
+      setTranslating(false);
     }
   };
 
@@ -851,20 +875,31 @@ function EditThoughtForm({
         <div className="flex flex-wrap gap-3">
           <button
             type="submit"
-            disabled={loading || deleting}
+            disabled={loading || deleting || translating}
             className="button-primary px-5 py-2.5 text-base font-medium hover:opacity-90 disabled:opacity-50"
           >
             {loading ? t("admin.updating") : t("admin.saveChanges")}
           </button>
           <button
             type="button"
+            onClick={() => void handleTranslate()}
+            disabled={loading || deleting || translating}
+            className="button-secondary px-5 py-2.5 text-base disabled:opacity-50"
+          >
+            {translating ? t("admin.regeneratingTranslation") : t("admin.regenerateTranslation")}
+          </button>
+          <button
+            type="button"
             onClick={onCancel}
-            disabled={deleting}
+            disabled={deleting || translating}
             className="button-secondary px-5 py-2.5 text-base disabled:opacity-50"
           >
             {t("admin.cancel")}
           </button>
         </div>
+        {translateNotice && (
+          <p className="text-sm text-muted">{translateNotice}</p>
+        )}
       </form>
 
       <div className="pt-6 border-t border-border">

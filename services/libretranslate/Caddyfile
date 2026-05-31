@@ -1,0 +1,3 @@
+{$DOMAIN} {
+	reverse_proxy libretranslate:5000
+}

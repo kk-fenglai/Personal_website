@@ -1,0 +1,43 @@
+services:
+  libretranslate:
+    image: libretranslate/libretranslate:latest
+    container_name: libretranslate
+    restart: unless-stopped
+    environment:
+      LT_HOST: "0.0.0.0"
+      LT_PORT: "5000"
+      LT_LOAD_ONLY: "zh,en,fr"
+      LT_UPDATE_MODELS: "true"
+      LT_API_KEYS: "true"
+    volumes:
+      - lt-models:/home/libretranslate/.local
+      - lt-db:/app/db
+    networks:
+      - lt-net
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: libretranslate-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?set DOMAIN in .env, e.g. translate.example.com}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - libretranslate
+    networks:
+      - lt-net
+
+networks:
+  lt-net:
+
+volumes:
+  lt-models:
+  lt-db:
+  caddy-data:
+  caddy-config:

@@ -1,0 +1,21 @@
+# LibreTranslate 云端服务（与 Vercel 网站分开部署）
+# 用法：Render Dashboard → New → Blueprint → 连接本 GitHub 仓库
+# 文档：services/libretranslate/README.md
+services:
+  - type: web
+    name: libretranslate
+    runtime: docker
+    dockerfilePath: ./services/libretranslate/Dockerfile
+    dockerContext: ./services/libretranslate
+    plan: starter
+    region: singapore
+    envVars:
+      - key: LT_LOAD_ONLY
+        value: zh,en,fr
+      - key: LT_API_KEYS
+        value: "true"
+      - key: LT_HOST
+        value: 0.0.0.0
+      - key: LT_UPDATE_MODELS
+        value: "true"
+    healthCheckPath: /

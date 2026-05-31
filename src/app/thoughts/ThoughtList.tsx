@@ -46,16 +46,22 @@ export function ThoughtList() {
   const selectedCategoryId = searchParams.get("category") || "all";
 
   useEffect(() => {
-    Promise.all([
-      fetch("/api/thoughts").then((res) => res.json()),
-      fetch("/api/thought-categories").then((res) => res.json()),
-    ])
-      .then(([tData, cData]) => {
-        setThoughts(Array.isArray(tData) ? tData : []);
+    fetch("/api/thought-categories")
+      .then((res) => res.json())
+      .then((cData) => {
         setCategories(Array.isArray(cData) ? cData : []);
+      });
+  }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch("/api/thoughts")
+      .then((res) => res.json())
+      .then((tData) => {
+        setThoughts(Array.isArray(tData) ? tData : []);
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [locale]);
 
   if (loading) {
     return <div className="py-20 text-muted tabular-nums">{t("thoughts.loading")}</div>;

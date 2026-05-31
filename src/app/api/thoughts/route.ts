@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { isAdmin } from "@/lib/auth";
 import { translateAndSaveThought } from "@/lib/thoughtTranslateAndSave";
+import { scheduleThoughtTranslationBackfill } from "@/lib/ensureThoughtTranslations";
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   const admin = await isAdmin();
   const thoughts = await prisma.thought.findMany({
     where: admin ? undefined : { isPublic: true },
@@ -17,6 +18,7 @@ export async function GET(request: NextRequest) {
       comments: { orderBy: { createdAt: "asc" } },
     },
   });
+  scheduleThoughtTranslationBackfill(thoughts);
   return NextResponse.json(thoughts);
 }
 
