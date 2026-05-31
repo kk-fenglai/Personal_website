@@ -279,29 +279,13 @@ function AccessRequestsList() {
 type VisitLogRow = {
   id: string;
   path: string;
-  ip: string | null;
-  userAgent: string | null;
-  referer: string | null;
-  browser: string | null;
-  os: string | null;
-  deviceType: string | null;
-  deviceModel: string | null;
-  country: string | null;
-  region: string | null;
-  city: string | null;
+  visitorKey: string | null;
   createdAt: string;
 };
 
-function formatVisitLocation(row: VisitLogRow): string {
-  const parts = [row.city, row.region, row.country].filter(Boolean);
-  return parts.length ? parts.join(" · ") : "—";
-}
-
-function formatVisitClient(row: VisitLogRow): string {
-  const env = [row.browser, row.os].filter(Boolean).join(" · ");
-  const dev = [row.deviceType, row.deviceModel].filter(Boolean).join(" · ");
-  if (env && dev) return `${env} · ${dev}`;
-  return env || dev || "—";
+function formatVisitVisitorKey(key: string | null | undefined): string {
+  if (!key) return "—";
+  return `#${key.slice(0, 8)}`;
 }
 
 const VISIT_PAGE_SIZE = 80;
@@ -310,6 +294,7 @@ function VisitLogsList() {
   const { t, dateLocale } = useLocale();
   const [items, setItems] = useState<VisitLogRow[]>([]);
   const [total, setTotal] = useState(0);
+  const [uniqueVisitors, setUniqueVisitors] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
 
@@ -318,9 +303,12 @@ function VisitLogsList() {
     run(true);
     fetch(`/api/visit-logs?take=${VISIT_PAGE_SIZE}&skip=${skip}`)
       .then((r) => r.json())
-      .then((data: { items?: VisitLogRow[]; total?: number }) => {
+      .then((data: { items?: VisitLogRow[]; total?: number; uniqueVisitors?: number }) => {
         const next = Array.isArray(data.items) ? data.items : [];
         setTotal(typeof data.total === "number" ? data.total : 0);
+        if (!append && typeof data.uniqueVisitors === "number") {
+          setUniqueVisitors(data.uniqueVisitors);
+        }
         setItems((prev) => (append ? [...prev, ...next] : next));
       })
       .finally(() => {
@@ -346,19 +334,15 @@ function VisitLogsList() {
   return (
     <div className="space-y-4">
       <p className="text-muted text-sm">
-        {t("admin.visitsTotal", { count: total })}
+        {t("admin.visitsTotal", { count: total, unique: uniqueVisitors })}
       </p>
       <div className="overflow-x-auto border border-border rounded-[var(--radius-card)] bg-bg-card">
-        <table className="w-full text-left text-sm min-w-[960px]">
+        <table className="w-full text-left text-sm min-w-[480px]">
           <thead className="bg-bg border-b border-border">
             <tr>
               <th className="px-3 py-2 font-medium text-fg">{t("admin.visitsTime")}</th>
               <th className="px-3 py-2 font-medium text-fg">{t("admin.visitsPath")}</th>
-              <th className="px-3 py-2 font-medium text-fg whitespace-nowrap">{t("admin.visitsIp")}</th>
-              <th className="px-3 py-2 font-medium text-fg">{t("admin.visitsLocation")}</th>
-              <th className="px-3 py-2 font-medium text-fg">{t("admin.visitsClient")}</th>
-              <th className="px-3 py-2 font-medium text-fg">{t("admin.visitsReferer")}</th>
-              <th className="px-3 py-2 font-medium text-fg">{t("admin.visitsUa")}</th>
+              <th className="px-3 py-2 font-medium text-fg whitespace-nowrap">{t("admin.visitsVisitor")}</th>
             </tr>
           </thead>
           <tbody>
@@ -367,29 +351,11 @@ function VisitLogsList() {
                 <td className="px-3 py-2 text-muted tabular-nums whitespace-nowrap">
                   {new Date(row.createdAt).toLocaleString(dateLocale)}
                 </td>
-                <td className="px-3 py-2 font-mono text-fg break-all max-w-[200px]">
+                <td className="px-3 py-2 font-mono text-fg break-all max-w-[320px]">
                   {row.path}
                 </td>
-                <td className="px-3 py-2 text-muted whitespace-nowrap">{row.ip ?? "—"}</td>
-                <td className="px-3 py-2 text-muted break-words max-w-[200px]">
-                  <span title={formatVisitLocation(row)}>{formatVisitLocation(row)}</span>
-                </td>
-                <td className="px-3 py-2 text-muted break-words max-w-[200px]">
-                  <span title={formatVisitClient(row)}>{formatVisitClient(row)}</span>
-                </td>
-                <td className="px-3 py-2 text-muted break-all max-w-[160px]">
-                  {row.referer ? (
-                    <span title={row.referer}>{row.referer}</span>
-                  ) : (
-                    "—"
-                  )}
-                </td>
-                <td className="px-3 py-2 text-muted break-all max-w-[220px]">
-                  {row.userAgent ? (
-                    <span title={row.userAgent}>{row.userAgent}</span>
-                  ) : (
-                    "—"
-                  )}
+                <td className="px-3 py-2 text-muted font-mono whitespace-nowrap">
+                  {formatVisitVisitorKey(row.visitorKey)}
                 </td>
               </tr>
             ))}
@@ -612,6 +578,13 @@ function ThoughtListAdmin({
                     )}
                   </div>
                   <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => onEdit(item)}
+                      className="button-secondary text-sm px-3 py-1.5"
+                    >
+                      {t("admin.editThought")}
+                    </button>
                     <select
                       value={item.category?.id ?? ""}
                       onChange={(e) => void moveToCategory(item.id, e.target.value)}

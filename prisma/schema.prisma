@@ -84,26 +84,12 @@ model AccessRequest {
 
 /// 访客页面访问记录（由 middleware 写入，供管理员查看）
 model VisitLog {
-  id        String   @id @default(cuid())
-  path      String
-  ip        String?
-  userAgent String?
-  referer   String?
-  /// 浏览器摘要，如 Chrome 120
-  browser      String?
-  /// 操作系统，如 Windows 11、iOS 17
-  os           String?
-  /// mobile | tablet | desktop 等
-  deviceType   String?
-  /// 设备型号 / 厂商，如 iPhone、SM-G991B
-  deviceModel  String?
-  /// 国家/地区（Geo 或 Vercel 头）
-  country   String?
-  /// 省/州
-  region    String?
-  /// 城市
-  city      String?
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  path       String
+  /// 匿名访客标识（visitor_like_key Cookie，UUID）
+  visitorKey String?
+  createdAt  DateTime @default(now())
 
   @@index([createdAt])
+  @@index([visitorKey, createdAt])
 }

@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse, type NextFetchEvent } from "next/server";
+import {
+  attachVisitorLikeCookie,
+  getVisitorLikeKeyFromRequest,
+} from "@/lib/visitorLikeKey";
 
 function visitLogSecret(): string {
   if (process.env.VISIT_LOG_SECRET?.trim()) {
@@ -45,23 +49,15 @@ export function middleware(request: NextRequest, event: NextFetchEvent) {
   }
 
   const secret = visitLogSecret();
-  if (!secret) {
-    return NextResponse.next();
+  const { key: visitorKey, isNew } = getVisitorLikeKeyFromRequest(request);
+  const response = NextResponse.next();
+  if (isNew) {
+    attachVisitorLikeCookie(response, visitorKey, true);
   }
 
-  const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    request.headers.get("x-real-ip") ||
-    "";
-
-  const payload = {
-    path,
-    ip,
-    userAgent: request.headers.get("user-agent") ?? "",
-    referer: request.headers.get("referer") ?? "",
-    vercelCountry: request.headers.get("x-vercel-ip-country") ?? "",
-    vercelRegion: request.headers.get("x-vercel-ip-country-region") ?? "",
-  };
+  if (!secret) {
+    return response;
+  }
 
   const logUrl = new URL("/api/visit-logs", request.url);
   const logPromise = fetch(logUrl, {
@@ -70,14 +66,14 @@ export function middleware(request: NextRequest, event: NextFetchEvent) {
       "Content-Type": "application/json",
       Authorization: `Bearer ${secret}`,
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ path, visitorKey }),
   }).catch((err) => {
     console.error("[visit-log middleware fetch]", err);
   });
 
   event.waitUntil(logPromise);
 
-  return NextResponse.next();
+  return response;
 }
 
 export const config = {

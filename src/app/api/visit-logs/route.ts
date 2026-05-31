@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { isAdmin } from "@/lib/auth";
-import {
-  lookupIpGeo,
-  mergeGeo,
-  parseVisitUserAgent,
-} from "@/lib/visitLogEnrich";
+import { isValidVisitorLikeKey } from "@/lib/visitorLikeKey";
 
 function getVisitLogSecret(): string {
   if (process.env.VISIT_LOG_SECRET?.trim()) {
@@ -19,14 +15,10 @@ function getVisitLogSecret(): string {
 
 type LogBody = {
   path?: string;
-  ip?: string;
-  userAgent?: string;
-  referer?: string;
-  vercelCountry?: string;
-  vercelRegion?: string;
+  visitorKey?: string;
 };
 
-/** 中间件调用：写入一条访问记录（含 UA 解析与 Geo） */
+/** 中间件调用：写入一条访问记录（匿名访客 + 路径） */
 export async function POST(request: NextRequest) {
   const secret = getVisitLogSecret();
   if (!secret) {
@@ -49,49 +41,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "path 无效" }, { status: 400 });
   }
 
-  const ip = body.ip?.slice(0, 128) || null;
-  const uaStr = body.userAgent?.slice(0, 512) || null;
-
-  let parsed: ReturnType<typeof parseVisitUserAgent>;
-  try {
-    parsed = parseVisitUserAgent(uaStr);
-  } catch (e) {
-    console.error("[visit-log] parseVisitUserAgent", e);
-    parsed = {
-      browser: null,
-      os: null,
-      deviceType: null,
-      deviceModel: null,
-    };
-  }
-
-  let geo = { country: null as string | null, region: null as string | null, city: null as string | null };
-  try {
-    const geoRaw = ip ? await lookupIpGeo(ip) : { country: null, region: null, city: null };
-    geo = mergeGeo(
-      geoRaw,
-      body.vercelCountry?.trim() || null,
-      body.vercelRegion?.trim() || null
-    );
-  } catch (e) {
-    console.error("[visit-log] geo", e);
+  const visitorKey =
+    typeof body.visitorKey === "string" && isValidVisitorLikeKey(body.visitorKey)
+      ? body.visitorKey
+      : null;
+  if (!visitorKey) {
+    return NextResponse.json({ error: "visitorKey 无效" }, { status: 400 });
   }
 
   try {
     await prisma.visitLog.create({
-      data: {
-        path,
-        ip,
-        userAgent: uaStr,
-        referer: body.referer?.slice(0, 2048) || null,
-        browser: parsed.browser?.slice(0, 128) || null,
-        os: parsed.os?.slice(0, 128) || null,
-        deviceType: parsed.deviceType?.slice(0, 64) || null,
-        deviceModel: parsed.deviceModel?.slice(0, 128) || null,
-        country: geo.country?.slice(0, 128) || null,
-        region: geo.region?.slice(0, 128) || null,
-        city: geo.city?.slice(0, 128) || null,
-      },
+      data: { path, visitorKey },
     });
   } catch (e) {
     console.error("[visit-log] prisma.create", e);
@@ -118,14 +78,24 @@ export async function GET(request: NextRequest) {
   const take = Math.min(Number(searchParams.get("take")) || 100, 500);
   const skip = Math.max(Number(searchParams.get("skip")) || 0, 0);
 
-  const [items, total] = await Promise.all([
+  const [items, total, uniqueGroups] = await Promise.all([
     prisma.visitLog.findMany({
       orderBy: { createdAt: "desc" },
       take,
       skip,
     }),
     prisma.visitLog.count(),
+    prisma.visitLog.groupBy({
+      by: ["visitorKey"],
+      where: { visitorKey: { not: null } },
+    }),
   ]);
 
-  return NextResponse.json({ items, total, take, skip });
+  return NextResponse.json({
+    items,
+    total,
+    uniqueVisitors: uniqueGroups.length,
+    take,
+    skip,
+  });
 }

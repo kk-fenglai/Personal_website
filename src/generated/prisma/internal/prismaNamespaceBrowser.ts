@@ -155,16 +155,7 @@ export type AccessRequestScalarFieldEnum = (typeof AccessRequestScalarFieldEnum)
 export const VisitLogScalarFieldEnum = {
   id: 'id',
   path: 'path',
-  ip: 'ip',
-  userAgent: 'userAgent',
-  referer: 'referer',
-  browser: 'browser',
-  os: 'os',
-  deviceType: 'deviceType',
-  deviceModel: 'deviceModel',
-  country: 'country',
-  region: 'region',
-  city: 'city',
+  visitorKey: 'visitorKey',
   createdAt: 'createdAt'
 } as const
 
