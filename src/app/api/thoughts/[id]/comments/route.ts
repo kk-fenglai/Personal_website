@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { isAdmin } from "@/lib/auth";
+import { isAdmin, isApprovedVisitor, canViewSite } from "@/lib/auth";
 
 export async function GET(
   _request: NextRequest,
@@ -8,6 +8,9 @@ export async function GET(
 ) {
   const { id } = await params;
   const admin = await isAdmin();
+  if (!admin && !(await isApprovedVisitor())) {
+    return NextResponse.json({ error: "需要访问许可" }, { status: 401 });
+  }
   const thought = await prisma.thought.findUnique({
     where: { id },
     include: { comments: { orderBy: { createdAt: "asc" } } },
@@ -26,6 +29,9 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  if (!(await canViewSite())) {
+    return NextResponse.json({ error: "需要访问许可" }, { status: 401 });
+  }
   const thought = await prisma.thought.findUnique({ where: { id } });
   if (!thought) {
     return NextResponse.json({ error: "未找到" }, { status: 404 });

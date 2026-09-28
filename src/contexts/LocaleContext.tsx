@@ -29,6 +29,7 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     document.documentElement.setAttribute("data-locale", locale);
+    document.documentElement.lang = dateLocales[locale];
   }, [locale]);
 
   const setLocale = useCallback((newLocale: Locale) => {

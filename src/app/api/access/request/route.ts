@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const name = String(body.name || "").trim();
+  const name = String(body.name || "").trim().slice(0, 64);
   const contact = body.contact != null ? String(body.contact).trim().slice(0, 200) : null;
   const message = body.message != null ? String(body.message).trim().slice(0, 1000) : null;
 

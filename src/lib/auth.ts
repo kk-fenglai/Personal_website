@@ -1,16 +1,22 @@
 import { cookies } from "next/headers";
 import bcrypt from "bcryptjs";
-
-const ADMIN_COOKIE = "admin_session";
-const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
+import { prisma } from "@/lib/db";
+import {
+  ADMIN_COOKIE,
+  ADMIN_MAX_AGE,
+  VISITOR_COOKIE,
+  createAdminCookieValue,
+  isValidAdminCookie,
+  visitorTokenFromCookie,
+} from "@/lib/session";
 
 export async function setAdminSession() {
   const cookieStore = await cookies();
-  cookieStore.set(ADMIN_COOKIE, "1", {
+  cookieStore.set(ADMIN_COOKIE, await createAdminCookieValue(), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: COOKIE_MAX_AGE,
+    maxAge: ADMIN_MAX_AGE,
     path: "/",
   });
 }
@@ -22,8 +28,24 @@ export async function clearAdminSession() {
 
 export async function isAdmin(): Promise<boolean> {
   const cookieStore = await cookies();
-  const session = cookieStore.get(ADMIN_COOKIE);
-  return session?.value === "1";
+  return isValidAdminCookie(cookieStore.get(ADMIN_COOKIE)?.value);
+}
+
+/** 已获批准的访客（签名有效且申请仍为 approved） */
+export async function isApprovedVisitor(): Promise<boolean> {
+  const cookieStore = await cookies();
+  const token = await visitorTokenFromCookie(cookieStore.get(VISITOR_COOKIE)?.value);
+  if (!token) return false;
+  const record = await prisma.accessRequest.findFirst({
+    where: { accessToken: token, status: "approved" },
+    select: { id: true },
+  });
+  return !!record;
+}
+
+/** 可查看首页以外内容：管理员或已获批准的访客 */
+export async function canViewSite(): Promise<boolean> {
+  return (await isAdmin()) || (await isApprovedVisitor());
 }
 
 export async function verifyAdminPassword(

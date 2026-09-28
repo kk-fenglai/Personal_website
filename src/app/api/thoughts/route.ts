@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { isAdmin } from "@/lib/auth";
+import { isAdmin, isApprovedVisitor } from "@/lib/auth";
 import { translateAndSaveThought } from "@/lib/thoughtTranslateAndSave";
 import { scheduleThoughtTranslationBackfill } from "@/lib/ensureThoughtTranslations";
 
 export async function GET(_request: NextRequest) {
   const admin = await isAdmin();
+  if (!admin && !(await isApprovedVisitor())) {
+    return NextResponse.json({ error: "需要访问许可" }, { status: 401 });
+  }
   const thoughts = await prisma.thought.findMany({
     where: admin ? undefined : { isPublic: true },
     orderBy: [

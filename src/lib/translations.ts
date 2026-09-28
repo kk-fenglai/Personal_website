@@ -773,7 +773,7 @@ export const translations: Record<
 
 const STORAGE_KEY = "locale";
 
-export const DEFAULT_LOCALE: Locale = "en";
+export const DEFAULT_LOCALE: Locale = "zh";
 
 export function getStoredLocale(): Locale {
   if (typeof window === "undefined") return DEFAULT_LOCALE;

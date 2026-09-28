@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { isAdmin } from "@/lib/auth";
+import { isAdmin, canViewSite } from "@/lib/auth";
 
 export async function GET() {
+  if (!(await canViewSite())) {
+    return NextResponse.json({ error: "需要访问许可" }, { status: 401 });
+  }
   const items = await prisma.thoughtCategory.findMany({
     orderBy: { name: "asc" },
   });

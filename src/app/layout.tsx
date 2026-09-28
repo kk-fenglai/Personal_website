@@ -27,9 +27,8 @@ const notoSerifSc = Noto_Serif_SC({
 });
 
 export const metadata: Metadata = {
-  title: "Waiting for the Wind | Thoughts & Gallery",
-  description:
-    "A place to pause and record. Thoughts, photos—shared or kept—all gathered in quiet.",
+  title: "等风来的小站 | 随想与相册",
+  description: "这里是停顿与记录。随想、相册，或藏或显，皆在静处完成。",
 };
 
 export default function RootLayout({
@@ -39,8 +38,8 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
-      data-locale="en"
+      lang="zh-CN"
+      data-locale="zh"
       data-season="winter"
       className={`${sourceSans3.variable} ${instrumentSerif.variable} ${notoSerifSc.variable}`}
     >
