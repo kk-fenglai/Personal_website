@@ -39,6 +39,8 @@ website/
 - **Thought**：随想。字段：标题、内容、是否公开、创建/更新时间；关联多条 Comment。
 - **Comment**：评论。归属某条 Thought，含作者、内容、创建时间。
 - **Photo**：照片。文件名（如 `/uploads/xxx.jpg`）、可选描述、是否公开、创建时间。
+- **AboutProfile**：关于页资料，全站只有一行（id 固定为 `default`）。大标题、介绍、两组小信息、合作与加入两栏的文字，各存中文和自动翻译的英、法文；另有联系邮箱。
+- **Project**：关于页展示的项目。名称、一句话说明（中文加英、法译文）、链接、显示用的域名、配图地址、排序序号、是否显示。
 - **AccessRequest**：访问申请。姓名、联系方式、留言、状态（pending/approved/rejected）、访问令牌、创建时间。
 
 数据库由环境变量 **`DATABASE_URL`** 指向的 PostgreSQL 实例提供（本地开发可用 Docker 或云端 Neon 等）。
@@ -53,6 +55,8 @@ website/
 | `/thoughts` | 随想列表。仅展示公开随想（未登录）或全部（管理员）。 |
 | `/thoughts/[id]` | 随想详情。标题、内容（支持 **加粗** 语法）、评论列表与发表评论表单。 |
 | `/gallery` | 相册。网格展示公开照片，点击进入灯箱大图（含下载）。 |
+| `/timeline` | 时间线。把随想和照片按年、月倒序排在一起，可按类型筛选。凭申请访问。 |
+| `/about` | 关于页。对所有人公开；自我介绍、项目、合作与招人三段，内容来自后台。服务端读库渲染。 |
 | `/admin` | 管理后台入口。未登录显示登录表单；登录后为管理面板。 |
 | `/verify` | 访问申请页（若启用访问控制时可在此申请）。 |
 
@@ -121,6 +125,14 @@ website/
 | POST | `/api/access/requests/[id]/approve` | 管理员批准某条申请（可生成 accessToken 等）。 |
 | GET | `/api/access/verify` | 校验访问令牌等（若启用访问控制）。 |
 | GET | `/api/access/check` | 检查访问权限（若启用）。 |
+| GET | `/api/about` | 关于页资料（三语），无需权限。 |
+| PUT | `/api/about` | 保存关于页资料（需管理员）；改动过的栏目会重新翻译。 |
+| GET | `/api/projects` | 项目列表：管理员返回全部，否则仅可见的。 |
+| POST | `/api/projects` | 新增项目（需管理员）。 |
+| PATCH | `/api/projects/[id]` | 修改项目（需管理员）。 |
+| DELETE | `/api/projects/[id]` | 删除项目（需管理员）。 |
+| POST | `/api/projects/[id]/move` | 上移或下移项目（需管理员）。 |
+| GET | `/api/og/home`、`/api/og/about` | 首页和关于页的分享卡片图（1200×630）。 |
 
 管理员判断：**auth.ts** 中 `isAdmin()` 读取 Cookie（如 `admin_session=1`），登录时由 `verifyAdminPassword()` 校验 `.env` 中的 `ADMIN_USERNAME` / `ADMIN_PASSWORD`。
 
@@ -159,6 +171,7 @@ website/
 - **.env**（参考 .env.example）：  
   - `DATABASE_URL`：PostgreSQL 连接串，如 `postgresql://user:pass@host:5432/db?sslmode=require`。  
   - `ADMIN_USERNAME`、`ADMIN_PASSWORD`：管理员账号密码（支持明文或 bcrypt）。
+  - `SITE_URL`（可选）：站点对外的完整地址，用于分享卡片图的绝对链接。
 
 - **常用命令**  
   - 安装依赖：`npm install`（会执行 `prisma generate`）。  
@@ -184,6 +197,10 @@ website/
 | 多语言 | `src/lib/translations.ts`, `src/contexts/LocaleContext.tsx`, LanguageSwitcher.tsx |
 | 季节 | `src/contexts/SeasonContext.tsx`, SeasonSwitcher.tsx |
 | 随想加粗 | `src/lib/formatContent.ts`, `src/components/FormattedContent.tsx`, BoldableContentField.tsx |
+| 关于页 | `src/app/about/page.tsx`, AboutView.tsx, ProjectRow.tsx, `src/lib/aboutContent.ts`, `src/lib/aboutStore.ts`, `src/app/admin/AboutAdmin.tsx` |
+| 时间线 | `src/app/timeline/page.tsx`, TimelineView.tsx, `src/lib/timeline.ts` |
+| 分享卡片图 | `src/app/api/og/[page]/route.tsx`, `src/lib/ogFont.ts`, `src/lib/siteUrl.ts` |
+| 单元测试 | `src/lib/__tests__/`（`npm test`） |
 | 全局样式与主题 | `src/app/globals.css` |
 
 以上即为当前「等风来的小站」的完整架构与运行方式说明。

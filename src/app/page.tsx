@@ -4,6 +4,9 @@ import { HomeView } from "./HomeView";
 const TITLE = "等风来的小站 | 随想与相册";
 const DESCRIPTION = "这里是停顿与记录。随想、相册，或藏或显，皆在静处完成。";
 
+// 分享卡片图的绝对地址取自运行时的 SITE_URL，预渲染会把构建时的地址写死
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   openGraph: {
     title: TITLE,
