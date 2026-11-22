@@ -2,6 +2,7 @@ import { ImageResponse } from "next/og";
 import { splitParagraphs } from "@/lib/aboutContent";
 import { getAboutProfile } from "@/lib/aboutStore";
 import { loadOgFont } from "@/lib/ogFont";
+import { ogLayout } from "@/lib/ogLayout";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +11,6 @@ const SITE_NAME = "等风来的小站";
 const SITE_NAME_LATIN = "Waiting for the Wind";
 const SITE_DESCRIPTION = "这里是停顿与记录。随想、相册，或藏或显，皆在静处完成。";
 const SUBTITLE_MAX = 60;
-const LONG_TITLE = 28;
 
 type Card = { label: string; title: string; subtitle: string | null };
 
@@ -34,12 +34,6 @@ async function cardFor(page: string): Promise<{ card: Card; latin: Card } | null
   return null;
 }
 
-function titleSize(title: string): number {
-  if (title.length <= 12) return 96;
-  if (title.length <= LONG_TITLE) return 72;
-  return 52;
-}
-
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ page: string }> }
@@ -49,9 +43,8 @@ export async function GET(
 
   const { card } = cards;
   const font = await loadOgFont(`${card.label}${card.title}${card.subtitle ?? ""}…`);
-  const fitted = font ? card : cards.latin;
-  // 长标题会占到四行，再放小字就超出画面
-  const shown = fitted.title.length > LONG_TITLE ? { ...fitted, subtitle: null } : fitted;
+  const shown = font ? card : cards.latin;
+  const layout = ogLayout(shown.title, shown.subtitle);
 
   return new ImageResponse(
     (
@@ -75,7 +68,7 @@ export async function GET(
           <div
             style={{
               display: "flex",
-              fontSize: titleSize(shown.title),
+              fontSize: layout.titleSize,
               lineHeight: 1.35,
               letterSpacing: font ? 4 : 0,
             }}
@@ -83,7 +76,7 @@ export async function GET(
             {shown.title}
           </div>
           <div style={{ display: "flex", width: 64, height: 1, marginTop: 40, background: "#7d562d" }} />
-          {shown.subtitle && (
+          {layout.showSubtitle && (
             <div
               style={{
                 display: "flex",

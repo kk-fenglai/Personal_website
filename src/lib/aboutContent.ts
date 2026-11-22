@@ -69,10 +69,11 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 export function normalizeHttpUrl(raw: string): string | null {
   const trimmed = raw.trim();
-  if (!trimmed) return null;
+  // `https:example.com` 能被 URL 解析，但浏览器会把它当成站内相对链接
+  if (!/^https?:\/\//i.test(trimmed)) return null;
   try {
-    const parsed = new URL(trimmed);
-    return parsed.protocol === "http:" || parsed.protocol === "https:" ? trimmed : null;
+    new URL(trimmed);
+    return trimmed;
   } catch {
     return null;
   }

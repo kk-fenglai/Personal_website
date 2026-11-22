@@ -8,7 +8,7 @@ import {
   type ProfileTextField,
   type ProjectInput,
 } from "@/lib/aboutContent";
-import { neighborToSwap, planTranslationReset } from "@/lib/aboutPlan";
+import { neighborToSwap, planTranslationReset, translationWrite } from "@/lib/aboutPlan";
 import { translateZhText } from "@/lib/translateThought";
 
 const PROFILE_ID = "default";
@@ -73,9 +73,10 @@ function clearedTranslations(fields: readonly string[]): Record<string, null> {
 
 /** 逐个字段翻译并写回；失败只打日志，不影响已保存的中文 */
 async function translateFields<F extends string>(
+  id: string,
   fields: readonly F[],
   source: Record<F, string>,
-  write: (data: Record<string, string>) => Promise<unknown>
+  write: (args: ReturnType<typeof translationWrite>) => Promise<unknown>
 ): Promise<void> {
   for (const field of fields) {
     const zh = source[field];
@@ -83,7 +84,7 @@ async function translateFields<F extends string>(
     try {
       const tr = await translateZhText(zh);
       if (!tr) return;
-      await write({ [`${field}En`]: tr.en, [`${field}Fr`]: tr.fr });
+      await write(translationWrite(id, field, zh, tr));
     } catch (e) {
       console.error("[about translate]", field, e);
     }
@@ -110,8 +111,8 @@ export async function saveAboutProfile(input: ProfileInput): Promise<AboutProfil
     update: data,
   });
 
-  void translateFields(changed, input, (tr) =>
-    prisma.aboutProfile.update({ where: { id: PROFILE_ID }, data: tr })
+  void translateFields(PROFILE_ID, changed, input, (args) =>
+    prisma.aboutProfile.updateMany(args)
   );
   return profileView(row);
 }
@@ -129,8 +130,8 @@ export async function createProject(input: ProjectInput): Promise<ProjectView> {
   const row = await prisma.project.create({
     data: { ...input, sortOrder: (last._max.sortOrder ?? 0) + 1 },
   });
-  void translateFields(PROJECT_TEXT_FIELDS, input, (tr) =>
-    prisma.project.update({ where: { id: row.id }, data: tr })
+  void translateFields(row.id, PROJECT_TEXT_FIELDS, input, (args) =>
+    prisma.project.updateMany(args)
   );
   return projectView(row);
 }
@@ -146,9 +147,7 @@ export async function updateProject(
     where: { id },
     data: { ...input, ...clearedTranslations(changed) },
   });
-  void translateFields(changed, input, (tr) =>
-    prisma.project.update({ where: { id }, data: tr })
-  );
+  void translateFields(id, changed, input, (args) => prisma.project.updateMany(args));
   return projectView(row);
 }
 

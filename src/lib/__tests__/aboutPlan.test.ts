@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { neighborToSwap, planTranslationReset } from "../aboutPlan";
+import { neighborToSwap, planTranslationReset, translationWrite } from "../aboutPlan";
 
 test("planTranslationReset lists only the fields whose Chinese text changed", () => {
   assert.deepEqual(
@@ -28,4 +28,11 @@ test("neighborToSwap returns null at the ends and for unknown ids", () => {
   assert.equal(neighborToSwap(items, "a", "up"), null);
   assert.equal(neighborToSwap(items, "c", "down"), null);
   assert.equal(neighborToSwap(items, "zzz", "up"), null);
+});
+
+test("translationWrite only applies while the Chinese text is still the one that was translated", () => {
+  assert.deepEqual(translationWrite("p1", "intro", "旧文", { en: "old", fr: "ancien" }), {
+    where: { id: "p1", intro: "旧文" },
+    data: { introEn: "old", introFr: "ancien" },
+  });
 });

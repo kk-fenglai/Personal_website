@@ -20,6 +20,8 @@ test("normalizeHttpUrl rejects script schemes, bare domains and empty input", ()
   assert.equal(normalizeHttpUrl("javascript:alert(1)"), null);
   assert.equal(normalizeHttpUrl("JAVASCRIPT:alert(1)"), null);
   assert.equal(normalizeHttpUrl("example.com"), null);
+  assert.equal(normalizeHttpUrl("https:example.com"), null);
+  assert.equal(normalizeHttpUrl("http:/example.com"), null);
   assert.equal(normalizeHttpUrl(""), null);
 });
 
