@@ -35,7 +35,8 @@ export async function GET(request: NextRequest) {
   if (!page || total === null) return NextResponse.json(photos);
   return NextResponse.json({
     items: photos,
-    total,
+    // 未获许可的访客不该知道相册一共有多少张
+    total: viewer ? total : photos.length,
     hasMore: viewer && skip + photos.length < total,
   });
 }
