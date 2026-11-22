@@ -4,6 +4,7 @@ import "./globals.css";
 import { LocaleProvider } from "@/contexts/LocaleContext";
 import { SeasonProvider } from "@/contexts/SeasonContext";
 import { ClientLayout } from "@/components/ClientLayout";
+import { resolveSiteUrl } from "@/lib/siteUrl";
 
 const sourceSans3 = Source_Sans_3({
   subsets: ["latin", "latin-ext"],
@@ -27,6 +28,7 @@ const notoSerifSc = Noto_Serif_SC({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(resolveSiteUrl(process.env)),
   title: "等风来的小站 | 随想与相册",
   description: "这里是停顿与记录。随想、相册，或藏或显，皆在静处完成。",
 };

@@ -17,7 +17,16 @@ export async function generateMetadata(): Promise<Metadata> {
   const title = `${profile.headline.zh} | ${SITE_NAME}`;
   const description =
     splitParagraphs(profile.intro.zh)[0]?.slice(0, 120) ?? FALLBACK_DESCRIPTION;
-  return { title, description };
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [{ url: "/api/og/about", width: 1200, height: 630 }],
+    },
+    twitter: { card: "summary_large_image" },
+  };
 }
 
 export default async function AboutPage() {
