@@ -57,7 +57,9 @@ export const ModelName = {
   Photo: 'Photo',
   Like: 'Like',
   AccessRequest: 'AccessRequest',
-  VisitLog: 'VisitLog'
+  VisitLog: 'VisitLog',
+  AboutProfile: 'AboutProfile',
+  Project: 'Project'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -160,6 +162,64 @@ export const VisitLogScalarFieldEnum = {
 } as const
 
 export type VisitLogScalarFieldEnum = (typeof VisitLogScalarFieldEnum)[keyof typeof VisitLogScalarFieldEnum]
+
+
+export const AboutProfileScalarFieldEnum = {
+  id: 'id',
+  headline: 'headline',
+  headlineEn: 'headlineEn',
+  headlineFr: 'headlineFr',
+  intro: 'intro',
+  introEn: 'introEn',
+  introFr: 'introFr',
+  fact1Label: 'fact1Label',
+  fact1LabelEn: 'fact1LabelEn',
+  fact1LabelFr: 'fact1LabelFr',
+  fact1Value: 'fact1Value',
+  fact1ValueEn: 'fact1ValueEn',
+  fact1ValueFr: 'fact1ValueFr',
+  fact2Label: 'fact2Label',
+  fact2LabelEn: 'fact2LabelEn',
+  fact2LabelFr: 'fact2LabelFr',
+  fact2Value: 'fact2Value',
+  fact2ValueEn: 'fact2ValueEn',
+  fact2ValueFr: 'fact2ValueFr',
+  collabTitle: 'collabTitle',
+  collabTitleEn: 'collabTitleEn',
+  collabTitleFr: 'collabTitleFr',
+  collabBody: 'collabBody',
+  collabBodyEn: 'collabBodyEn',
+  collabBodyFr: 'collabBodyFr',
+  joinTitle: 'joinTitle',
+  joinTitleEn: 'joinTitleEn',
+  joinTitleFr: 'joinTitleFr',
+  joinBody: 'joinBody',
+  joinBodyEn: 'joinBodyEn',
+  joinBodyFr: 'joinBodyFr',
+  email: 'email',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AboutProfileScalarFieldEnum = (typeof AboutProfileScalarFieldEnum)[keyof typeof AboutProfileScalarFieldEnum]
+
+
+export const ProjectScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  nameEn: 'nameEn',
+  nameFr: 'nameFr',
+  description: 'description',
+  descriptionEn: 'descriptionEn',
+  descriptionFr: 'descriptionFr',
+  url: 'url',
+  domain: 'domain',
+  imageUrl: 'imageUrl',
+  sortOrder: 'sortOrder',
+  isVisible: 'isVisible',
+  createdAt: 'createdAt'
+} as const
+
+export type ProjectScalarFieldEnum = (typeof ProjectScalarFieldEnum)[keyof typeof ProjectScalarFieldEnum]
 
 
 export const SortOrder = {

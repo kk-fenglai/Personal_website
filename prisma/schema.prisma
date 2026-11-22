@@ -8,36 +8,36 @@ datasource db {
 }
 
 model Thought {
-  id         String    @id @default(cuid())
-  title      String
-  content    String
+  id                String           @id @default(cuid())
+  title             String
+  content           String
   /// 英文标题（LibreTranslate 自动翻译，随保存更新）
-  titleEn    String?
+  titleEn           String?
   /// 法文标题
-  titleFr    String?
+  titleFr           String?
   /// 英文正文
-  contentEn  String?
+  contentEn         String?
   /// 法文正文
-  contentFr  String?
-  isPublic   Boolean   @default(true)
-  categoryId String?
-  category   ThoughtCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  isPinned   Boolean   @default(false)
-  pinnedOrder Int?
+  contentFr         String?
+  isPublic          Boolean          @default(true)
+  categoryId        String?
+  category          ThoughtCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  isPinned          Boolean          @default(false)
+  pinnedOrder       Int?
   /// 首页展示顺序 1–3；null 表示不在首页展示
-  homeFeaturedOrder Int? @unique
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  comments   Comment[]
+  homeFeaturedOrder Int?             @unique
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  comments          Comment[]
 
   @@index([isPinned, pinnedOrder])
   @@index([categoryId, createdAt])
 }
 
 model ThoughtCategory {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  createdAt DateTime @default(now())
+  id        String    @id @default(cuid())
+  name      String    @unique
+  createdAt DateTime  @default(now())
   thoughts  Thought[]
 }
 
@@ -92,4 +92,61 @@ model VisitLog {
 
   @@index([createdAt])
   @@index([visitorKey, createdAt])
+}
+
+/// 关于页资料（全站仅一行，id 固定为 default；中文由后台填写，英法文自动翻译）
+model AboutProfile {
+  id            String   @id @default("default")
+  headline      String   @default("")
+  headlineEn    String?
+  headlineFr    String?
+  intro         String   @default("")
+  introEn       String?
+  introFr       String?
+  fact1Label    String   @default("")
+  fact1LabelEn  String?
+  fact1LabelFr  String?
+  fact1Value    String   @default("")
+  fact1ValueEn  String?
+  fact1ValueFr  String?
+  fact2Label    String   @default("")
+  fact2LabelEn  String?
+  fact2LabelFr  String?
+  fact2Value    String   @default("")
+  fact2ValueEn  String?
+  fact2ValueFr  String?
+  collabTitle   String   @default("")
+  collabTitleEn String?
+  collabTitleFr String?
+  collabBody    String   @default("")
+  collabBodyEn  String?
+  collabBodyFr  String?
+  joinTitle     String   @default("")
+  joinTitleEn   String?
+  joinTitleFr   String?
+  joinBody      String   @default("")
+  joinBodyEn    String?
+  joinBodyFr    String?
+  email         String
+  updatedAt     DateTime @updatedAt
+}
+
+/// 关于页展示的项目
+model Project {
+  id            String   @id @default(cuid())
+  name          String
+  nameEn        String?
+  nameFr        String?
+  description   String   @default("")
+  descriptionEn String?
+  descriptionFr String?
+  url           String
+  /// 显示用的域名；为空时前台从 url 里取
+  domain        String?
+  imageUrl      String?
+  sortOrder     Int
+  isVisible     Boolean  @default(true)
+  createdAt     DateTime @default(now())
+
+  @@index([sortOrder])
 }
