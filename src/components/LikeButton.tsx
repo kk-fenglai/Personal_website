@@ -10,7 +10,7 @@ type LikeButtonProps = {
   targetId: string;
   initialCount?: number;
   initialLiked?: boolean;
-  /** Skip initial fetch when parent already loaded stats */
+  /** 父组件自己批量取点赞数据时设为 true，本组件不再单独请求 */
   skipFetch?: boolean;
   variant?: "default" | "onDark";
   className?: string;
@@ -32,7 +32,8 @@ export function LikeButton({
   const [pending, setPending] = useState(false);
 
   useEffect(() => {
-    if (skipFetch && initialCount !== undefined) {
+    if (skipFetch) {
+      if (initialCount === undefined) return;
       setCount(initialCount);
       setLiked(initialLiked ?? false);
       setReady(true);

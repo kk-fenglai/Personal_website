@@ -1,15 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { useLocale } from "@/contexts/LocaleContext";
-import { plainTextExcerpt } from "@/lib/stitchPlaceholders";
-import {
-  pickThoughtContent,
-  pickThoughtTitle,
-} from "@/lib/pickThoughtLocale";
 
 type Thought = {
   id: string;
@@ -29,16 +24,25 @@ function formatEditorialDate(iso: string, dateLocale: string) {
     .toUpperCase();
 }
 
+const PAGE_SIZE = 20;
+const SEARCH_DELAY_MS = 300;
+
+type Page = { items: Thought[]; total: number; hasMore: boolean };
+
 export function ThoughtList() {
   const { t, dateLocale, locale } = useLocale();
-  const [thoughts, setThoughts] = useState<Thought[]>([]);
+  const [page, setPage] = useState<{ key: string; items: Thought[]; hasMore: boolean } | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
+  const [search, setSearch] = useState("");
+  const sentinel = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const selectedCategoryId = searchParams.get("category") || "all";
+  const listKey = `${locale}|${selectedCategoryId}|${search}`;
+  const current = page?.key === listKey ? page : null;
 
   useEffect(() => {
     fetch("/api/thought-categories")
@@ -49,38 +53,67 @@ export function ThoughtList() {
   }, []);
 
   useEffect(() => {
-    setLoading(true);
-    fetch(`/api/thoughts?locale=${locale}`)
-      .then((res) => res.json())
-      .then((tData) => {
-        setThoughts(Array.isArray(tData) ? tData : []);
-      })
-      .finally(() => setLoading(false));
-  }, [locale]);
+    const timer = setTimeout(() => setSearch(query.trim()), SEARCH_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [query]);
 
-  if (loading) {
-    return <div className="py-20 text-muted tabular-nums">{t("thoughts.loading")}</div>;
-  }
+  const fetchPage = useCallback(
+    async (offset: number, signal?: AbortSignal): Promise<Page> => {
+      const params = new URLSearchParams({
+        locale,
+        excerpt: "1",
+        limit: String(PAGE_SIZE),
+        offset: String(offset),
+        category: selectedCategoryId,
+      });
+      if (search) params.set("q", search);
+      const res = await fetch(`/api/thoughts?${params}`, { signal });
+      const data = await res.json();
+      return Array.isArray(data?.items) ? data : { items: [], total: 0, hasMore: false };
+    },
+    [locale, selectedCategoryId, search]
+  );
 
-  if (thoughts.length === 0) {
-    return <p className="py-20 text-muted">{t("thoughts.empty")}</p>;
-  }
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchPage(0, controller.signal)
+      .then((data) => setPage({ key: listKey, items: data.items, hasMore: data.hasMore }))
+      .catch(() => {
+        if (!controller.signal.aborted) setPage({ key: listKey, items: [], hasMore: false });
+      });
+    return () => controller.abort();
+  }, [fetchPage, listKey]);
 
-  const normalizedQuery = query.trim().toLowerCase();
-  const matchesQuery = (item: Thought) => {
-    if (!normalizedQuery) return true;
-    const title = pickThoughtTitle(item, locale) ?? "";
-    const content = pickThoughtContent(item, locale) ?? "";
-    return `${title}\n${content}`.toLowerCase().includes(normalizedQuery);
-  };
+  const loadMore = useCallback(async () => {
+    if (!current?.hasMore || loadingMore) return;
+    setLoadingMore(true);
+    try {
+      const data = await fetchPage(current.items.length);
+      setPage((prev) =>
+        prev?.key === listKey
+          ? { key: listKey, items: [...prev.items, ...data.items], hasMore: data.hasMore }
+          : prev
+      );
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [current, loadingMore, fetchPage, listKey]);
 
-  const filtered = thoughts
-    .filter((item) => {
-      if (selectedCategoryId === "all") return true;
-      if (selectedCategoryId === "uncategorized") return !item.category?.id;
-      return item.category?.id === selectedCategoryId;
-    })
-    .filter(matchesQuery);
+  useEffect(() => {
+    const node = sentinel.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) void loadMore();
+      },
+      { rootMargin: "800px 0px" }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [loadMore]);
+
+  const filtered = current?.items ?? [];
+  const isFiltered = selectedCategoryId !== "all" || search !== "";
 
   const setCategory = (id: string) => {
     const url = id === "all" ? "/thoughts" : `/thoughts?category=${encodeURIComponent(id)}`;
@@ -120,13 +153,15 @@ export function ThoughtList() {
         />
       </div>
 
-      {filtered.length === 0 ? (
-        <p className="py-12 text-muted">{t("thoughts.emptyInFolder")}</p>
+      {!current ? (
+        <div className="py-20 text-muted tabular-nums">{t("thoughts.loading")}</div>
+      ) : filtered.length === 0 ? (
+        <p className="py-12 text-muted">
+          {t(isFiltered ? "thoughts.emptyInFolder" : "thoughts.empty")}
+        </p>
       ) : (
         <section className="space-y-24 md:space-y-32">
           {filtered.map((item) => {
-            const body = pickThoughtContent(item, locale) ?? "";
-
             return (
               <ScrollReveal key={item.id}>
                 <article className="asymmetric-entry group">
@@ -151,10 +186,10 @@ export function ThoughtList() {
                       className="block group-hover:opacity-80 transition-opacity"
                     >
                       <h2 className="type-headline-md text-fg leading-tight mb-4 group-hover:text-warm transition-colors">
-                        {pickThoughtTitle(item, locale)}
+                        {item.title}
                       </h2>
                       <p className="type-body-lg text-muted max-w-[600px] reading line-clamp-4">
-                        {plainTextExcerpt(body)}
+                        {item.content}
                       </p>
                     </Link>
                     <Link href={`/thoughts/${item.id}`} className="read-article-link">
@@ -166,6 +201,10 @@ export function ThoughtList() {
             );
           })}
         </section>
+      )}
+      <div ref={sentinel} aria-hidden />
+      {loadingMore && (
+        <div className="py-12 text-muted tabular-nums">{t("thoughts.loading")}</div>
       )}
     </>
   );

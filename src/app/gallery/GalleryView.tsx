@@ -17,6 +17,9 @@ type Photo = {
   createdAt: string;
 };
 
+/** /api/likes 一次最多接受 100 个 id */
+const LIKES_BATCH_SIZE = 100;
+
 function layoutForIndex(i: number): GalleryLayoutSpec {
   return GALLERY_LAYOUT_CYCLE[i % GALLERY_LAYOUT_CYCLE.length];
 }
@@ -28,7 +31,6 @@ export function GalleryView() {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [likeCounts, setLikeCounts] = useState<Record<string, number>>({});
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
-  const [likesLoaded, setLikesLoaded] = useState(false);
 
   useEffect(() => {
     fetch("/api/photos")
@@ -42,23 +44,29 @@ export function GalleryView() {
 
   useEffect(() => {
     if (photos.length === 0) return;
-    const params = new URLSearchParams({
-      targetType: "photo",
-      ids: photos.map((p) => p.id).join(","),
+    const ids = photos.map((p) => p.id);
+    const batches: string[][] = [];
+    for (let i = 0; i < ids.length; i += LIKES_BATCH_SIZE) {
+      batches.push(ids.slice(i, i + LIKES_BATCH_SIZE));
+    }
+    Promise.all(
+      batches.map((batch) =>
+        fetch(`/api/likes?${new URLSearchParams({ targetType: "photo", ids: batch.join(",") })}`)
+          .then((res) => (res.ok ? res.json() : null))
+          .catch(() => null)
+      )
+    ).then((results) => {
+      const counts: Record<string, number> = {};
+      const liked = new Set<string>();
+      for (const id of ids) counts[id] = 0;
+      for (const data of results) {
+        if (!data) continue;
+        Object.assign(counts, data.counts ?? {});
+        for (const id of Array.isArray(data.liked) ? data.liked : []) liked.add(id);
+      }
+      setLikeCounts(counts);
+      setLikedIds(liked);
     });
-    fetch(`/api/likes?${params}`)
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (!data) return;
-        const counts: Record<string, number> = {};
-        for (const p of photos) {
-          counts[p.id] = data.counts?.[p.id] ?? 0;
-        }
-        setLikeCounts(counts);
-        setLikedIds(new Set(Array.isArray(data.liked) ? data.liked : []));
-        setLikesLoaded(true);
-      })
-      .catch(() => {});
   }, [photos]);
 
   const openLightbox = useCallback((index: number) => setLightboxIndex(index), []);
@@ -179,7 +187,7 @@ export function GalleryView() {
                   targetId={p.id}
                   initialCount={likeCounts[p.id]}
                   initialLiked={likedIds.has(p.id)}
-                  skipFetch={likesLoaded}
+                  skipFetch
                 />
               </div>
             </ScrollReveal>
@@ -265,7 +273,7 @@ export function GalleryView() {
                   targetId={current.id}
                   initialCount={likeCounts[current.id]}
                   initialLiked={likedIds.has(current.id)}
-                  skipFetch={likesLoaded}
+                  skipFetch
                   variant="onDark"
                 />
               </div>
