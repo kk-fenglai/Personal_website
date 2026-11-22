@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useLocale } from "@/contexts/LocaleContext";
 import { BoldableContentField } from "@/components/BoldableContentField";
+import { AboutAdmin } from "./AboutAdmin";
 import {
   formatPhotoUploadBytes,
   getPhotoUploadConfig,
@@ -54,7 +55,7 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<
-    "thoughts" | "photos" | "new-thought" | "upload" | "access" | "visits" | "categories"
+    "thoughts" | "photos" | "new-thought" | "upload" | "access" | "visits" | "categories" | "about"
   >("thoughts");
   const [editingThought, setEditingThought] = useState<Thought | null>(null);
 
@@ -105,6 +106,7 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
           ["access", t("admin.accessRequests")],
           ["visits", t("admin.tabVisits")],
           ["categories", t("admin.tabCategories")],
+          ["about", t("admin.tabAbout")],
         ].map(([tab, label]) => (
           <button
             key={tab}
@@ -149,6 +151,7 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
       )}
       {activeTab === "access" && <AccessRequestsList />}
       {activeTab === "visits" && <VisitLogsList />}
+      {activeTab === "about" && <AboutAdmin />}
       {activeTab === "categories" && (
         <CategoryManager
           categories={categories}

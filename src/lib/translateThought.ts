@@ -98,13 +98,12 @@ async function translateTextChunks(
 }
 
 /**
- * 将一条随想的标题与正文翻译为英、法。
- * 设置 `LIBRETRANSLATE_DISABLED=true` 时返回 null。
+ * 将一段中文翻译为英、法。
+ * 设置 `LIBRETRANSLATE_DISABLED=true` 时返回 null；请求失败时抛错。
  */
-export async function translateThoughtZhToEnFr(
-  title: string,
-  content: string
-): Promise<ThoughtTranslations | null> {
+export async function translateZhText(
+  text: string
+): Promise<{ en: string; fr: string } | null> {
   if (process.env.LIBRETRANSLATE_DISABLED?.toLowerCase() === "true") {
     return null;
   }
@@ -113,10 +112,27 @@ export async function translateThoughtZhToEnFr(
   const apiKey = process.env.LIBRETRANSLATE_API_KEY?.trim();
 
   // 串行请求，减轻公共实例限频（429）
-  const titleEn = await translateTextChunks(title, "en", baseUrl, apiKey);
-  const contentEn = await translateTextChunks(content, "en", baseUrl, apiKey);
-  const titleFr = await translateTextChunks(title, "fr", baseUrl, apiKey);
-  const contentFr = await translateTextChunks(content, "fr", baseUrl, apiKey);
+  const en = await translateTextChunks(text, "en", baseUrl, apiKey);
+  const fr = await translateTextChunks(text, "fr", baseUrl, apiKey);
+  return { en, fr };
+}
 
-  return { titleEn, contentEn, titleFr, contentFr };
+/**
+ * 将一条随想的标题与正文翻译为英、法。
+ * 设置 `LIBRETRANSLATE_DISABLED=true` 时返回 null。
+ */
+export async function translateThoughtZhToEnFr(
+  title: string,
+  content: string
+): Promise<ThoughtTranslations | null> {
+  const titleTr = await translateZhText(title);
+  if (!titleTr) return null;
+  const contentTr = await translateZhText(content);
+  if (!contentTr) return null;
+  return {
+    titleEn: titleTr.en,
+    contentEn: contentTr.en,
+    titleFr: titleTr.fr,
+    contentFr: contentTr.fr,
+  };
 }

@@ -1028,3 +1028,263 @@ p,
     fill: #f0eef8;
   }
 }
+
+/* 关于页：项目列表与联系方式 */
+.about-project {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--gutter);
+  align-items: center;
+  padding: 2.25rem 0;
+  border-top: 1px solid color-mix(in srgb, var(--border) 90%, transparent);
+}
+
+.reveal:first-child > .about-project {
+  border-top: none;
+}
+
+.about-project > * {
+  min-width: 0;
+}
+
+.about-project-num {
+  grid-column: span 2;
+  font-family: var(--font-serif-latin);
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--warm);
+}
+
+.about-project-thumb {
+  grid-column: span 10;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--fg) 8%, var(--surface));
+}
+
+.about-project-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1);
+  transition:
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.7s ease;
+}
+
+.about-project:hover .about-project-thumb img {
+  transform: scale(1.03);
+  filter: grayscale(0);
+}
+
+.about-project-info,
+.about-project-go {
+  grid-column: span 12;
+}
+
+.about-project-title {
+  transition: color 0.25s ease;
+  overflow-wrap: anywhere;
+}
+
+.about-project:hover .about-project-title {
+  color: var(--warm);
+}
+
+.about-project-domain {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tertiary);
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 768px) {
+  .about-project-num {
+    grid-column: span 1;
+  }
+  .about-project-thumb {
+    grid-column: span 3;
+  }
+  .about-project-info {
+    grid-column: 6 / span 4;
+  }
+  .about-project-go {
+    grid-column: 11 / span 2;
+    text-align: right;
+  }
+}
+
+.about-collab-heading {
+  font-size: clamp(2rem, 6vw, 3.2rem);
+}
+
+.about-email {
+  font-family: var(--font-serif-latin);
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+  transition: color 0.25s ease;
+}
+
+.about-email:hover {
+  color: var(--warm);
+}
+
+/* 12 列加 2rem 列距在手机宽度下比屏幕宽，这里收窄列距避免横向滚动 */
+@media (max-width: 767px) {
+  .about-page .asymmetric-grid,
+  .about-project {
+    column-gap: 1rem;
+  }
+}
+
+/* 时间线 */
+.timeline-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 2rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--fg) 8%, transparent);
+}
+
+.timeline-filter-count {
+  margin-left: 0.4rem;
+  font-weight: 400;
+  color: var(--tertiary);
+}
+
+.timeline-year {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  column-gap: 1rem;
+  row-gap: 2rem;
+  padding: 3.5rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.timeline-filters + .timeline-year {
+  border-top: none;
+}
+
+.timeline-year-head,
+.timeline-year-body {
+  grid-column: span 12;
+  min-width: 0;
+}
+
+.timeline-year-num {
+  font-family: var(--font-serif-latin);
+  font-size: clamp(3.5rem, 9vw, 6rem);
+  line-height: 1;
+  letter-spacing: var(--tracking-latin-display);
+  color: var(--fg);
+}
+
+@media (min-width: 768px) {
+  .timeline-year {
+    column-gap: var(--gutter);
+  }
+  .timeline-year-head {
+    grid-column: span 3;
+  }
+  .timeline-year-sticky {
+    position: sticky;
+    top: 9.5rem;
+  }
+  .timeline-year-body {
+    grid-column: 5 / span 8;
+  }
+}
+
+.timeline-month + .timeline-month {
+  margin-top: 3.5rem;
+}
+
+.timeline-entry {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr);
+  gap: 1.5rem;
+  padding: 1.4rem 0;
+  border-top: 1px solid color-mix(in srgb, var(--border) 90%, transparent);
+}
+
+.timeline-day {
+  font-family: var(--font-serif-latin);
+  font-size: 1.35rem;
+  line-height: 1.5;
+  color: var(--tertiary);
+}
+
+.timeline-kind {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--warm);
+}
+
+.timeline-entry-title {
+  margin-top: 0.2rem;
+  overflow-wrap: anywhere;
+  transition: color 0.25s ease;
+}
+
+.timeline-entry:hover .timeline-entry-title {
+  color: var(--warm);
+}
+
+.timeline-entry p {
+  max-width: 38rem;
+}
+
+.timeline-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  max-width: 38rem;
+  margin-top: 0.9rem;
+}
+
+.timeline-thumb {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--fg) 8%, var(--surface));
+}
+
+.timeline-thumb img {
+  filter: grayscale(1);
+  transition: filter 0.7s ease;
+}
+
+.timeline-thumb:hover img {
+  filter: grayscale(0);
+}
+
+.timeline-thumb-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-family: var(--font-serif-latin);
+  font-size: 1.3rem;
+  color: var(--tertiary);
+}
+
+/* 导航加到六项后在手机宽度下会折成两行、顶栏变高盖住正文；改为单行，放不下时横向滑动 */
+@media (max-width: 767px) {
+  .site-header-mobile-nav {
+    flex-wrap: nowrap;
+    column-gap: 0.4rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .site-header-mobile-nav .nav-link {
+    flex-shrink: 0;
+  }
+}

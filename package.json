@@ -7,6 +7,7 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "tsx --test src/lib/__tests__/*.test.ts",
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate-sqlite": "tsx scripts/migrate-sqlite-to-neon.ts",

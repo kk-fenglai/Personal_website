@@ -52,3 +52,13 @@ export type AccessRequest = Prisma.AccessRequestModel
  * 访客页面访问记录（由 middleware 写入，供管理员查看）
  */
 export type VisitLog = Prisma.VisitLogModel
+/**
+ * Model AboutProfile
+ * 关于页资料（全站仅一行，id 固定为 default；中文由后台填写，英法文自动翻译）
+ */
+export type AboutProfile = Prisma.AboutProfileModel
+/**
+ * Model Project
+ * 关于页展示的项目
+ */
+export type Project = Prisma.ProjectModel

@@ -10,10 +10,10 @@ import {
   visitorTokenFromCookie,
 } from "@/lib/session";
 
-/** 无需许可即可访问的页面：首页、申请访问页、管理后台（自带登录） */
+/** 无需许可即可访问的页面：首页、关于页、申请访问页、管理后台（自带登录） */
 function isOpenPage(path: string): boolean {
   if (path === "/") return true;
-  return ["/verify", "/admin"].some((p) => path === p || path.startsWith(`${p}/`));
+  return ["/verify", "/admin", "/about"].some((p) => path === p || path.startsWith(`${p}/`));
 }
 
 /** 签名校验（不查库）；撤销许可由各 API 查库兜底 */

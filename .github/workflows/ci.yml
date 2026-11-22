@@ -44,5 +44,8 @@ jobs:
       - name: Sync Prisma schema to PostgreSQL (CI)
         run: npx prisma db push
 
+      - name: Unit tests
+        run: npm test
+
       - name: Build Next.js
         run: npm run build
