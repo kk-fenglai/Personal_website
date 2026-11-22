@@ -4,30 +4,42 @@ import { isAdmin, isApprovedVisitor } from "@/lib/auth";
 import { translateAndSaveThought } from "@/lib/thoughtTranslateAndSave";
 import { scheduleThoughtTranslationBackfill } from "@/lib/ensureThoughtTranslations";
 import { parseListLocale, toListView } from "@/lib/thoughtListView";
+import { parseThoughtPage, thoughtListWhere } from "@/lib/thoughtListQuery";
 
 export async function GET(request: NextRequest) {
   const admin = await isAdmin();
   if (!admin && !(await isApprovedVisitor())) {
     return NextResponse.json({ error: "需要访问许可" }, { status: 401 });
   }
-  const thoughts = await prisma.thought.findMany({
-    where: admin ? undefined : { isPublic: true },
-    orderBy: [
-      { isPinned: "desc" },
-      { pinnedOrder: "asc" },
-      { createdAt: "desc" },
-    ],
-    include: {
-      category: true,
-      comments: { orderBy: { createdAt: "asc" } },
-    },
-  });
-  scheduleThoughtTranslationBackfill(thoughts);
   const params = request.nextUrl.searchParams;
+  const where = thoughtListWhere(params, { admin });
+  const page = parseThoughtPage(params);
+  const [thoughts, total] = await Promise.all([
+    prisma.thought.findMany({
+      where,
+      orderBy: [
+        { isPinned: "desc" },
+        { pinnedOrder: "asc" },
+        { createdAt: "desc" },
+        { id: "asc" },
+      ],
+      include: {
+        category: true,
+        comments: { orderBy: { createdAt: "asc" } },
+      },
+      ...(page ?? {}),
+    }),
+    page ? prisma.thought.count({ where }) : null,
+  ]);
+  scheduleThoughtTranslationBackfill(thoughts);
+
   const locale = parseListLocale(params.get("locale"));
-  if (!locale) return NextResponse.json(thoughts);
   const excerpt = params.get("excerpt") === "1";
-  return NextResponse.json(thoughts.map((thought) => toListView(thought, locale, { excerpt })));
+  const items = locale
+    ? thoughts.map((thought) => toListView(thought, locale, { excerpt }))
+    : thoughts;
+  if (!page || total === null) return NextResponse.json(items);
+  return NextResponse.json({ items, total, hasMore: page.skip + thoughts.length < total });
 }
 
 export async function POST(request: NextRequest) {
