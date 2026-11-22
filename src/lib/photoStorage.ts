@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { isSiteSlot } from "@/lib/siteSlots";
+import { isAllowedPhotoUrl } from "@/lib/photoUrl";
 
 export type CreatePhotoInput = {
   filename: string;
@@ -8,11 +9,7 @@ export type CreatePhotoInput = {
   siteSlot?: string | null;
 };
 
-export function isAllowedPhotoUrl(url: string): boolean {
-  if (url.startsWith("/uploads/")) return true;
-  if (url.startsWith("https://") && url.includes(".blob.")) return true;
-  return false;
-}
+export { isAllowedPhotoUrl };
 
 export async function createPhotoRecord(input: CreatePhotoInput) {
   const siteSlot =
