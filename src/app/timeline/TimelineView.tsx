@@ -17,10 +17,6 @@ type Thought = {
   id: string;
   title: string;
   content: string;
-  titleEn?: string | null;
-  titleFr?: string | null;
-  contentEn?: string | null;
-  contentFr?: string | null;
   createdAt: string;
 };
 
@@ -44,10 +40,10 @@ export function TimelineView() {
 
   useEffect(() => {
     void Promise.all([
-      fetchList<Thought>("/api/thoughts"),
+      fetchList<Thought>(`/api/thoughts?locale=${locale}&excerpt=1`),
       fetchList<TimelinePhoto>("/api/photos"),
     ]).then(([thoughts, photos]) => setData({ thoughts, photos }));
-  }, []);
+  }, [locale]);
 
   const years = useMemo(() => {
     if (!data) return [];

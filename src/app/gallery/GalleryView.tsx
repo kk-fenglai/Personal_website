@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { PhotoImage } from "@/components/PhotoImage";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { useLocale } from "@/contexts/LocaleContext";
+import { sizesForColumns } from "@/lib/photoUrl";
 import { GALLERY_LAYOUT_CYCLE, type GalleryLayoutSpec } from "@/lib/stitchPlaceholders";
 import { LikeButton } from "@/components/LikeButton";
 
@@ -146,7 +147,7 @@ export function GalleryView() {
                     alt={p.caption || t("gallery.photoAlt")}
                     fill
                     className="object-cover transition-transform duration-700"
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    sizes={sizesForColumns(layout.cols)}
                   />
                   {layout.overlay && (
                     <div className="gallery-item-overlay text-white">

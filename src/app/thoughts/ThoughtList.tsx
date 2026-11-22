@@ -15,15 +15,10 @@ type Thought = {
   id: string;
   title: string;
   content: string;
-  titleEn?: string | null;
-  titleFr?: string | null;
-  contentEn?: string | null;
-  contentFr?: string | null;
   isPublic: boolean;
   isPinned?: boolean;
   category?: { id: string; name: string } | null;
   createdAt: string;
-  comments: { id: string }[];
 };
 
 type Category = { id: string; name: string };
@@ -55,7 +50,7 @@ export function ThoughtList() {
 
   useEffect(() => {
     setLoading(true);
-    fetch("/api/thoughts")
+    fetch(`/api/thoughts?locale=${locale}`)
       .then((res) => res.json())
       .then((tData) => {
         setThoughts(Array.isArray(tData) ? tData : []);
