@@ -2,6 +2,7 @@
 
 import { Fragment } from "react";
 import { parseBold, parseThoughtContent } from "@/lib/formatContent";
+import { canResizeRemoteImage, resizedImageUrl } from "@/lib/photoUrl";
 
 type Props = {
   content: string;
@@ -64,7 +65,13 @@ export function FormattedContent({
         block.type === "image" ? (
           <figure key={i} className="my-0">
             <img
-              src={block.url}
+              src={resizedImageUrl(block.url, 1200)}
+              srcSet={
+                canResizeRemoteImage(block.url)
+                  ? `${resizedImageUrl(block.url, 640)} 640w, ${resizedImageUrl(block.url, 1200)} 1200w`
+                  : undefined
+              }
+              sizes="(max-width: 768px) 100vw, 720px"
               alt={block.alt}
               className="max-w-full rounded-lg border border-border/60 bg-bg-card/30"
               loading="lazy"

@@ -3,8 +3,9 @@ import { prisma } from "@/lib/db";
 import { isAdmin, isApprovedVisitor } from "@/lib/auth";
 import { translateAndSaveThought } from "@/lib/thoughtTranslateAndSave";
 import { scheduleThoughtTranslationBackfill } from "@/lib/ensureThoughtTranslations";
+import { parseListLocale, toListView } from "@/lib/thoughtListView";
 
-export async function GET(_request: NextRequest) {
+export async function GET(request: NextRequest) {
   const admin = await isAdmin();
   if (!admin && !(await isApprovedVisitor())) {
     return NextResponse.json({ error: "需要访问许可" }, { status: 401 });
@@ -22,7 +23,11 @@ export async function GET(_request: NextRequest) {
     },
   });
   scheduleThoughtTranslationBackfill(thoughts);
-  return NextResponse.json(thoughts);
+  const params = request.nextUrl.searchParams;
+  const locale = parseListLocale(params.get("locale"));
+  if (!locale) return NextResponse.json(thoughts);
+  const excerpt = params.get("excerpt") === "1";
+  return NextResponse.json(thoughts.map((thought) => toListView(thought, locale, { excerpt })));
 }
 
 export async function POST(request: NextRequest) {

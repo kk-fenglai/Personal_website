@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { canResizeRemoteImage } from "@/lib/photoUrl";
 
 type PhotoImageProps = {
   src: string;
@@ -11,7 +12,7 @@ type PhotoImageProps = {
   priority?: boolean;
 };
 
-/** 远程图（Vercel Blob 等）用原生 img，避免 next/image 域名白名单导致前台不显示 */
+/** Blob 上的图交给 next/image 按显示尺寸缩放；白名单之外的远程图只能用原生 img */
 export function PhotoImage({
   src,
   alt,
@@ -20,7 +21,7 @@ export function PhotoImage({
   sizes,
   priority,
 }: PhotoImageProps) {
-  const isRemote = /^https?:\/\//i.test(src);
+  const isRemote = /^https?:\/\//i.test(src) && !(fill && canResizeRemoteImage(src));
 
   if (isRemote) {
     if (fill) {
