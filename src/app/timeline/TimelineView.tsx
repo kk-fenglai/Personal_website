@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import Link from "next/link";
 import { PhotoImage } from "@/components/PhotoImage";
 import { useLocale } from "@/contexts/LocaleContext";
@@ -8,6 +8,7 @@ import { pickThoughtContent, pickThoughtTitle } from "@/lib/pickThoughtLocale";
 import { plainTextExcerpt } from "@/lib/stitchPlaceholders";
 import {
   buildTimeline,
+  limitTimeline,
   type TimelineEntry,
   type TimelineFilter,
   type TimelinePhoto,
@@ -22,6 +23,8 @@ type Thought = {
 
 const MAX_THUMBS = 3;
 const EXCERPT_LENGTH = 90;
+/** 一次渲染多少条，滚动到底部附近再加一批 */
+const BATCH_SIZE = 40;
 
 async function fetchList<T>(url: string): Promise<T[]> {
   try {
@@ -37,6 +40,11 @@ export function TimelineView() {
   const { t, locale, dateLocale } = useLocale();
   const [data, setData] = useState<{ thoughts: Thought[]; photos: TimelinePhoto[] } | null>(null);
   const [filter, setFilter] = useState<TimelineFilter>("all");
+  const [shown, setShown] = useState<{ filter: TimelineFilter; count: number }>({
+    filter: "all",
+    count: BATCH_SIZE,
+  });
+  const sentinel = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     void Promise.all([
@@ -45,11 +53,32 @@ export function TimelineView() {
     ]).then(([thoughts, photos]) => setData({ thoughts, photos }));
   }, [locale]);
 
-  const years = useMemo(() => {
+  const allYears = useMemo(() => {
     if (!data) return [];
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     return buildTimeline(data.thoughts, data.photos, timeZone, filter);
   }, [data, filter]);
+  const { years, hasMore } = useMemo(
+    () => limitTimeline(allYears, shown.filter === filter ? shown.count : BATCH_SIZE),
+    [allYears, shown, filter]
+  );
+
+  useEffect(() => {
+    const node = sentinel.current;
+    if (!node || !hasMore) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        setShown((prev) => ({
+          filter,
+          count: (prev.filter === filter ? prev.count : BATCH_SIZE) + BATCH_SIZE,
+        }));
+      },
+      { rootMargin: "1200px 0px" }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [hasMore, filter, years]);
 
   const monthName = useMemo(() => {
     const format = new Intl.DateTimeFormat(dateLocale, { month: "long", timeZone: "UTC" });
@@ -156,6 +185,7 @@ export function TimelineView() {
           </div>
         </section>
       ))}
+      <div ref={sentinel} aria-hidden />
     </>
   );
 }

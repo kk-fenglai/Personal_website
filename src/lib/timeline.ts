@@ -87,3 +87,28 @@ export function buildTimeline(
   }
   return years;
 }
+
+/** 只保留最新的 maxEntries 条用于渲染；每年的统计数字仍是全量的 */
+export function limitTimeline(
+  years: TimelineYear[],
+  maxEntries: number
+): { years: TimelineYear[]; hasMore: boolean } {
+  let remaining = maxEntries;
+  const kept: TimelineYear[] = [];
+  for (const year of years) {
+    if (remaining <= 0) break;
+    const months: TimelineMonth[] = [];
+    for (const month of year.months) {
+      if (remaining <= 0) break;
+      const entries = month.entries.slice(0, remaining);
+      remaining -= entries.length;
+      months.push({ ...month, entries });
+    }
+    kept.push({ ...year, months });
+  }
+  const total = years.reduce(
+    (sum, year) => sum + year.months.reduce((n, month) => n + month.entries.length, 0),
+    0
+  );
+  return { years: kept, hasMore: total > maxEntries };
+}

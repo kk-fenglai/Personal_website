@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { createPortal } from "react-dom";
 import { PhotoImage } from "@/components/PhotoImage";
 import { ScrollReveal } from "@/components/ScrollReveal";
@@ -17,8 +17,8 @@ type Photo = {
   createdAt: string;
 };
 
-/** /api/likes 一次最多接受 100 个 id */
-const LIKES_BATCH_SIZE = 100;
+/** 每页张数不能超过 /api/likes 一次接受的 100 个 id */
+const PAGE_SIZE = 24;
 
 function layoutForIndex(i: number): GalleryLayoutSpec {
   return GALLERY_LAYOUT_CYCLE[i % GALLERY_LAYOUT_CYCLE.length];
@@ -27,47 +27,72 @@ function layoutForIndex(i: number): GalleryLayoutSpec {
 export function GalleryView() {
   const { t, dateLocale } = useLocale();
   const [photos, setPhotos] = useState<Photo[]>([]);
+  const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [likeCounts, setLikeCounts] = useState<Record<string, number>>({});
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
+  const sentinel = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    fetch("/api/photos")
-      .then((res) => res.json())
-      .then((data) => {
-        setPhotos(Array.isArray(data) ? data : []);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+  const loadLikes = useCallback(async (ids: string[]) => {
+    if (ids.length === 0) return;
+    const query = new URLSearchParams({ targetType: "photo", ids: ids.join(",") });
+    const data = await fetch(`/api/likes?${query}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .catch(() => null);
+    setLikeCounts((prev) => {
+      const next = { ...prev };
+      for (const id of ids) next[id] = data?.counts?.[id] ?? 0;
+      return next;
+    });
+    if (Array.isArray(data?.liked)) {
+      setLikedIds((prev) => new Set([...prev, ...data.liked]));
+    }
   }, []);
 
+  const loadPage = useCallback(
+    async (offset: number) => {
+      const data = await fetch(`/api/photos?limit=${PAGE_SIZE}&offset=${offset}`)
+        .then((res) => res.json())
+        .catch(() => null);
+      const items: Photo[] = Array.isArray(data?.items) ? data.items : [];
+      setPhotos((prev) => {
+        const seen = new Set(prev.map((p) => p.id));
+        return [...prev, ...items.filter((p) => !seen.has(p.id))];
+      });
+      setHasMore(data?.hasMore === true);
+      void loadLikes(items.map((p) => p.id));
+    },
+    [loadLikes]
+  );
+
   useEffect(() => {
-    if (photos.length === 0) return;
-    const ids = photos.map((p) => p.id);
-    const batches: string[][] = [];
-    for (let i = 0; i < ids.length; i += LIKES_BATCH_SIZE) {
-      batches.push(ids.slice(i, i + LIKES_BATCH_SIZE));
+    void loadPage(0).finally(() => setLoading(false));
+  }, [loadPage]);
+
+  const loadMore = useCallback(async () => {
+    if (!hasMore || loadingMore) return;
+    setLoadingMore(true);
+    try {
+      await loadPage(photos.length);
+    } finally {
+      setLoadingMore(false);
     }
-    Promise.all(
-      batches.map((batch) =>
-        fetch(`/api/likes?${new URLSearchParams({ targetType: "photo", ids: batch.join(",") })}`)
-          .then((res) => (res.ok ? res.json() : null))
-          .catch(() => null)
-      )
-    ).then((results) => {
-      const counts: Record<string, number> = {};
-      const liked = new Set<string>();
-      for (const id of ids) counts[id] = 0;
-      for (const data of results) {
-        if (!data) continue;
-        Object.assign(counts, data.counts ?? {});
-        for (const id of Array.isArray(data.liked) ? data.liked : []) liked.add(id);
-      }
-      setLikeCounts(counts);
-      setLikedIds(liked);
-    });
-  }, [photos]);
+  }, [hasMore, loadingMore, loadPage, photos.length]);
+
+  useEffect(() => {
+    const node = sentinel.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) void loadMore();
+      },
+      { rootMargin: "1200px 0px" }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [loadMore, loading]);
 
   const openLightbox = useCallback((index: number) => setLightboxIndex(index), []);
   const closeLightbox = useCallback(() => setLightboxIndex(null), []);
@@ -194,6 +219,12 @@ export function GalleryView() {
           );
         })}
       </section>
+      <div ref={sentinel} aria-hidden />
+      {loadingMore && (
+        <div className="site-container mx-auto py-12 text-center text-muted tabular-nums">
+          {t("gallery.loading")}
+        </div>
+      )}
 
       {current &&
         lightboxIndex !== null &&

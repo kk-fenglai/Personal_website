@@ -4,7 +4,8 @@ import { isAdmin, isApprovedVisitor } from "@/lib/auth";
 import { translateAndSaveThought } from "@/lib/thoughtTranslateAndSave";
 import { scheduleThoughtTranslationBackfill } from "@/lib/ensureThoughtTranslations";
 import { parseListLocale, toListView } from "@/lib/thoughtListView";
-import { parseThoughtPage, thoughtListWhere } from "@/lib/thoughtListQuery";
+import { parsePage } from "@/lib/paging";
+import { thoughtListWhere } from "@/lib/thoughtListQuery";
 
 export async function GET(request: NextRequest) {
   const admin = await isAdmin();
@@ -13,7 +14,7 @@ export async function GET(request: NextRequest) {
   }
   const params = request.nextUrl.searchParams;
   const where = thoughtListWhere(params, { admin });
-  const page = parseThoughtPage(params);
+  const page = parsePage(params);
   const [thoughts, total] = await Promise.all([
     prisma.thought.findMany({
       where,
