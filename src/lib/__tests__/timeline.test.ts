@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { buildTimeline } from "../timeline";
+import { buildTimeline, limitTimeline } from "../timeline";
 
 const thoughts = [
   { id: "t1", createdAt: "2026-11-22T03:00:00Z" },
@@ -49,4 +49,21 @@ test("buildTimeline filters by kind and drops empty years", () => {
 
 test("buildTimeline returns nothing for empty input", () => {
   assert.deepEqual(buildTimeline([], [], "UTC", "all"), []);
+});
+
+test("limitTimeline keeps the newest entries and the full yearly counts", () => {
+  const full = buildTimeline(thoughts, photos, "UTC", "all");
+  const total = full.flatMap((year) => year.months.flatMap((month) => month.entries)).length;
+  const limited = limitTimeline(full, 2);
+  const kept = limited.years.flatMap((year) => year.months.flatMap((month) => month.entries));
+  assert.equal(kept.length, 2);
+  assert.deepEqual(kept, full.flatMap((year) => year.months.flatMap((month) => month.entries)).slice(0, 2));
+  assert.equal(limited.hasMore, true);
+  assert.equal(limited.years[0].thoughtCount, full[0].thoughtCount);
+  assert.equal(limited.years[0].photoCount, full[0].photoCount);
+  assert.equal(limited.years.every((year) => year.months.every((month) => month.entries.length > 0)), true);
+
+  const all = limitTimeline(full, total);
+  assert.equal(all.hasMore, false);
+  assert.deepEqual(all.years, full);
 });

@@ -60,11 +60,11 @@ export function HomeView() {
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/photos").then((r) => r.json()),
+      fetch("/api/photos?limit=5").then((r) => r.json()),
       fetch("/api/site-images").then((r) => r.json()),
     ])
       .then(([pData, sData]) => {
-        setPhotos(Array.isArray(pData) ? pData : []);
+        setPhotos(Array.isArray(pData?.items) ? pData.items : []);
         setSiteImages(parseSiteImages(sData));
       })
       .catch(() => setSiteImages(EMPTY_SITE_IMAGES));
