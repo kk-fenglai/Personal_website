@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { canResizeRemoteImage, resizedImageUrl } from "../photoUrl";
+import { canResizeRemoteImage, resizedImageUrl, sizesForColumns } from "../photoUrl";
 
 const blob = "https://abc123.public.blob.vercel-storage.com/uploads/a b.jpg";
 
@@ -18,4 +18,13 @@ test("resizedImageUrl points blob images at the resizer and leaves other address
     `/_next/image?url=${encodeURIComponent(blob)}&w=1200&q=75`
   );
   assert.equal(resizedImageUrl("https://other.example/a.jpg", 1200), "https://other.example/a.jpg");
+});
+
+test("sizesForColumns turns a tile's desktop column span into an image width hint", () => {
+  assert.equal(
+    sizesForColumns("col-span-12 md:col-span-8 md:col-start-1"),
+    "(max-width: 768px) 100vw, min(67vw, 854px)"
+  );
+  assert.equal(sizesForColumns("col-span-12 md:col-span-4 md:col-start-9"), "(max-width: 768px) 100vw, min(34vw, 427px)");
+  assert.equal(sizesForColumns("col-span-12"), "(max-width: 768px) 100vw, min(100vw, 1280px)");
 });

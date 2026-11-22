@@ -21,3 +21,12 @@ export function resizedImageUrl(url: string, width: number): string {
   if (!canResizeRemoteImage(url)) return url;
   return `/_next/image?url=${encodeURIComponent(url)}&w=${width}&q=75`;
 }
+
+const CONTAINER_WIDTH_PX = 1280;
+
+/** 由栅格类名（如 "col-span-12 md:col-span-8"）算出图片在桌面宽度下实际占多宽 */
+export function sizesForColumns(cols: string): string {
+  const span = Number(cols.match(/md:col-span-(\d+)/)?.[1] ?? 12);
+  const share = span / 12;
+  return `(max-width: 768px) 100vw, min(${Math.ceil(share * 100)}vw, ${Math.ceil(share * CONTAINER_WIDTH_PX)}px)`;
+}
